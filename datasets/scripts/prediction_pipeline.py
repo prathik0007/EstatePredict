@@ -11,6 +11,45 @@ from sentence_transformers import SentenceTransformer
 model = joblib.load("../models/rental_price_model.pkl")
 # Load training dataset (only for column structure)
 training_df = pd.read_csv("../training_dataset.csv")
+city_map = {
+    "Bangalore": 0,
+    "Chennai": 1,
+    "Delhi": 2,
+    "Hyderabad": 3,
+    "Kolkata": 4,
+    "Mumbai": 5
+}
+
+area_type_map = {
+    "Super Area": 0,
+    "Carpet Area": 1,
+    "Built Area": 2
+}
+
+furnishing_map = {
+    "Unfurnished": 0,
+    "Semi-Furnished": 1,
+    "Furnished": 2
+}
+
+tenant_map = {
+    "Bachelors": 0,
+    "Family": 1,
+    "Anyone": 2
+}
+
+property_type_map = {
+    "Apartment": 0,
+    "House": 1,
+    "Villa": 2,
+    "Condominium": 3
+}
+
+room_type_map = {
+    "Entire home/apt": 0,
+    "Private room": 1,
+    "Shared room": 2
+}
 
 # Load MiniLM once
 text_model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -61,5 +100,41 @@ def predict_rent(
         verbose=0
     )
 
-    return (
+    # ------------------------
+    # Create Input DataFrame
+    # ------------------------
+
+    input_df = pd.DataFrame(
+        columns=training_df.columns.drop("Rent")
+    )
+
+    input_df.loc[0] = 0
+
+    # ------------------------
+    # Fill Tabular Features
+    # ------------------------
+
+    input_df.loc[0, "BHK"] = bhk
+    input_df.loc[0, "Size"] = size
+    input_df.loc[0, "Bathroom"] = bathroom
+    input_df.loc[0, "Bedrooms"] = bedrooms
+    input_df.loc[0, "Bathrooms_Airbnb"] = bathrooms_airbnb
+
+    # ------------------------
+    # Fill Encoded Categorical Features
+    # ------------------------
+
+    input_df.loc[0, "City"] = city_map[city]
+    input_df.loc[0, "Area Type"] = area_type_map[area_type]
+    input_df.loc[0, "Furnishing Status"] = furnishing_map[furnishing]
+    input_df.loc[0, "Tenant Preferred"] = tenant_map[tenant]
+    input_df.loc[0, "Property_Type"] = property_type_map[property_type]
+    input_df.loc[0, "Room_Type"] = room_type_map[room_type]
     
+    
+
+    # ------------------------
+    # Temporary Test
+    # ------------------------
+
+    return f"Input dataframe shape: {input_df.shape}"
