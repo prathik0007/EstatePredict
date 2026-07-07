@@ -3,12 +3,16 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
+from sympy import intervals
 from tensorflow.keras.applications import EfficientNetB0
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from sentence_transformers import SentenceTransformer
 
 # Load trained model
 model = joblib.load("../models/rental_price_model.pkl")
+
+# Load conformal model
+conformal_model = joblib.load("../models/conformal_model.pkl")
 # Load training dataset (only for column structure)
 training_df = pd.read_csv("../training_dataset.csv")
 city_map = {
@@ -154,6 +158,19 @@ def predict_rent(
     # Predict Rent
     # ------------------------
 
-    predicted_rent = model.predict(input_df)[0]
+    # ------------------------
+    # Predict Rent
+    # ------------------------
 
-    return f"Predicted Rent: ₹{predicted_rent:.2f} per month"
+    prediction, intervals = conformal_model.predict_interval(input_df)
+
+    predicted_rent = prediction[0]
+
+    lower_bound = intervals[0, 0, 0]
+    upper_bound = intervals[0, 1, 0]
+
+    return (
+    f"Predicted Rent : ₹{predicted_rent:.2f}\n\n"
+    f"95% Confidence Interval\n"
+    f"₹{lower_bound:.2f}  -  ₹{upper_bound:.2f}"
+)
