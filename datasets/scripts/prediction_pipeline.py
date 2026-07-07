@@ -80,6 +80,7 @@ def predict_rent(
     # ------------------------
 
     text_embedding = text_model.encode([description])
+    print("Text embedding shape:", text_embedding.shape)
 
     # ------------------------
     # Image Features
@@ -104,12 +105,12 @@ def predict_rent(
     # Create Input DataFrame
     # ------------------------
 
+    feature_columns = training_df.columns.drop("Rent")
+
     input_df = pd.DataFrame(
-        columns=training_df.columns.drop("Rent")
+    np.zeros((1, len(feature_columns)), dtype=np.float32),
+    columns=feature_columns
     )
-
-    input_df.loc[0] = 0
-
     # ------------------------
     # Fill Tabular Features
     # ------------------------
@@ -130,11 +131,29 @@ def predict_rent(
     input_df.loc[0, "Tenant Preferred"] = tenant_map[tenant]
     input_df.loc[0, "Property_Type"] = property_type_map[property_type]
     input_df.loc[0, "Room_Type"] = room_type_map[room_type]
-    
-    
+
+    # ------------------------
+    # Fill Text Embeddings
+    # ------------------------
+
+    for i in range(384):
+        input_df.loc[0, f"Embedding_{i}"] = text_embedding[0][i]
+        
+    # ------------------------
+    # Fill Image Features
+    # ------------------------
+
+    for i in range(1280):
+        input_df.loc[0, f"Image_Feature_{i}"] = image_features[0][i]
 
     # ------------------------
     # Temporary Test
     # ------------------------
 
-    return f"Input dataframe shape: {input_df.shape}"
+    # ------------------------
+    # Predict Rent
+    # ------------------------
+
+    predicted_rent = model.predict(input_df)[0]
+
+    return f"Predicted Rent: ₹{predicted_rent:.2f} per month"
