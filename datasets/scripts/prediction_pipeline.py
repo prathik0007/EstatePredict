@@ -1,4 +1,6 @@
 import joblib
+import shap
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -13,6 +15,7 @@ model = joblib.load("../models/rental_price_model.pkl")
 
 # Load conformal model
 conformal_model = joblib.load("../models/conformal_model.pkl")
+explainer = joblib.load("../models/shap_explainer.pkl")
 # Load training dataset (only for column structure)
 training_df = pd.read_csv("../training_dataset.csv")
 city_map = {
@@ -163,6 +166,29 @@ def predict_rent(
     # ------------------------
 
     prediction, intervals = conformal_model.predict_interval(input_df)
+    
+    # ------------------------
+    # SHAP Explanation
+    # ------------------------
+
+    shap_values = explainer.shap_values(input_df)
+    plt.figure(figsize=(10, 6))
+
+    shap.plots.bar(
+    shap.Explanation(
+        values=shap_values[0],
+        base_values=explainer.expected_value,
+        data=input_df.iloc[0],
+        feature_names=input_df.columns
+    ),
+    show=False
+)
+
+    plt.tight_layout()
+
+    plt.savefig("../results/shap_bar.png")
+
+    plt.close()
 
     predicted_rent = prediction[0]
 
