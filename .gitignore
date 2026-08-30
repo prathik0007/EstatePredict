@@ -31,3 +31,7 @@ build/
 
 # Logs
 *.log
+
+# Runtime uploaded files
+backend/uploads/*
+!backend/uploads/.gitkeep
