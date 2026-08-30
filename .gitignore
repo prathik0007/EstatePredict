@@ -35,3 +35,5 @@ build/
 # Runtime uploaded files
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+datasets/images/*
