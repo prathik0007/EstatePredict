@@ -195,8 +195,8 @@ def predict_rent(
     lower_bound = intervals[0, 0, 0]
     upper_bound = intervals[0, 1, 0]
 
-    return (
-    f"Predicted Rent : ₹{predicted_rent:.2f}\n\n"
-    f"95% Confidence Interval\n"
-    f"₹{lower_bound:.2f}  -  ₹{upper_bound:.2f}"
-)
+    return {
+    "predicted_rent": predicted_rent,
+    "lower_bound": lower_bound,
+    "upper_bound": upper_bound
+}

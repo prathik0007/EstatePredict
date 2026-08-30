@@ -1,7 +1,9 @@
 
 import streamlit as st
 import sys
+import os
 from pathlib import Path
+from PIL import Image
 
 # Allow importing from scripts/
 sys.path.append(str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -158,4 +160,26 @@ if predict:
         uploaded_image
     )
 
-    st.success(result)
+    st.subheader("🏠 Predicted Monthly Rent")
+    st.metric(
+    label="Predicted Rent",
+    value=f"₹{result['predicted_rent']:.2f}"
+)
+
+    st.subheader("📊 95% Confidence Interval")
+    st.info(
+    f"₹{result['lower_bound']:.2f}  –  ₹{result['upper_bound']:.2f}"
+)
+    # Display SHAP Plot
+
+    shap_plot_path = "../results/shap_bar.png"
+
+    if os.path.exists(shap_plot_path):
+
+        st.subheader("SHAP Explainability")
+
+        st.image(
+            shap_plot_path,
+            caption="Feature Importance using SHAP",
+            use_container_width=True
+        )
