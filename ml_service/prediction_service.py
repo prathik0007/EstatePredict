@@ -79,16 +79,17 @@ class RentalPredictor:
         self.model = joblib.load(model_path) if model_path.exists() else None
         self.conformal_model = joblib.load(conformal_path) if conformal_path.exists() else None
 
-        # EfficientNet is loaded only if an image is explicitly uploaded
+        # Image model is disabled by default for 512MB RAM free instances
+        self.enable_image_model = os.environ.get("ENABLE_IMAGE_MODEL", "false").lower() == "true"
         self.image_model = None
-        self.explainer = None
 
         # SHAP is optional and disabled by default on low-memory instances
         self.enable_shap = os.environ.get("ENABLE_SHAP", "false").lower() == "true"
+        self.explainer = None
         if self.enable_shap and shap_path.exists():
             self.explainer = joblib.load(shap_path)
 
-        print("Text embedding model disabled for ultra-low memory deployment (<512MB RAM).")
+        print("Text and image neural networks disabled for ultra-low memory deployment (<512MB RAM).")
         print("All lightweight ML components successfully initialized!")
 
     def predict(
@@ -110,8 +111,8 @@ class RentalPredictor:
         # 1. Text Embeddings (384 dimensions) - Zero vector lightweight baseline for 512MB RAM limit
         text_embedding = np.zeros((1, 384), dtype=np.float32)
 
-        # 2. Image Features (1280 dimensions) - Lazy loaded only when an image is provided
-        if image_file:
+        # 2. Image Features (1280 dimensions) - Zero vector fallback unless ENABLE_IMAGE_MODEL=true
+        if image_file and self.enable_image_model:
             try:
                 if self.image_model is None:
                     print("Loading EfficientNetB0 for image prediction on demand...")
