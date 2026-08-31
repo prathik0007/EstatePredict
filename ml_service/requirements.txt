@@ -9,3 +9,5 @@ tensorflow>=2.15.0
 sentence-transformers>=2.2.0
 MAPIE>=0.8.0
 shap>=0.44.0
+
+gunicorn>=21.2.0
