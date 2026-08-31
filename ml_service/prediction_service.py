@@ -6,10 +6,9 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-# Optional heavy libraries are loaded only when needed
+# Ensure clean environment and suppress verbose logs
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-
-from sentence_transformers import SentenceTransformer
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Resolve root datasets paths safely
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -64,7 +63,7 @@ ROOM_TYPE_MAP = {
 
 class RentalPredictor:
     def __init__(self):
-        print("Loading ML models and Neural Network extractors...")
+        print("Loading lightweight ML models...")
         
         # Load column matrix reference
         if TRAINING_DATA_PATH.exists():
@@ -73,7 +72,7 @@ class RentalPredictor:
         else:
             raise FileNotFoundError(f"Training dataset not found at {TRAINING_DATA_PATH}")
 
-        # Load models from datasets/models
+        # Load tabular prediction models from datasets/models
         model_path = MODELS_DIR / "rental_price_model.pkl"
         conformal_path = MODELS_DIR / "conformal_model.pkl"
         shap_path = MODELS_DIR / "shap_explainer.pkl"
@@ -81,18 +80,15 @@ class RentalPredictor:
         self.model = joblib.load(model_path) if model_path.exists() else None
         self.conformal_model = joblib.load(conformal_path) if conformal_path.exists() else None
 
-        # SHAP is optional because it consumes significant memory.
-        self.enable_shap = os.environ.get("ENABLE_SHAP", "false").lower() == "true"
+        # Heavy neural networks and explainers are lazy-loaded to keep memory < 512MB
+        self.text_model = None
+        self.image_model = None
         self.explainer = None
+
+        # SHAP is optional and disabled by default on low-memory instances
+        self.enable_shap = os.environ.get("ENABLE_SHAP", "false").lower() == "true"
         if self.enable_shap and shap_path.exists():
             self.explainer = joblib.load(shap_path)
-
-        # Load Neural Network feature extractors once
-        print("Loading SentenceTransformer (all-MiniLM-L6-v2)...")
-        self.text_model = SentenceTransformer("all-MiniLM-L6-v2")
-
-        # EfficientNet is loaded only when an image is actually uploaded.
-        self.image_model = None
 
         print("All lightweight ML components successfully initialized!")
 
@@ -112,17 +108,28 @@ class RentalPredictor:
         description="Modern apartment with good amenities",
         image_file=None
     ):
-        # 1. Text Embeddings (384 dimensions)
+        # 1. Text Embeddings (384 dimensions) - Lazy loaded on demand
         text_str = str(description).strip() if description else "Modern apartment with good amenities"
-        text_embedding = self.text_model.encode([text_str])
+        try:
+            if self.text_model is None:
+                print("Loading SentenceTransformer (all-MiniLM-L6-v2) on demand...")
+                from sentence_transformers import SentenceTransformer
+                self.text_model = SentenceTransformer("all-MiniLM-L6-v2")
+            text_embedding = self.text_model.encode([text_str])
+        except Exception as e:
+            print(f"Text embedding note/fallback: {e}")
+            text_embedding = np.zeros((1, 384), dtype=np.float32)
 
-        # 2. Image Features (1280 dimensions)
+        # 2. Image Features (1280 dimensions) - Lazy loaded only when image is provided
         if image_file:
             try:
-                # Load EfficientNet only when an image is actually provided.
                 if self.image_model is None:
-                    print("Loading EfficientNetB0 for image prediction...")
-                    from keras.applications.efficientnet import EfficientNetB0
+                    print("Loading EfficientNetB0 for image prediction on demand...")
+                    try:
+                        from tensorflow.keras.applications.efficientnet import EfficientNetB0
+                    except ImportError:
+                        from keras.applications.efficientnet import EfficientNetB0
+                    
                     self.image_model = EfficientNetB0(
                         weights="imagenet",
                         include_top=False,
@@ -138,14 +145,17 @@ class RentalPredictor:
                 img_array = np.array(img, dtype=np.float32)
                 img_array = np.expand_dims(img_array, axis=0)
 
-                from keras.applications.efficientnet import preprocess_input
+                try:
+                    from tensorflow.keras.applications.efficientnet import preprocess_input
+                except ImportError:
+                    from keras.applications.efficientnet import preprocess_input
+
                 img_array = preprocess_input(img_array)
 
                 image_features = self.image_model.predict(
                     img_array,
                     verbose=0
                 )
-
             except Exception as e:
                 print(f"Error processing image, using baseline zero features: {e}")
                 image_features = np.zeros((1, 1280), dtype=np.float32)
@@ -200,7 +210,7 @@ class RentalPredictor:
         lower_bound = max(1000.0, lower_bound)
         upper_bound = max(predicted_rent, upper_bound)
 
-        # 5. SHAP Explanation & Top Feature Factors
+        # 5. SHAP Explanation & Top Feature Factors (only if enabled)
         top_factors = []
         shap_saved = False
         try:
