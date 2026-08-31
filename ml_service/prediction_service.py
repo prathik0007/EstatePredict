@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-# Suppress verbose TensorFlow logs
+# Suppress verbose logs
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 # Resolve root datasets paths safely
@@ -79,9 +79,9 @@ class RentalPredictor:
         self.model = joblib.load(model_path) if model_path.exists() else None
         self.conformal_model = joblib.load(conformal_path) if conformal_path.exists() else None
 
-        # Image model is disabled by default for 512MB RAM free instances
-        self.enable_image_model = os.environ.get("ENABLE_IMAGE_MODEL", "false").lower() == "true"
+        # Heavy neural network dependencies are disabled for 512MB RAM environment
         self.image_model = None
+        self.text_model = None
 
         # SHAP is optional and disabled by default on low-memory instances
         self.enable_shap = os.environ.get("ENABLE_SHAP", "false").lower() == "true"
@@ -89,8 +89,46 @@ class RentalPredictor:
         if self.enable_shap and shap_path.exists():
             self.explainer = joblib.load(shap_path)
 
-        print("Text and image neural networks disabled for ultra-low memory deployment (<512MB RAM).")
+        print("Lightweight PIL image analysis enabled (no TensorFlow/PyTorch required).")
         print("All lightweight ML components successfully initialized!")
+
+    def analyze_image(self, image_file):
+        """
+        Lightweight image analysis using PIL/NumPy.
+        Does not load TensorFlow or EfficientNet.
+        """
+        try:
+            if hasattr(image_file, "seek"):
+                image_file.seek(0)
+
+            img = Image.open(image_file).convert("RGB")
+            img.thumbnail((224, 224))
+
+            img_array = np.asarray(img, dtype=np.float32)
+
+            # Basic image statistics
+            brightness = float(img_array.mean())
+            contrast = float(img_array.std())
+
+            # Avoid extreme influence
+            brightness_score = np.clip((brightness - 60) / 140, 0, 1)
+            contrast_score = np.clip((contrast - 20) / 80, 0, 1)
+
+            # Overall visual quality score
+            quality_score = (
+                0.6 * brightness_score +
+                0.4 * contrast_score
+            )
+
+            return {
+                "brightness": brightness,
+                "contrast": contrast,
+                "quality_score": float(quality_score)
+            }
+
+        except Exception as e:
+            print(f"Image analysis failed: {e}")
+            return None
 
     def predict(
         self,
@@ -108,50 +146,11 @@ class RentalPredictor:
         description="Modern apartment with good amenities",
         image_file=None
     ):
-        # 1. Text Embeddings (384 dimensions) - Zero vector lightweight baseline for 512MB RAM limit
+        # 1. Text Embeddings (384 dimensions) - Zero vector lightweight baseline
         text_embedding = np.zeros((1, 384), dtype=np.float32)
 
-        # 2. Image Features (1280 dimensions) - Zero vector fallback unless ENABLE_IMAGE_MODEL=true
-        if image_file and self.enable_image_model:
-            try:
-                if self.image_model is None:
-                    print("Loading EfficientNetB0 for image prediction on demand...")
-                    try:
-                        from tensorflow.keras.applications.efficientnet import EfficientNetB0
-                    except ImportError:
-                        from keras.applications.efficientnet import EfficientNetB0
-                    
-                    self.image_model = EfficientNetB0(
-                        weights="imagenet",
-                        include_top=False,
-                        pooling="avg"
-                    )
-
-                if hasattr(image_file, 'seek'):
-                    image_file.seek(0)
-
-                img = Image.open(image_file).convert("RGB")
-                img = img.resize((224, 224))
-
-                img_array = np.array(img, dtype=np.float32)
-                img_array = np.expand_dims(img_array, axis=0)
-
-                try:
-                    from tensorflow.keras.applications.efficientnet import preprocess_input
-                except ImportError:
-                    from keras.applications.efficientnet import preprocess_input
-
-                img_array = preprocess_input(img_array)
-
-                image_features = self.image_model.predict(
-                    img_array,
-                    verbose=0
-                )
-            except Exception as e:
-                print(f"Error processing image, using baseline zero features: {e}")
-                image_features = np.zeros((1, 1280), dtype=np.float32)
-        else:
-            image_features = np.zeros((1, 1280), dtype=np.float32)
+        # 2. Image Features (1280 dimensions) - Zero vector baseline for model input matrix
+        image_features = np.zeros((1, 1280), dtype=np.float32)
 
         # 3. Build Feature Matrix DataFrame
         input_df = pd.DataFrame(
@@ -196,6 +195,18 @@ class RentalPredictor:
             predicted_rent = 25000.0
             lower_bound = 20000.0
             upper_bound = 30000.0
+
+        # 4.5 Lightweight image influence using PIL/NumPy quality assessment
+        image_adjustment = 0.0
+        if image_file:
+            image_analysis = self.analyze_image(image_file)
+            if image_analysis:
+                quality_score = image_analysis["quality_score"]
+                # Maximum influence limited to ±5%
+                image_adjustment = (quality_score - 0.5) * 0.10
+                predicted_rent *= (1.0 + image_adjustment)
+                lower_bound *= (1.0 + image_adjustment)
+                upper_bound *= (1.0 + image_adjustment)
 
         # Ensure realistic positive lower bound
         lower_bound = max(1000.0, lower_bound)
@@ -257,7 +268,9 @@ class RentalPredictor:
             "upper_bound": round(upper_bound, 2),
             "confidence_level": "95%",
             "top_factors": top_factors[:5],
-            "shap_plot_saved": shap_saved
+            "shap_plot_saved": shap_saved,
+            "image_used": image_file is not None,
+            "image_adjustment_percent": round(image_adjustment * 100, 2)
         }
 
 # Singleton instance for the service
