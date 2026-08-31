@@ -19,7 +19,7 @@ def health_check():
             "rental_price_model": predictor.model is not None,
             "conformal_model": predictor.conformal_model is not None,
             "shap_explainer": predictor.explainer is not None,
-            "text_embedding_model": predictor.text_model is not None,
+            "text_embedding_model": False,
             "image_feature_model": predictor.image_model is not None
         }
     }), 200

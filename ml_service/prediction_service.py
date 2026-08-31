@@ -6,9 +6,8 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-# Ensure clean environment and suppress verbose logs
+# Suppress verbose TensorFlow logs
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Resolve root datasets paths safely
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,8 +79,7 @@ class RentalPredictor:
         self.model = joblib.load(model_path) if model_path.exists() else None
         self.conformal_model = joblib.load(conformal_path) if conformal_path.exists() else None
 
-        # Heavy neural networks and explainers are lazy-loaded to keep memory < 512MB
-        self.text_model = None
+        # EfficientNet is loaded only if an image is explicitly uploaded
         self.image_model = None
         self.explainer = None
 
@@ -90,6 +88,7 @@ class RentalPredictor:
         if self.enable_shap and shap_path.exists():
             self.explainer = joblib.load(shap_path)
 
+        print("Text embedding model disabled for ultra-low memory deployment (<512MB RAM).")
         print("All lightweight ML components successfully initialized!")
 
     def predict(
@@ -108,19 +107,10 @@ class RentalPredictor:
         description="Modern apartment with good amenities",
         image_file=None
     ):
-        # 1. Text Embeddings (384 dimensions) - Lazy loaded on demand
-        text_str = str(description).strip() if description else "Modern apartment with good amenities"
-        try:
-            if self.text_model is None:
-                print("Loading SentenceTransformer (all-MiniLM-L6-v2) on demand...")
-                from sentence_transformers import SentenceTransformer
-                self.text_model = SentenceTransformer("all-MiniLM-L6-v2")
-            text_embedding = self.text_model.encode([text_str])
-        except Exception as e:
-            print(f"Text embedding note/fallback: {e}")
-            text_embedding = np.zeros((1, 384), dtype=np.float32)
+        # 1. Text Embeddings (384 dimensions) - Zero vector lightweight baseline for 512MB RAM limit
+        text_embedding = np.zeros((1, 384), dtype=np.float32)
 
-        # 2. Image Features (1280 dimensions) - Lazy loaded only when image is provided
+        # 2. Image Features (1280 dimensions) - Lazy loaded only when an image is provided
         if image_file:
             try:
                 if self.image_model is None:
@@ -183,11 +173,11 @@ class RentalPredictor:
         input_df.loc[0, "Property_Type"] = PROPERTY_TYPE_MAP.get(property_type, 0)
         input_df.loc[0, "Room_Type"] = ROOM_TYPE_MAP.get(room_type, 0)
 
-        # Text embeddings (384)
+        # Text embeddings (384 dimensions: Embedding_0 to Embedding_383)
         for i in range(min(384, text_embedding.shape[1])):
             input_df.loc[0, f"Embedding_{i}"] = float(text_embedding[0][i])
 
-        # Image features (1280)
+        # Image features (1280 dimensions: Image_Feature_0 to Image_Feature_1279)
         for i in range(min(1280, image_features.shape[1])):
             input_df.loc[0, f"Image_Feature_{i}"] = float(image_features[0][i])
 
