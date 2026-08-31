@@ -6,15 +6,8 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-# Use Agg backend for headless matplotlib in background services
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import shap
-
-# Ensure tensorflow / keras runs cleanly
+# Optional heavy libraries are loaded only when needed
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
-from keras.applications.efficientnet import EfficientNetB0, preprocess_input
 
 from sentence_transformers import SentenceTransformer
 
@@ -87,19 +80,21 @@ class RentalPredictor:
 
         self.model = joblib.load(model_path) if model_path.exists() else None
         self.conformal_model = joblib.load(conformal_path) if conformal_path.exists() else None
-        self.explainer = joblib.load(shap_path) if shap_path.exists() else None
+
+        # SHAP is optional because it consumes significant memory.
+        self.enable_shap = os.environ.get("ENABLE_SHAP", "false").lower() == "true"
+        self.explainer = None
+        if self.enable_shap and shap_path.exists():
+            self.explainer = joblib.load(shap_path)
 
         # Load Neural Network feature extractors once
         print("Loading SentenceTransformer (all-MiniLM-L6-v2)...")
         self.text_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-        print("Loading EfficientNetB0...")
-        self.image_model = EfficientNetB0(
-            weights="imagenet",
-            include_top=False,
-            pooling="avg"
-        )
-        print("All ML components successfully initialized!")
+        # EfficientNet is loaded only when an image is actually uploaded.
+        self.image_model = None
+
+        print("All lightweight ML components successfully initialized!")
 
     def predict(
         self,
@@ -124,14 +119,33 @@ class RentalPredictor:
         # 2. Image Features (1280 dimensions)
         if image_file:
             try:
+                # Load EfficientNet only when an image is actually provided.
+                if self.image_model is None:
+                    print("Loading EfficientNetB0 for image prediction...")
+                    from keras.applications.efficientnet import EfficientNetB0
+                    self.image_model = EfficientNetB0(
+                        weights="imagenet",
+                        include_top=False,
+                        pooling="avg"
+                    )
+
                 if hasattr(image_file, 'seek'):
                     image_file.seek(0)
+
                 img = Image.open(image_file).convert("RGB")
                 img = img.resize((224, 224))
+
                 img_array = np.array(img, dtype=np.float32)
                 img_array = np.expand_dims(img_array, axis=0)
+
+                from keras.applications.efficientnet import preprocess_input
                 img_array = preprocess_input(img_array)
-                image_features = self.image_model.predict(img_array, verbose=0)
+
+                image_features = self.image_model.predict(
+                    img_array,
+                    verbose=0
+                )
+
             except Exception as e:
                 print(f"Error processing image, using baseline zero features: {e}")
                 image_features = np.zeros((1, 1280), dtype=np.float32)
@@ -190,7 +204,9 @@ class RentalPredictor:
         top_factors = []
         shap_saved = False
         try:
-            if self.explainer:
+            if self.enable_shap and self.explainer:
+                import shap
+
                 shap_vals = self.explainer.shap_values(input_df)
                 values = shap_vals[0] if isinstance(shap_vals, list) else shap_vals[0]
                 
@@ -209,6 +225,10 @@ class RentalPredictor:
 
                 # Save SHAP bar plot
                 try:
+                    import matplotlib
+                    matplotlib.use("Agg")
+                    import matplotlib.pyplot as plt
+
                     plt.figure(figsize=(10, 6))
                     shap.plots.bar(
                         shap.Explanation(
