@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshCw, Info } from 'lucide-react';
-import api from '../services/api';
+import mlApi from '../services/mlApi';
 
 const AiPriceEstimatorModal = ({
   isOpen,
@@ -45,7 +45,7 @@ const AiPriceEstimatorModal = ({
         data.append('image', imageFile);
       }
 
-      const res = await api.post('/ml/predict-rent', data, {
+      const res = await mlApi.post('/predict-rent', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
