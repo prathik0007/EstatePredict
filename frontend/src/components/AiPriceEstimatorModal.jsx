@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshCw, Info } from 'lucide-react';
 import mlApi from '../services/mlApi';
+import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
 
 const AiPriceEstimatorModal = ({
   isOpen,
@@ -155,23 +156,26 @@ const AiPriceEstimatorModal = ({
           <div className="ai-prediction-card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
               <div>
-                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Predicted Nightly Price
+                <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  PREDICTED NIGHTLY RENTAL PRICE
                 </span>
                 <div style={{ fontSize: '2rem', fontWeight: '900', color: '#0f172a', lineHeight: 1.2 }}>
-                  ${Number(predictionResult.predicted_rent).toLocaleString('en-US')}
-                  <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}> / night</span>
+                  ₹{usdToInr(predictionResult.predicted_rent).toLocaleString('en-IN')}
+                  <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>/night</span>
+                </div>
+                <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>
+                  USD: ${Number(predictionResult.predicted_rent).toFixed(2)}/night (1 USD = ₹{USD_TO_INR_RATE})
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                  <ShieldCheck size={12} /> Calibrated 95% Prediction Interval
+                <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: '800' }}>
+                  <ShieldCheck size={12} /> EMPIRICAL COVERAGE: 93.70%
                 </span>
-                <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#334155', marginTop: '4px' }}>
-                  ${Number(predictionResult.lower_bound).toLocaleString('en-US')} – ${Number(predictionResult.upper_bound).toLocaleString('en-US')}
+                <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#059669', marginTop: '4px' }}>
+                  Calibrated 95% Prediction Interval
                 </div>
-                <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>
-                  Empirical coverage: 93.70%
+                <div style={{ fontSize: '1rem', fontWeight: '800', color: '#334155', marginTop: '2px' }}>
+                  ₹{usdToInr(predictionResult.lower_bound).toLocaleString('en-IN')} – ₹{usdToInr(predictionResult.upper_bound).toLocaleString('en-IN')}
                 </div>
               </div>
             </div>

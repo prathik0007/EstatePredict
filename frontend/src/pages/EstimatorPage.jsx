@@ -12,6 +12,7 @@ import {
   Info
 } from 'lucide-react';
 import mlApi from '../services/mlApi';
+import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
 
 const EstimatorPage = () => {
   const [formData, setFormData] = useState({
@@ -236,15 +237,21 @@ const EstimatorPage = () => {
 
               {/* Main Predicted Nightly Price */}
               <div style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #c4b5fd', marginBottom: '20px' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#6d28d9', textTransform: 'uppercase' }}>
-                  Predicted Nightly Rental Price
-                </span>
-                <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
-                  ${Number(prediction.predicted_rent).toLocaleString('en-US')}
-                  <span style={{ fontSize: '1rem', fontWeight: '500', color: '#64748b' }}> /night</span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    PREDICTED NIGHTLY RENTAL PRICE
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>
+                    USD: ${Number(prediction.predicted_rent).toFixed(2)}/night
+                  </span>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                  Model: HistGradientBoostingRegressor (log1p target transform)
+                <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
+                  ₹{usdToInr(prediction.predicted_rent).toLocaleString('en-IN')}
+                  <span style={{ fontSize: '1rem', fontWeight: '500', color: '#64748b' }}>/night</span>
+                </div>
+                <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                  <span>Model: HistGradientBoostingRegressor (log1p target transform)</span>
+                  <span>Conversion rate: 1 USD = ₹{USD_TO_INR_RATE}</span>
                 </div>
               </div>
 
@@ -254,13 +261,15 @@ const EstimatorPage = () => {
                   <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <ShieldCheck size={16} /> Calibrated 95% Prediction Interval
                   </span>
-                  <span className="badge badge-success">Empirical coverage: 93.70%</span>
+                  <span className="badge badge-success" style={{ fontWeight: '800', letterSpacing: '0.03em' }}>
+                    EMPIRICAL COVERAGE: 93.70%
+                  </span>
                 </div>
-                <div style={{ fontSize: '1.15rem', fontWeight: '800', color: '#1e293b' }}>
-                  ${Number(prediction.lower_bound).toLocaleString('en-US')} – ${Number(prediction.upper_bound).toLocaleString('en-US')}
+                <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>
+                  ₹{usdToInr(prediction.lower_bound).toLocaleString('en-IN')} – ₹{usdToInr(prediction.upper_bound).toLocaleString('en-IN')}
                 </div>
                 <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px', lineHeight: '1.4' }}>
-                  Calibrated conformal interval derived on separate calibration partition (cutoff q̂ = 0.8606 on log scale). Evaluated on held-out Asheville test cohort.
+                  Calibrated conformal interval derived on separate calibration partition (cutoff q̂ = 0.8606 on log scale; USD range: ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}). Display converted to INR at 1 USD = ₹{USD_TO_INR_RATE}.
                 </p>
               </div>
 

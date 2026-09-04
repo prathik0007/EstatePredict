@@ -24,6 +24,7 @@ import MapViewer from '../components/MapViewer';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
+import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams();
@@ -314,20 +315,25 @@ const PropertyDetailsPage = () => {
                 border: '1px solid #c4b5fd'
               }}>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>AI Predicted Nightly Price</span>
-                  <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#6d28d9' }}>
-                    ${Number(property.predictedRentInfo.predictedRent).toLocaleString('en-US')}/night
+                  <span style={{ fontSize: '0.75rem', color: '#6d28d9', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    PREDICTED NIGHTLY RENTAL PRICE
+                  </span>
+                  <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a' }}>
+                    ₹{usdToInr(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}/night
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                    USD: ${Number(property.predictedRentInfo.predictedRent).toFixed(2)}/night (1 USD = ₹{USD_TO_INR_RATE})
                   </div>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Calibrated 95% Prediction Interval</span>
-                  <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a' }}>
-                    ${Number(property.predictedRentInfo.lowerBound).toLocaleString('en-US')} – ${Number(property.predictedRentInfo.upperBound).toLocaleString('en-US')}
+                  <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: '700' }}>Calibrated 95% Prediction Interval</span>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>
+                    ₹{usdToInr(property.predictedRentInfo.lowerBound).toLocaleString('en-IN')} – ₹{usdToInr(property.predictedRentInfo.upperBound).toLocaleString('en-IN')}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <span className="badge badge-success" style={{ fontSize: '0.75rem' }}>
-                    <ShieldCheck size={13} /> Empirical coverage: 93.70%
+                  <span className="badge badge-success" style={{ fontSize: '0.75rem', fontWeight: '800' }}>
+                    <ShieldCheck size={13} /> EMPIRICAL COVERAGE: 93.70%
                   </span>
                 </div>
               </div>
