@@ -117,7 +117,7 @@ const Navbar = () => {
 
         {/* Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {isAuthenticated ? (
+          {isAuthenticated && (
             <>
               {/* Notification Bell */}
               <div ref={notificationRef} style={{ position: 'relative' }}>
@@ -328,15 +328,6 @@ const Navbar = () => {
                 )}
               </div>
             </>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Link to="/login" className="btn btn-secondary btn-sm">
-                Log In
-              </Link>
-              <Link to="/register" className="btn btn-primary btn-sm">
-                Sign Up
-              </Link>
-            </div>
           )}
         </div>
       </div>
