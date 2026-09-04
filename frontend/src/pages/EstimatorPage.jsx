@@ -16,7 +16,7 @@ import { usdToInr, getInrPrice, USD_TO_INR_RATE } from '../utils/currency';
 
 const EstimatorPage = () => {
   const [formData, setFormData] = useState({
-    city: 'Downtown',
+    city: 'Mumbai',
     accommodates: 4,
     bedrooms: 2,
     bathrooms: 2,
@@ -113,14 +113,16 @@ const EstimatorPage = () => {
               <div className="form-group">
                 <label className="form-label">Neighborhood / Area</label>
                 <select name="city" value={formData.city} onChange={handleInputChange} className="form-select">
-                  <option value="Downtown">Downtown Asheville</option>
-                  <option value="Montford">Montford</option>
-                  <option value="West Asheville">West Asheville</option>
-                  <option value="Biltmore Village">Biltmore Village</option>
-                  <option value="Grove Park">Grove Park</option>
-                  <option value="River Arts District">River Arts District</option>
-                  <option value="North Asheville">North Asheville</option>
-                  <option value="South Asheville">South Asheville</option>
+                  <option value="Mumbai">Mumbai</option>
+                  <option value="Bengaluru">Bengaluru</option>
+                  <option value="Hyderabad">Hyderabad</option>
+                  <option value="Chennai">Chennai</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Kolkata">Kolkata</option>
+                  <option value="Pune">Pune</option>
+                  <option value="Ahmedabad">Ahmedabad</option>
+                  <option value="Jaipur">Jaipur</option>
+                  <option value="Lucknow">Lucknow</option>
                 </select>
               </div>
 

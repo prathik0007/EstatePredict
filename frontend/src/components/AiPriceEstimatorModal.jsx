@@ -11,7 +11,7 @@ const AiPriceEstimatorModal = ({
   onApplyPrice = null
 }) => {
   const [formData, setFormData] = useState({
-    city: initialData.city || 'Downtown',
+    city: initialData.city || 'Mumbai',
     accommodates: initialData.accommodates || 4,
     bedrooms: initialData.bedrooms || initialData.bhk || 2,
     bathrooms: initialData.bathrooms || initialData.bathroom || 2,
@@ -94,16 +94,18 @@ const AiPriceEstimatorModal = ({
         {/* Input Controls */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '16px' }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.75rem' }}>Neighborhood</label>
+            <label className="form-label" style={{ fontSize: '0.75rem' }}>Neighborhood / Area</label>
             <select name="city" value={formData.city} onChange={handleChange} className="form-select" style={{ padding: '0.5rem' }}>
-              <option value="Downtown">Downtown Asheville</option>
-              <option value="Montford">Montford</option>
-              <option value="West Asheville">West Asheville</option>
-              <option value="Biltmore Village">Biltmore Village</option>
-              <option value="Grove Park">Grove Park</option>
-              <option value="River Arts District">River Arts District</option>
-              <option value="North Asheville">North Asheville</option>
-              <option value="South Asheville">South Asheville</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Bengaluru">Bengaluru</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Kolkata">Kolkata</option>
+              <option value="Pune">Pune</option>
+              <option value="Ahmedabad">Ahmedabad</option>
+              <option value="Jaipur">Jaipur</option>
+              <option value="Lucknow">Lucknow</option>
             </select>
           </div>
 
