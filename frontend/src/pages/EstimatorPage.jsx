@@ -56,6 +56,9 @@ const EstimatorPage = () => {
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
+      if (formData.review_scores_rating !== undefined) {
+        data.append('rating', formData.review_scores_rating);
+      }
       if (imageFile) {
         data.append('image', imageFile);
       }
@@ -298,20 +301,27 @@ const EstimatorPage = () => {
                     SHAP values provide post-hoc model interpretation indicating relative feature impact on the log-price prediction.
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {prediction.top_factors.map((item, idx) => (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
-                        <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
-                        <span style={{
-                          fontWeight: '800',
-                          color: item.impact >= 0 ? '#15803d' : '#b91c1c',
-                          background: item.impact >= 0 ? '#dcfce7' : '#fee2e2',
-                          padding: '2px 8px',
-                          borderRadius: '6px'
-                        }}>
-                          {item.impact >= 0 ? `+${item.impact}` : `${item.impact}`}
-                        </span>
-                      </div>
-                    ))}
+                    {prediction.top_factors.map((item, idx) => {
+                      const impactNum = typeof item.impact === 'number' ? item.impact : parseFloat(item.impact);
+                      const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                      const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                      const isPositive = impactNum >= 0;
+
+                      return (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
+                          <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
+                          <span style={{
+                            fontWeight: '800',
+                            color: isPositive ? '#15803d' : '#b91c1c',
+                            background: isPositive ? '#dcfce7' : '#fee2e2',
+                            padding: '2px 8px',
+                            borderRadius: '6px'
+                          }}>
+                            {formattedVal}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

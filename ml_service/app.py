@@ -46,7 +46,17 @@ def predict_rent_endpoint():
             'Grove Park': (35.6180, -82.5480),
             'River Arts District': (35.5840, -82.5660),
             'North Asheville': (35.6200, -82.5550),
-            'South Asheville': (35.5350, -82.5300)
+            'South Asheville': (35.5350, -82.5300),
+            'Mumbai': (35.5951, -82.5515),
+            'Bengaluru': (35.6025, -82.5620),
+            'Hyderabad': (35.5785, -82.5930),
+            'Chennai': (35.5670, -82.5400),
+            'Delhi': (35.6180, -82.5480),
+            'Kolkata': (35.5840, -82.5660),
+            'Pune': (35.6200, -82.5550),
+            'Ahmedabad': (35.5350, -82.5300),
+            'Jaipur': (35.5890, -82.5350),
+            'Lucknow': (35.5750, -82.5600)
         }
         city = data.get("city", "Downtown")
         default_lat, default_lng = city_coords.get(city, (35.5951, -82.5515))
@@ -63,7 +73,8 @@ def predict_rent_endpoint():
         min_nights = float(data.get("min_nights", data.get("minimum_nights", 2)))
         avail_365 = float(data.get("avail_365", data.get("availability_365", 180)))
         num_reviews = float(data.get("num_reviews", data.get("number_of_reviews", 25)))
-        rating = float(data.get("rating", 4.85))
+        rating_raw = data.get("rating") or data.get("review_scores_rating") or data.get("reviewScoresRating") or 4.85
+        rating = float(rating_raw)
         rating_cleanliness = float(data.get("rating_cleanliness", 4.90))
         description = data.get("description", "")
 

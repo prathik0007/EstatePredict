@@ -41,6 +41,9 @@ const AiPriceEstimatorModal = ({
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
+      if (formData.review_scores_rating !== undefined) {
+        data.append('rating', formData.review_scores_rating);
+      }
       if (imageFile) {
         data.append('image', imageFile);
       }
@@ -198,20 +201,27 @@ const AiPriceEstimatorModal = ({
                   <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution:
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {predictionResult.top_factors.map((factor, idx) => (
-                    <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
-                      <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
-                      <span style={{
-                        fontWeight: '700',
-                        color: factor.impact >= 0 ? '#16a34a' : '#dc2626',
-                        background: factor.impact >= 0 ? '#dcfce7' : '#fee2e2',
-                        padding: '2px 8px',
-                        borderRadius: '4px'
-                      }}>
-                        {factor.impact >= 0 ? `+${factor.impact}` : `${factor.impact}`}
-                      </span>
-                    </div>
-                  ))}
+                  {predictionResult.top_factors.map((factor, idx) => {
+                    const impactNum = typeof factor.impact === 'number' ? factor.impact : parseFloat(factor.impact);
+                    const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                    const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                    const isPositive = impactNum >= 0;
+
+                    return (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
+                        <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
+                        <span style={{
+                          fontWeight: '700',
+                          color: isPositive ? '#16a34a' : '#dc2626',
+                          background: isPositive ? '#dcfce7' : '#fee2e2',
+                          padding: '2px 8px',
+                          borderRadius: '4px'
+                        }}>
+                          {formattedVal}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}

@@ -47,8 +47,11 @@ exports.predictRent = async (req, res) => {
     formData.append('min_nights', String(minNights || minimumNights || 2));
     formData.append('avail_365', String(avail365 || availability365 || 180));
     formData.append('num_reviews', String(numReviews || numberOfReviews || 25));
-    formData.append('rating', String(rating || 4.85));
+    const ratingVal = rating || req.body.review_scores_rating || req.body.reviewScoresRating || 4.85;
+    formData.append('rating', String(ratingVal));
+    formData.append('review_scores_rating', String(ratingVal));
     formData.append('rating_cleanliness', String(ratingCleanliness || 4.90));
+    if (req.body.city) formData.append('city', String(req.body.city));
     formData.append('description', description || 'Charming property in Asheville, NC with mountain views and modern amenities');
 
     // Attach image if uploaded

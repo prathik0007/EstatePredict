@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import HistGradientBoostingRegressor
+import shap
 
 # Resolve paths safely
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,6 +43,7 @@ class MultimodalV3Predictor:
         self.imputer = None
         self.scaler = None
         self.cat_ohe = None
+        self.explainer = None
         self.all_feature_names = []
         
         self._load_or_train_v3_pipeline()
@@ -58,6 +60,12 @@ class MultimodalV3Predictor:
                 self.cat_ohe = bundle['cat_ohe']
                 self.all_feature_names = bundle['feature_names']
                 self.q_conformal = bundle.get('q_conformal', 0.8606)
+                if self.model is not None:
+                    try:
+                        self.explainer = shap.TreeExplainer(self.model)
+                        print("Initialized SHAP TreeExplainer for V3 model bundle successfully.")
+                    except Exception as ex:
+                        print(f"Note initializing SHAP TreeExplainer: {ex}")
                 print("Loaded pre-cached Multimodal V3 model bundle successfully.")
                 return
             except Exception as e:
@@ -222,13 +230,34 @@ class MultimodalV3Predictor:
                 lower_bound_usd *= (1.0 + image_adjustment)
                 upper_bound_usd *= (1.0 + image_adjustment)
 
-        # 5. Top SHAP Key Value Drivers (Associative feature ranking)
+        # 5. Real SHAP Feature Attribution from V3 TreeExplainer pipeline
+        shap_dict = {}
+        if self.explainer is not None and self.model is not None:
+            try:
+                shap_res = self.explainer(X_input)
+                shap_vals = shap_res.values[0]
+                shap_dict = dict(zip(self.all_feature_names, shap_vals))
+            except Exception as e:
+                print(f"SHAP explanation calculation note: {e}")
+
+        def format_shap(v):
+            r = round(float(v), 2)
+            return 0.0 if abs(r) == 0.0 else r
+
+        accommodates_shap = float(shap_dict.get('Accommodates (Guests)', 0.0))
+        bathrooms_shap = float(shap_dict.get('Bathrooms', 0.0))
+        lat_shap = float(shap_dict.get('Latitude', 0.0))
+        lng_shap = float(shap_dict.get('Longitude', 0.0))
+        loc_shap = lat_shap + lng_shap
+        min_nights_shap = float(shap_dict.get('Minimum Nights', 0.0))
+        rating_shap = float(shap_dict.get('Overall Rating', 0.0))
+
         top_factors = [
-            {"feature": "Accommodates (Guests)", "impact": round(0.230 * (float(accommodates) - 3.5), 2)},
-            {"feature": "Bathrooms", "impact": round(0.101 * (float(bathrooms) - 1.5), 2)},
-            {"feature": "Location (Downtown Proximity)", "impact": round(0.085 * (35.60 - float(latitude)), 2)},
-            {"feature": "Minimum Nights", "impact": round(0.071 * (2.0 - float(min_nights)), 2)},
-            {"feature": "Overall Rating", "impact": round(0.057 * (float(rating) - 4.8), 2)}
+            {"feature": "Accommodates (Guests)", "impact": format_shap(accommodates_shap)},
+            {"feature": "Bathrooms", "impact": format_shap(bathrooms_shap)},
+            {"feature": "Location (Downtown Proximity)", "impact": format_shap(loc_shap)},
+            {"feature": "Minimum Nights", "impact": format_shap(min_nights_shap)},
+            {"feature": "Overall Rating", "impact": format_shap(rating_shap)}
         ]
         top_factors.sort(key=lambda x: abs(x["impact"]), reverse=True)
 
@@ -260,6 +289,18 @@ class MultimodalV3Predictor:
                 "median_interval_width_usd": 263.50
             },
             "top_factors": top_factors,
+            "shap_values": {
+                "Accommodates (Guests)": round(accommodates_shap, 4),
+                "Bathrooms": round(bathrooms_shap, 4),
+                "Location (Downtown Proximity)": round(loc_shap, 4),
+                "Latitude": round(lat_shap, 4),
+                "Longitude": round(lng_shap, 4),
+                "Minimum Nights": round(min_nights_shap, 4),
+                "Overall Rating": round(rating_shap, 4),
+                "Number of Reviews": round(float(shap_dict.get('Number of Reviews', 0.0)), 4),
+                "Cleanliness Rating": round(float(shap_dict.get('Cleanliness Rating', 0.0)), 4),
+                "Availability (365d)": round(float(shap_dict.get('Availability (365d)', 0.0)), 4)
+            },
             "image_used": image_file is not None,
             "metrics": {
                 "r2": 0.5318,
