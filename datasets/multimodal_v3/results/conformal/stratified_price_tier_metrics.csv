@@ -1,0 +1,4 @@
+Price_Tier,Sample_Count,Coverage_Pct,Mean_Width_USD,Median_Width_USD,MAE_USD
+High Price (> $185),90,86.67,547.85,461.6,173.33
+Low Price (<= $103),90,94.44,209.64,197.74,32.88
+Mid Price ($104 - $185),90,100.0,270.59,258.92,30.32

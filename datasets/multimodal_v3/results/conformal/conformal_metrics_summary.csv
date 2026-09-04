@@ -1,0 +1,2 @@
+Nominal_Coverage,Empirical_Coverage,Mean_Interval_Width,Median_Interval_Width,Test_MAE,Test_RMSE,Test_R2,Test_MAPE,Test_MedAE,Train_N,Calib_N,Test_N
+0.95,93.7,342.69,263.5,78.84,184.88,0.4294,34.89,31.76,1260,270,270

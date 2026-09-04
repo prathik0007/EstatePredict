@@ -1,0 +1,5 @@
+Model,Features,Feature_Dimension,MAE,RMSE,R2,MAPE,MedAE,Test_N
+HistGradientBoosting (Log1p),Tabular Only,23,74.07,158.64,0.5318,33.66,34.88,360
+HistGradientBoosting (Log1p),Tabular + Text,55,77.58,165.03,0.4933,35.19,35.88,360
+HistGradientBoosting (Log1p),Tabular + Image,87,79.59,174.16,0.4357,33.45,33.55,360
+HistGradientBoosting (Log1p),Full Multimodal,119,79.65,174.78,0.4316,34.17,35.93,360

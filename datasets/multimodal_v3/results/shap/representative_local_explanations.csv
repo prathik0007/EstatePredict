@@ -1,0 +1,4 @@
+Case,Listing_ID,Actual_Price_USD,Predicted_Price_USD,Top_Positive_Drivers,Top_Negative_Drivers
+Budget / Low-Tier Rental,6197585,71.0,57.59,Superhost: No (+0.018); Property: Private room in home (+0.013); Room Type: Entire home/apt (+0.009),Minimum Nights (-0.266); Accommodates (Guests) (-0.245); Bathrooms (-0.076)
+Median / Mid-Tier Rental,5114762,137.0,112.08,Accommodates (Guests) (+0.186); Beds (+0.031); Cleanliness Rating (+0.022),Bathrooms (-0.166); Number of Reviews (-0.157); Longitude (-0.049)
+Luxury / High-Tier Rental,934254553856369722,595.0,553.03,Number of Reviews (+0.559); Longitude (+0.382); Latitude (+0.175),Accommodates (Guests) (-0.056); Property: Other (-0.032); Bathrooms (-0.031)

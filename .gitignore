@@ -37,3 +37,6 @@ backend/uploads/*
 !backend/uploads/.gitkeep
 
 datasets/images/*
+
+datasets/multimodal_v3/images/
+datasets/multimodal_v3/features/*.npy
