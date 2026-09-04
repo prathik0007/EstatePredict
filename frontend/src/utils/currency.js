@@ -16,6 +16,24 @@ export const usdToInr = (usdAmount) => {
   return Math.round(Number(usdAmount) * USD_TO_INR_RATE);
 };
 
+export const getInrPrice = (item, field = 'predicted_rent') => {
+  if (item === null || item === undefined) return 0;
+  if (typeof item === 'number' || typeof item === 'string') {
+    return usdToInr(item);
+  }
+  if (field === 'predicted_rent' && item.predicted_price_inr) {
+    return Number(item.predicted_price_inr);
+  }
+  if (field === 'lower_bound' && (item.lower_bound_inr || item.prediction_interval?.lower_bound_inr)) {
+    return Number(item.lower_bound_inr || item.prediction_interval.lower_bound_inr);
+  }
+  if (field === 'upper_bound' && (item.upper_bound_inr || item.prediction_interval?.upper_bound_inr)) {
+    return Number(item.upper_bound_inr || item.prediction_interval.upper_bound_inr);
+  }
+  const rawVal = item[field] ?? item.predicted_price_usd ?? item.predictedRent ?? 0;
+  return usdToInr(rawVal);
+};
+
 /**
  * Formats an amount in INR with ₹ symbol and Indian numbering system (en-IN)
  * @param {number|string} inrAmount - Amount in INR

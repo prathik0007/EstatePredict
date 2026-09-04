@@ -232,11 +232,20 @@ class MultimodalV3Predictor:
         ]
         top_factors.sort(key=lambda x: abs(x["impact"]), reverse=True)
 
+        usd_to_inr_rate = float(os.environ.get("USD_TO_INR_RATE", 83.50))
+        predicted_price_inr = int(round(predicted_price_usd * usd_to_inr_rate))
+        lower_bound_inr = int(round(lower_bound_usd * usd_to_inr_rate))
+        upper_bound_inr = int(round(upper_bound_usd * usd_to_inr_rate))
+
         return {
             "predicted_rent": round(predicted_price_usd, 2),
             "predicted_price_usd": round(predicted_price_usd, 2),
             "lower_bound": round(lower_bound_usd, 2),
             "upper_bound": round(upper_bound_usd, 2),
+            "predicted_price_inr": predicted_price_inr,
+            "lower_bound_inr": lower_bound_inr,
+            "upper_bound_inr": upper_bound_inr,
+            "usd_to_inr_rate": usd_to_inr_rate,
             "unit": "USD/night",
             "model_name": "HistGradientBoostingRegressor (log1p)",
             "benchmark_dataset": "Asheville, NC Inside Airbnb (Dec 18, 2023 snapshot, 1,800 listings)",
@@ -245,6 +254,8 @@ class MultimodalV3Predictor:
                 "empirical_coverage": "93.70%",
                 "lower_bound_usd": round(lower_bound_usd, 2),
                 "upper_bound_usd": round(upper_bound_usd, 2),
+                "lower_bound_inr": lower_bound_inr,
+                "upper_bound_inr": upper_bound_inr,
                 "mean_interval_width_usd": 342.69,
                 "median_interval_width_usd": 263.50
             },

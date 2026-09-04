@@ -78,6 +78,11 @@ exports.predictRent = async (req, res) => {
     const lowerBound = Math.max(20, Math.round(estimated * 0.42));
     const upperBound = Math.round(estimated * 2.36);
 
+    const usdToInrRate = Number(process.env.USD_TO_INR_RATE) || 83.50;
+    const estimatedInr = Math.round(estimated * usdToInrRate);
+    const lowerBoundInr = Math.round(lowerBound * usdToInrRate);
+    const upperBoundInr = Math.round(upperBound * usdToInrRate);
+
     res.status(200).json({
       success: true,
       data: {
@@ -85,6 +90,10 @@ exports.predictRent = async (req, res) => {
         predicted_price_usd: estimated,
         lower_bound: lowerBound,
         upper_bound: upperBound,
+        predicted_price_inr: estimatedInr,
+        lower_bound_inr: lowerBoundInr,
+        upper_bound_inr: upperBoundInr,
+        usd_to_inr_rate: usdToInrRate,
         unit: 'USD/night',
         model_name: 'HistGradientBoostingRegressor (log1p)',
         benchmark_dataset: 'Asheville, NC Inside Airbnb (Dec 18, 2023 snapshot, 1,800 listings)',
@@ -93,6 +102,8 @@ exports.predictRent = async (req, res) => {
           empirical_coverage: '93.70%',
           lower_bound_usd: lowerBound,
           upper_bound_usd: upperBound,
+          lower_bound_inr: lowerBoundInr,
+          upper_bound_inr: upperBoundInr,
           mean_interval_width_usd: 342.69,
           median_interval_width_usd: 263.50
         },

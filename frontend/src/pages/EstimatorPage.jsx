@@ -12,7 +12,7 @@ import {
   Info
 } from 'lucide-react';
 import mlApi from '../services/mlApi';
-import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
+import { usdToInr, getInrPrice, USD_TO_INR_RATE } from '../utils/currency';
 
 const EstimatorPage = () => {
   const [formData, setFormData] = useState({
@@ -242,11 +242,11 @@ const EstimatorPage = () => {
                     PREDICTED NIGHTLY RENTAL PRICE
                   </span>
                   <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>
-                    USD: ${Number(prediction.predicted_rent).toFixed(2)}/night
+                    USD: ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)}/night
                   </span>
                 </div>
                 <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
-                  ₹{usdToInr(prediction.predicted_rent).toLocaleString('en-IN')}
+                  ₹{getInrPrice(prediction, 'predicted_rent').toLocaleString('en-IN')}
                   <span style={{ fontSize: '1rem', fontWeight: '500', color: '#64748b' }}>/night</span>
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
@@ -266,7 +266,7 @@ const EstimatorPage = () => {
                   </span>
                 </div>
                 <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>
-                  ₹{usdToInr(prediction.lower_bound).toLocaleString('en-IN')} – ₹{usdToInr(prediction.upper_bound).toLocaleString('en-IN')}
+                  ₹{getInrPrice(prediction, 'lower_bound').toLocaleString('en-IN')} – ₹{getInrPrice(prediction, 'upper_bound').toLocaleString('en-IN')}
                 </div>
                 <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px', lineHeight: '1.4' }}>
                   Calibrated conformal interval derived on separate calibration partition (cutoff q̂ = 0.8606 on log scale; USD range: ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}). Display converted to INR at 1 USD = ₹{USD_TO_INR_RATE}.
