@@ -15,7 +15,10 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const redirectPath = location.state?.from?.pathname || '/';
+  const fromLocation = location.state?.from;
+  const redirectTarget = fromLocation
+    ? (typeof fromLocation === 'string' ? fromLocation : ((fromLocation.pathname || '/') + (fromLocation.search || '')))
+    : null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,10 +29,16 @@ const LoginPage = () => {
       const user = await login(email, password);
       showToast(`Welcome back, ${user.name}!`, 'success');
 
-      // Redirect based on role
-      if (user.role === 'owner') navigate('/owner/dashboard');
-      else if (user.role === 'admin') navigate('/admin/dashboard');
-      else navigate(redirectPath);
+      // If user came from a protected feature/route, redirect there; otherwise use role default
+      if (redirectTarget) {
+        navigate(redirectTarget);
+      } else if (user.role === 'owner') {
+        navigate('/owner/dashboard');
+      } else if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid email or password');
     } finally {
@@ -162,7 +171,7 @@ const LoginPage = () => {
 
         <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.875rem', color: '#64748b' }}>
           Don't have an account yet?{' '}
-          <Link to="/register" style={{ color: '#3b82f6', fontWeight: '700' }}>
+          <Link to="/register" state={{ from: location.state?.from }} style={{ color: '#3b82f6', fontWeight: '700' }}>
             Create Account
           </Link>
         </div>

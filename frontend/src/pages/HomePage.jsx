@@ -11,7 +11,8 @@ import {
   ArrowRight,
   SlidersHorizontal,
   Home,
-  CheckCircle2
+  CheckCircle2,
+  Lock
 } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import MapViewer from '../components/MapViewer';
@@ -28,6 +29,11 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
     const fetchFeatured = async () => {
       try {
         const res = await api.get('/properties?limit=6');
@@ -42,19 +48,28 @@ const HomePage = () => {
     };
 
     fetchFeatured();
-  }, []);
+  }, [isAuthenticated]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
     const params = new URLSearchParams();
     if (searchCity !== 'All') params.append('city', searchCity);
     if (searchBedrooms !== 'All') params.append('bedrooms', searchBedrooms);
     if (searchQuery.trim()) params.append('search', searchQuery.trim());
-    navigate(`/properties?${params.toString()}`);
+    const queryStr = params.toString() ? `?${params.toString()}` : '';
+
+    if (!isAuthenticated) {
+      navigate('/login', {
+        state: {
+          from: {
+            pathname: '/properties',
+            search: queryStr
+          }
+        }
+      });
+      return;
+    }
+    navigate(`/properties${queryStr}`);
   };
 
   return (
@@ -117,70 +132,129 @@ const HomePage = () => {
               Direct connection between verified hosts and guests with calibrated 95% prediction intervals and SHAP feature explainability.
             </p>
 
-            {/* Hero Quick Search Box */}
-            <form onSubmit={handleSearchSubmit} style={{
-              background: '#ffffff',
-              padding: '12px',
-              borderRadius: '16px',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr)) auto',
-              gap: '10px',
-              alignItems: 'center'
-            }}>
-              {/* Neighborhood selector */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
-                <MapPin size={18} color="#3b82f6" />
-                <select
-                  value={searchCity}
-                  onChange={(e) => setSearchCity(e.target.value)}
-                  style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
-                >
-                  <option value="All">All Neighborhoods</option>
-                  <option value="Downtown">Downtown Asheville</option>
-                  <option value="Montford">Montford</option>
-                  <option value="West Asheville">West Asheville</option>
-                  <option value="Biltmore Village">Biltmore Village</option>
-                  <option value="Grove Park">Grove Park</option>
-                  <option value="River Arts District">River Arts District</option>
-                  <option value="North Asheville">North Asheville</option>
-                  <option value="South Asheville">South Asheville</option>
-                </select>
+            {/* Hero Section Content: Auth Gate if logged out, Search Form if logged in */}
+            {!isAuthenticated ? (
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.08)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid rgba(255, 255, 255, 0.18)',
+                borderRadius: '16px',
+                padding: '36px 28px',
+                maxWidth: '640px',
+                margin: '0 auto',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '50%',
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  color: '#60a5fa',
+                  marginBottom: '16px'
+                }}>
+                  <Lock size={26} />
+                </div>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#ffffff', marginBottom: '8px', letterSpacing: '-0.01em' }}>
+                  Sign in to Access the Rental Application
+                </h3>
+                <p style={{ fontSize: '0.95rem', color: '#cbd5e1', marginBottom: '24px', lineHeight: '1.6', maxWidth: '480px', margin: '0 auto 24px' }}>
+                  Authentication is required to search verified rental properties, view nightly rates, and use the AI Rent Estimator.
+                </p>
+                <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <Link
+                    to="/login"
+                    state={{ from: { pathname: '/' } }}
+                    className="btn btn-primary btn-lg"
+                    style={{ minWidth: '150px', fontWeight: '700' }}
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    to="/register"
+                    state={{ from: { pathname: '/' } }}
+                    className="btn btn-outline-primary btn-lg"
+                    style={{
+                      minWidth: '150px',
+                      fontWeight: '700',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      borderColor: 'rgba(255, 255, 255, 0.3)',
+                      color: '#ffffff'
+                    }}
+                  >
+                    Sign Up
+                  </Link>
+                </div>
               </div>
+            ) : (
+              <form onSubmit={handleSearchSubmit} style={{
+                background: '#ffffff',
+                padding: '12px',
+                borderRadius: '16px',
+                boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr)) auto',
+                gap: '10px',
+                alignItems: 'center'
+              }}>
+                {/* Neighborhood selector */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
+                  <MapPin size={18} color="#3b82f6" />
+                  <select
+                    value={searchCity}
+                    onChange={(e) => setSearchCity(e.target.value)}
+                    style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
+                  >
+                    <option value="All">All Neighborhoods</option>
+                    <option value="Downtown">Downtown Asheville</option>
+                    <option value="Montford">Montford</option>
+                    <option value="West Asheville">West Asheville</option>
+                    <option value="Biltmore Village">Biltmore Village</option>
+                    <option value="Grove Park">Grove Park</option>
+                    <option value="River Arts District">River Arts District</option>
+                    <option value="North Asheville">North Asheville</option>
+                    <option value="South Asheville">South Asheville</option>
+                  </select>
+                </div>
 
-              {/* Bedrooms selector */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
-                <Home size={18} color="#3b82f6" />
-                <select
-                  value={searchBedrooms}
-                  onChange={(e) => setSearchBedrooms(e.target.value)}
-                  style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
-                >
-                  <option value="All">Any Bedrooms</option>
-                  <option value="1">1 Bedroom</option>
-                  <option value="2">2 Bedrooms</option>
-                  <option value="3">3 Bedrooms</option>
-                  <option value="4">4+ Bedrooms</option>
-                </select>
-              </div>
+                {/* Bedrooms selector */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
+                  <Home size={18} color="#3b82f6" />
+                  <select
+                    value={searchBedrooms}
+                    onChange={(e) => setSearchBedrooms(e.target.value)}
+                    style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
+                  >
+                    <option value="All">Any Bedrooms</option>
+                    <option value="1">1 Bedroom</option>
+                    <option value="2">2 Bedrooms</option>
+                    <option value="3">3 Bedrooms</option>
+                    <option value="4">4+ Bedrooms</option>
+                  </select>
+                </div>
 
-              {/* Keyword text search */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
-                <Search size={18} color="#94a3b8" />
-                <input
-                  type="text"
-                  placeholder="Neighborhood, title or keyword..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '500', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
-                />
-              </div>
+                {/* Keyword text search */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
+                  <Search size={18} color="#94a3b8" />
+                  <input
+                    type="text"
+                    placeholder="Neighborhood, title or keyword..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '500', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
+                  />
+                </div>
 
-              {/* Search Action Button */}
-              <button type="submit" className="btn btn-primary btn-lg" style={{ height: '100%' }}>
-                <Search size={18} /> Search
-              </button>
-            </form>
+                {/* Search Action Button */}
+                <button type="submit" className="btn btn-primary btn-lg" style={{ height: '100%' }}>
+                  <Search size={18} /> Search
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
@@ -237,56 +311,61 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Properties Section */}
-      <section style={{ padding: '64px 0' }}>
-        <div className="container">
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
-            <div>
-              <span style={{ fontSize: '0.825rem', fontWeight: '700', color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                Top Handpicked Listings
-              </span>
-              <h2 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginTop: '4px' }}>
-                Featured Properties For Rent
-              </h2>
-            </div>
-            <Link to="/properties" className="btn btn-outline-primary" style={{ fontWeight: '700' }}>
-              Browse All Listings <ArrowRight size={16} />
-            </Link>
-          </div>
+      {/* Application Content: Only accessible when logged in */}
+      {isAuthenticated && (
+        <>
+          {/* Featured Properties Section */}
+          <section style={{ padding: '64px 0' }}>
+            <div className="container">
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <span style={{ fontSize: '0.825rem', fontWeight: '700', color: '#3b82f6', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    Top Handpicked Listings
+                  </span>
+                  <h2 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginTop: '4px' }}>
+                    Featured Properties For Rent
+                  </h2>
+                </div>
+                <Link to="/properties" className="btn btn-outline-primary" style={{ fontWeight: '700' }}>
+                  Browse All Listings <ArrowRight size={16} />
+                </Link>
+              </div>
 
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b', fontWeight: '600' }}>
-              Loading properties...
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '60px 0', color: '#64748b', fontWeight: '600' }}>
+                  Loading properties...
+                </div>
+              ) : properties.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8' }}>
+                  No properties found.
+                </div>
+              ) : (
+                <div className="grid-properties">
+                  {properties.map((prop) => (
+                    <PropertyCard key={prop._id} property={prop} />
+                  ))}
+                </div>
+              )}
             </div>
-          ) : properties.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8' }}>
-              No properties found.
-            </div>
-          ) : (
-            <div className="grid-properties">
-              {properties.map((prop) => (
-                <PropertyCard key={prop._id} property={prop} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+          </section>
 
-      {/* Interactive Map Explorer Preview */}
-      <section style={{ padding: '40px 0 80px', background: '#f1f5f9' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '650px', margin: '0 auto 32px' }}>
-            <h2 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a' }}>
-              Explore Properties on OpenStreetMap
-            </h2>
-            <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
-              View verified Airbnb properties across Asheville, NC (Downtown, Montford, West Asheville, Biltmore Village) directly on Leaflet.js
-            </p>
-          </div>
+          {/* Interactive Map Explorer Preview */}
+          <section style={{ padding: '40px 0 80px', background: '#f1f5f9' }}>
+            <div className="container">
+              <div style={{ textAlign: 'center', maxWidth: '650px', margin: '0 auto 32px' }}>
+                <h2 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a' }}>
+                  Explore Properties on OpenStreetMap
+                </h2>
+                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
+                  View verified Airbnb properties across Asheville, NC (Downtown, Montford, West Asheville, Biltmore Village) directly on Leaflet.js
+                </p>
+              </div>
 
-          <MapViewer properties={properties} height="480px" />
-        </div>
-      </section>
+              <MapViewer properties={properties} height="480px" />
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 };

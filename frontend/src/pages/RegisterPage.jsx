@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Building2, UserPlus, Lock, Mail, User, Phone, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
@@ -16,6 +16,12 @@ const RegisterPage = () => {
   const { register } = useAuth();
   const { showToast } = useNotification();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const fromLocation = location.state?.from;
+  const redirectTarget = fromLocation
+    ? (typeof fromLocation === 'string' ? fromLocation : ((fromLocation.pathname || '/') + (fromLocation.search || '')))
+    : null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,8 +32,13 @@ const RegisterPage = () => {
       const user = await register({ name, email, password, phone, role });
       showToast(`Account created successfully! Welcome, ${user.name}`, 'success');
 
-      if (user.role === 'owner') navigate('/owner/dashboard');
-      else navigate('/');
+      if (redirectTarget) {
+        navigate(redirectTarget);
+      } else if (user.role === 'owner') {
+        navigate('/owner/dashboard');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
@@ -195,7 +206,7 @@ const RegisterPage = () => {
 
         <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.875rem', color: '#64748b' }}>
           Already have an account?{' '}
-          <Link to="/login" style={{ color: '#3b82f6', fontWeight: '700' }}>
+          <Link to="/login" state={{ from: location.state?.from }} style={{ color: '#3b82f6', fontWeight: '700' }}>
             Sign In
           </Link>
         </div>

@@ -33,18 +33,22 @@ async function runE2ETests() {
     console.log('✔ [4/8] Tenant Authentication successful! (Token generated)');
 
     // 4. ML Rental Price Prediction (Multimodal Simulation)
-    const predictionRes = await axios.post(`${API_URL}/ml/predict-rent`, {
-      city: 'Bangalore',
-      bhk: 2,
-      size: 1200,
-      bathroom: 2,
-      areaType: 'Super Area',
-      furnishingStatus: 'Semi-Furnished',
-      tenantPreferred: 'Anyone',
-      propertyType: 'Apartment',
-      roomType: 'Entire home/apt',
-      description: 'Spacious 2 BHK near IT tech parks with covered parking and power backup'
-    });
+    const predictionRes = await axios.post(
+      `${API_URL}/ml/predict-rent`,
+      {
+        city: 'Bangalore',
+        bhk: 2,
+        size: 1200,
+        bathroom: 2,
+        areaType: 'Super Area',
+        furnishingStatus: 'Semi-Furnished',
+        tenantPreferred: 'Anyone',
+        propertyType: 'Apartment',
+        roomType: 'Entire home/apt',
+        description: 'Spacious 2 BHK near IT tech parks with covered parking and power backup'
+      },
+      { headers: { Authorization: `Bearer ${tenantToken}` } }
+    );
     console.log('✔ [5/8] Multimodal ML Valuation Engine:');
     console.log(`        Predicted Monthly Rent: ₹${predictionRes.data.data.predicted_rent}`);
     console.log(`        95% Confidence Band   : ₹${predictionRes.data.data.lower_bound} – ₹${predictionRes.data.data.upper_bound}`);
