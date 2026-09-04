@@ -1,5 +1,5 @@
 // USD to INR conversion utility for Multimodal V3 UI presentation
-// The underlying ML model strictly predicts in USD (Airbnb nightly price in Asheville, NC).
+// The underlying ML model strictly predicts in USD (Airbnb rental price in Asheville, NC).
 // This utility handles client-side currency display conversion to Indian Rupees (INR / ₹).
 
 export const USD_TO_INR_RATE = Number(import.meta.env.VITE_USD_TO_INR_RATE) || 83.5;

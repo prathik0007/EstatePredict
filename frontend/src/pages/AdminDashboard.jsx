@@ -186,7 +186,7 @@ const AdminDashboard = () => {
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
                   <th style={{ padding: '12px' }}>Neighborhood</th>
                   <th style={{ padding: '12px' }}>Active Listings</th>
-                  <th style={{ padding: '12px' }}>Average Nightly Price</th>
+                  <th style={{ padding: '12px' }}>Average Rental Price</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,7 +197,7 @@ const AdminDashboard = () => {
                       <span className="badge badge-primary">{city.count} properties</span>
                     </td>
                     <td style={{ padding: '12px', fontWeight: '700', color: '#2563eb' }}>
-                      ${Math.round(city.avgPrice || 0).toLocaleString('en-US')}/night
+                      ${Math.round(city.avgPrice || 0).toLocaleString('en-US')}
                     </td>
                   </tr>
                 ))}
@@ -220,7 +220,7 @@ const AdminDashboard = () => {
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
                   <th style={{ padding: '12px' }}>Property</th>
                   <th style={{ padding: '12px' }}>Neighborhood</th>
-                  <th style={{ padding: '12px' }}>Nightly Price</th>
+                  <th style={{ padding: '12px' }}>Rental Price</th>
                   <th style={{ padding: '12px' }}>Host</th>
                   <th style={{ padding: '12px' }}>Status</th>
                   <th style={{ padding: '12px', textAlign: 'right' }}>Actions</th>
@@ -235,7 +235,7 @@ const AdminDashboard = () => {
                       </div>
                     </td>
                     <td style={{ padding: '12px' }}>{prop.location?.city || 'Asheville'}</td>
-                    <td style={{ padding: '12px', fontWeight: '700' }}>${Number(prop.price).toLocaleString('en-US')}/night</td>
+                    <td style={{ padding: '12px', fontWeight: '700' }}>${Number(prop.price).toLocaleString('en-US')}</td>
                     <td style={{ padding: '12px', color: '#64748b' }}>{prop.owner?.name || 'Host'}</td>
                     <td style={{ padding: '12px' }}>
                       <span className={`badge ${prop.status === 'available' ? 'badge-success' : 'badge-danger'}`}>

@@ -87,7 +87,7 @@ const AiPriceEstimatorModal = ({
               <Sparkles size={20} />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>AI Nightly Price Valuation</h3>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>AI Rental Price Valuation</h3>
               <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>
                 HistGradientBoosting (log1p) & Conformal Prediction
               </p>
@@ -152,7 +152,7 @@ const AiPriceEstimatorModal = ({
             </>
           ) : (
             <>
-              <Sparkles size={16} /> Predict Nightly Market Rate
+              <Sparkles size={16} /> Predict Rental Market Rate
             </>
           )}
         </button>
@@ -169,14 +169,13 @@ const AiPriceEstimatorModal = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  PREDICTED NIGHTLY RENTAL PRICE
+                  PREDICTED RENTAL PRICE
                 </span>
                 <div style={{ fontSize: '2rem', fontWeight: '900', color: '#0f172a', lineHeight: 1.2 }}>
                   ₹{usdToInr(predictionResult.predicted_rent).toLocaleString('en-IN')}
-                  <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}>/night</span>
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>
-                  USD: ${Number(predictionResult.predicted_rent).toFixed(2)}/night (1 USD = ₹{USD_TO_INR_RATE})
+                  USD: ${Number(predictionResult.predicted_rent).toFixed(2)} (1 USD = ₹{USD_TO_INR_RATE})
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>

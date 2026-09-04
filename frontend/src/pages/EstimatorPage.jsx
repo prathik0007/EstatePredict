@@ -108,10 +108,10 @@ const EstimatorPage = () => {
           <Sparkles size={16} /> Multimodal V3 Research Benchmark
         </div>
         <h1 style={{ fontSize: '2.2rem', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.02em' }}>
-          AI Nightly Rental Price Valuation & Prediction Intervals
+          AI Rental Price Valuation & Prediction Intervals
         </h1>
         <p style={{ color: '#64748b', fontSize: '1rem', maxWidth: '750px', margin: '8px auto 0' }}>
-          Predict calibrated nightly market rates using HistGradientBoosting with log1p target transformation, calibrated 95% conformal prediction intervals, and SHAP factor attribution.
+          Predict calibrated rental market rates using HistGradientBoosting with log1p target transformation, calibrated 95% conformal prediction intervals, and SHAP factor attribution.
         </p>
       </div>
 
@@ -225,7 +225,7 @@ const EstimatorPage = () => {
                 </>
               ) : (
                 <>
-                  <Sparkles size={18} /> Predict Nightly Rental Price
+                  <Sparkles size={18} /> Predict Rental Price
                 </>
               )}
             </button>
@@ -251,19 +251,18 @@ const EstimatorPage = () => {
                 </h3>
               </div>
 
-              {/* Main Predicted Nightly Price */}
+              {/* Main Predicted Rental Price */}
               <div style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #c4b5fd', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    PREDICTED NIGHTLY RENTAL PRICE
+                    PREDICTED RENTAL PRICE
                   </span>
                   <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>
-                    USD: ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)}/night
+                    USD: ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)}
                   </span>
                 </div>
                 <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
                   ₹{getInrPrice(prediction, 'predicted_rent').toLocaleString('en-IN')}
-                  <span style={{ fontSize: '1rem', fontWeight: '500', color: '#64748b' }}>/night</span>
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
                   <span>Model: HistGradientBoostingRegressor (log1p target transform)</span>

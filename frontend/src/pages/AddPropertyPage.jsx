@@ -96,7 +96,7 @@ const AddPropertyPage = () => {
       confidenceLevel: aiData.confidence_level || '95%',
       estimatedAt: new Date()
     });
-    showToast(`AI Suggested Price of $${Math.round(suggestedPrice).toLocaleString('en-US')}/night applied!`, 'success');
+    showToast(`AI Suggested Price of $${Math.round(suggestedPrice).toLocaleString('en-US')} applied!`, 'success');
   };
 
   const handleSubmit = async (e) => {
@@ -164,7 +164,7 @@ const AddPropertyPage = () => {
           Create New Property Listing
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-          Fill in details about your Asheville property and use our built-in Multimodal V3 AI to calculate fair nightly market rates.
+          Fill in details about your Asheville property and use our built-in Multimodal V3 AI to calculate fair rental market rates.
         </p>
       </div>
 
@@ -213,7 +213,7 @@ const AddPropertyPage = () => {
             <div className="form-group">
               <label className="form-label">Listing Type</label>
               <select name="listingType" value={formData.listingType} onChange={handleInputChange} className="form-select">
-                <option value="Rent">Nightly Short-Term Rent</option>
+                <option value="Rent">Short-Term Rent</option>
                 <option value="MidTerm">Mid-Term Lease</option>
               </select>
             </div>
@@ -234,7 +234,7 @@ const AddPropertyPage = () => {
               className="btn btn-accent btn-sm"
               style={{ fontWeight: '700' }}
             >
-              <Sparkles size={16} /> Estimate Nightly Rate with AI
+              <Sparkles size={16} /> Estimate Rental Rate with AI
             </button>
           </div>
 
@@ -268,10 +268,10 @@ const AddPropertyPage = () => {
           {/* Pricing input with AI badge indicator */}
           <div className="form-group" style={{ marginTop: '10px' }}>
             <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span>Nightly Rental Price ($) *</span>
+              <span>Rental Price ($) *</span>
               {aiValuationInfo && (
                 <span className="badge badge-ai" style={{ fontSize: '0.7rem' }}>
-                  <Sparkles size={12} /> AI Valuated (${aiValuationInfo.predictedRent}/night)
+                  <Sparkles size={12} /> AI Valuated (${aiValuationInfo.predictedRent})
                 </span>
               )}
             </label>

@@ -121,7 +121,7 @@ const TenantDashboard = () => {
                           {booking.property?.title || 'Property Listing'}
                         </h4>
                         <p style={{ fontSize: '0.825rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                          <MapPin size={13} /> {booking.property?.location?.city || 'Asheville'} • ${Number(booking.property?.price).toLocaleString('en-US')}/night
+                          <MapPin size={13} /> {booking.property?.location?.city || 'Asheville'} • ${Number(booking.property?.price).toLocaleString('en-US')}
                         </p>
                         <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '8px' }}>
                           📅 <strong>Requested Date:</strong> {new Date(booking.visitDate).toLocaleDateString()} ({booking.timeSlot})

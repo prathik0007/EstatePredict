@@ -188,10 +188,9 @@ const PropertyDetailsPage = () => {
 
         {/* Price Box */}
         <div style={{ textAlign: 'right' }}>
-          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Nightly Price</span>
+          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Rental Price</span>
           <div style={{ fontSize: '2.2rem', fontWeight: '900', color: '#0f172a' }}>
             ${Number(property.price).toLocaleString('en-US')}
-            <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: '500' }}> /night</span>
           </div>
         </div>
       </div>
@@ -297,11 +296,11 @@ const PropertyDetailsPage = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <Sparkles size={18} color="#7c3aed" />
                 <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  AI Nightly Rental Price Valuation & Uncertainty Range
+                  AI Rental Price Valuation & Uncertainty Range
                 </span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#334155', lineHeight: 1.5, marginBottom: '14px' }}>
-                Our research-trained HistGradientBoosting model (with log1p target transformation) and calibrated 95% conformal prediction intervals estimated fair market nightly rates for this property:
+                Our research-trained HistGradientBoosting model (with log1p target transformation) and calibrated 95% conformal prediction intervals estimated fair market rental rates for this property:
               </p>
               <div style={{
                 background: '#ffffff',
@@ -316,13 +315,13 @@ const PropertyDetailsPage = () => {
               }}>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: '#6d28d9', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    PREDICTED NIGHTLY RENTAL PRICE
+                    PREDICTED RENTAL PRICE
                   </span>
                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a' }}>
-                    ₹{usdToInr(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}/night
+                    ₹{usdToInr(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}
                   </div>
                   <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                    USD: ${Number(property.predictedRentInfo.predictedRent).toFixed(2)}/night (1 USD = ₹{USD_TO_INR_RATE})
+                    USD: ${Number(property.predictedRentInfo.predictedRent).toFixed(2)} (1 USD = ₹{USD_TO_INR_RATE})
                   </div>
                 </div>
                 <div>

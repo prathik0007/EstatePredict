@@ -82,7 +82,7 @@ const MapViewer = ({ properties = [], singleProperty = null, height = '450px', z
                   />
                   <h4 style={{ margin: '0 0 4px', fontSize: '0.9rem', fontWeight: '700' }}>{prop.title}</h4>
                   <div style={{ color: '#2563eb', fontWeight: '800', fontSize: '0.95rem', marginBottom: '6px' }}>
-                    ${Number(prop.price).toLocaleString('en-US')}/night
+                    ${Number(prop.price).toLocaleString('en-US')}
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px' }}>
                     {prop.bedrooms || prop.bhk || 2} Beds • {prop.bathrooms || prop.bathroom || 1} Baths • {prop.accommodates || 4} Guests

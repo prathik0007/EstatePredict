@@ -52,7 +52,7 @@ const Footer = () => {
             </h4>
             <ul style={{ listStyle: 'none', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <li><a href="/properties" style={{ color: '#94a3b8' }}>Search & Filter Listings</a></li>
-              <li><a href="/estimator" style={{ color: '#94a3b8' }}>AI Nightly Rate Valuation</a></li>
+              <li><a href="/estimator" style={{ color: '#94a3b8' }}>AI Rental Rate Valuation</a></li>
               <li><a href="/login" style={{ color: '#94a3b8' }}>Host & Guest Portals</a></li>
               <li><a href="/admin/dashboard" style={{ color: '#94a3b8' }}>Platform Administration</a></li>
             </ul>

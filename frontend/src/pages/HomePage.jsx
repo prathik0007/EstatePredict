@@ -120,7 +120,7 @@ const HomePage = () => {
               letterSpacing: '-0.03em',
               marginBottom: '20px'
             }}>
-              Discover Verified Rentals & Predict Fair Nightly Prices with <span style={{ color: '#38bdf8' }}>Machine Learning</span>
+              Discover Verified Rentals & Predict Fair Rental Prices with <span style={{ color: '#38bdf8' }}>Machine Learning</span>
             </h1>
 
             <p style={{
@@ -163,7 +163,7 @@ const HomePage = () => {
                   Sign in to Access the Rental Application
                 </h3>
                 <p style={{ fontSize: '0.95rem', color: '#cbd5e1', marginBottom: '24px', lineHeight: '1.6', maxWidth: '480px', margin: '0 auto 24px' }}>
-                  Authentication is required to search verified rental properties, view nightly rates, and use the AI Rent Estimator.
+                  Authentication is required to search verified rental properties, view rental rates, and use the AI Rent Estimator.
                 </p>
                 <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <Link

@@ -115,7 +115,7 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
               <span>AI Predicted Rate</span>
             </div>
             <span style={{ color: '#34d399' }}>
-              ₹{usdToInr(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}/night
+              ₹{usdToInr(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}
             </span>
           </div>
         )}
@@ -129,7 +129,6 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
             <span style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>
               ${Number(property.price).toLocaleString('en-US')}
             </span>
-            <span style={{ fontSize: '0.825rem', color: '#64748b', marginLeft: '4px' }}>/night</span>
           </div>
           <span className="badge badge-ai" style={{ fontSize: '0.7rem' }}>
             {property.propertyType}
