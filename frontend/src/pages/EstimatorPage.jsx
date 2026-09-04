@@ -64,12 +64,26 @@ const EstimatorPage = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (res.data.success) {
+      if (res.data && res.data.success && res.data.data) {
         setPrediction(res.data.data);
+      } else {
+        setError('Invalid prediction response received from ML server.');
       }
     } catch (err) {
       console.error(err);
-      setError('Error communicating with ML server. Please check that Python Flask ML service is running.');
+      if (err.response) {
+        const status = err.response.status;
+        const msg = err.response.data?.error || err.response.data?.message || err.message;
+        if (status >= 400 && status < 500) {
+          setError(`ML Service Client Error (HTTP ${status}): ${msg || 'Invalid request parameters'}`);
+        } else {
+          setError(`ML Service Server Error (HTTP ${status}): ${msg || 'Internal prediction service error'}`);
+        }
+      } else if (err.request) {
+        setError('Connection failure: Unable to reach the Python Flask ML service on Render. Please verify the service is awake and active.');
+      } else {
+        setError(`Error communicating with ML server: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }

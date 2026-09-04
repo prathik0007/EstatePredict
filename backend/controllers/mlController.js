@@ -2,7 +2,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 
-const FLASK_ML_URL = process.env.FLASK_ML_URL || 'http://127.0.0.1:5000';
+const FLASK_ML_URL = process.env.FLASK_ML_URL || 'https://rental-price-prediction-1.onrender.com';
 
 // @desc    Predict Rental Price using Flask ML API (Multimodal V3 HistGradientBoosting + Conformal Intervals)
 // @route   POST /api/ml/predict-rent

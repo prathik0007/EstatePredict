@@ -49,12 +49,22 @@ const AiPriceEstimatorModal = ({
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      if (res.data.success) {
+      if (res.data && res.data.success && res.data.data) {
         setPredictionResult(res.data.data);
+      } else {
+        setError('Invalid prediction response received from ML server.');
       }
     } catch (err) {
       console.error(err);
-      setError('Unable to fetch AI prediction. Please check ML service.');
+      if (err.response) {
+        const status = err.response.status;
+        const msg = err.response.data?.error || err.response.data?.message || err.message;
+        setError(`ML Service Error (HTTP ${status}): ${msg}`);
+      } else if (err.request) {
+        setError('Connection failure: Unable to reach the Python Flask ML service on Render. Please verify the service is active.');
+      } else {
+        setError(`Unable to fetch AI prediction: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }
