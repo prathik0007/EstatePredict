@@ -15,9 +15,11 @@ import {
 } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import MapViewer from '../components/MapViewer';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
 const HomePage = () => {
+  const { isAuthenticated } = useAuth();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState('All');
@@ -44,6 +46,10 @@ const HomePage = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     const params = new URLSearchParams();
     if (searchCity !== 'All') params.append('city', searchCity);
     if (searchBedrooms !== 'All') params.append('bedrooms', searchBedrooms);

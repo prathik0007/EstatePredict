@@ -30,11 +30,15 @@ function App() {
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<HomePage />} />
-                <Route path="/properties" element={<PropertiesPage />} />
-                <Route path="/properties/:id" element={<PropertyDetailsPage />} />
-                <Route path="/estimator" element={<EstimatorPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+
+                {/* Authenticated User Protected Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/properties" element={<PropertiesPage />} />
+                  <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+                  <Route path="/estimator" element={<EstimatorPage />} />
+                </Route>
 
                 {/* Owner & Admin Protected Routes */}
                 <Route element={<ProtectedRoute allowedRoles={['owner', 'admin']} />}>
