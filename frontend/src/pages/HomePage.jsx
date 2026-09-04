@@ -283,7 +283,7 @@ const HomePage = () => {
                 <ShieldCheck size={24} />
               </div>
               <div>
-                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>Calibrated 95% Interval</h4>
+                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>Calibrated 95% Prediction Interval</h4>
                 <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Empirical coverage: 93.70%</p>
               </div>
             </div>
