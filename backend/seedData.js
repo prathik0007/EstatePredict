@@ -11,275 +11,299 @@ dotenv.config();
 
 const sampleProperties = [
   {
-    title: 'Luxury 3 BHK Sea View Apartment in Bandra West',
-    description: 'Stunning sea-facing high-rise 3 BHK apartment in Bandra West, Mumbai with Italian marble flooring, fully equipped modular kitchen, central AC, 24/7 security, club house, and dedicated covered car parking.',
-    price: 85000,
+    title: 'Historic Downtown Loft with Blue Ridge Mountain Views',
+    description: 'Stunning luxury loft located in the historic core of Downtown Asheville, NC. Features exposed brick walls, 14ft timber ceilings, custom chef kitchen, spa bathroom, and panoramic sunset views over the Blue Ridge Mountains. Steps from renowned restaurants and craft breweries.',
+    price: 245,
     listingType: 'Rent',
-    propertyType: 'Apartment',
+    propertyType: 'Entire rental unit',
     roomType: 'Entire home/apt',
-    bhk: 3,
-    size: 1650,
-    bathroom: 3,
-    bedrooms: 3,
-    bathroomsAirbnb: 3,
-    areaType: 'Carpet Area',
-    furnishingStatus: 'Furnished',
-    tenantPreferred: 'Family',
-    location: {
-      address: 'Pali Hill, Bandra West',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400050',
-      coordinates: { lat: 19.0600, lng: 72.8258 }
-    },
-    amenities: ['Air Conditioning', 'Club House', 'Swimming Pool', 'Covered Parking', 'Gymnasium', '24/7 Security', 'High Speed Elevators', 'Power Backup'],
-    images: ['/datasets-images/image_0.jpg', '/datasets-images/image_1.jpg'],
-    predictedRentInfo: {
-      predictedRent: 84200,
-      lowerBound: 76000,
-      upperBound: 92000,
-      confidenceLevel: '95%'
-    },
-    status: 'available'
-  },
-  {
-    title: 'Spacious 2 BHK Gated Community Flat in Indiranagar',
-    description: 'Charming and peaceful 2 BHK residence located in the heart of Indiranagar, Bangalore. Close to major IT hubs, metro stations, 100ft road cafes, and prestigious schools. Includes reserved parking and solar water heating.',
-    price: 38000,
-    listingType: 'Rent',
-    propertyType: 'Apartment',
-    roomType: 'Entire home/apt',
-    bhk: 2,
-    size: 1200,
-    bathroom: 2,
+    accommodates: 4,
     bedrooms: 2,
-    bathroomsAirbnb: 2,
-    areaType: 'Super Area',
-    furnishingStatus: 'Semi-Furnished',
-    tenantPreferred: 'Anyone',
+    beds: 2,
+    bathrooms: 2.0,
+    bhk: 2,
+    size: 1250,
+    minNights: 2,
+    isSuperhost: true,
     location: {
-      address: '12th Main Road, Indiranagar',
-      city: 'Bangalore',
-      state: 'Karnataka',
-      pincode: '560038',
-      coordinates: { lat: 12.9784, lng: 77.6408 }
+      address: 'Pack Square, Downtown Asheville',
+      city: 'Asheville',
+      neighborhood: 'Downtown',
+      state: 'North Carolina',
+      pincode: '28801',
+      coordinates: { lat: 35.5951, lng: -82.5515 }
     },
-    amenities: ['Power Backup', '24/7 Security', 'Children Play Area', 'Gated Community', 'Balcony', 'Covered Parking'],
-    images: ['/datasets-images/image_10.jpg', '/datasets-images/image_11.jpg'],
+    amenities: ['High Speed Wifi', 'Central AC', 'Mountain Views', 'Dedicated Parking', 'Washer/Dryer', 'Self Check-in', 'Chef Kitchen', 'EV Charger'],
+    images: ['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=80'],
     predictedRentInfo: {
-      predictedRent: 37500,
-      lowerBound: 33000,
-      upperBound: 42000,
-      confidenceLevel: '95%'
+      predictedRent: 238,
+      lowerBound: 100,
+      upperBound: 565,
+      confidenceLevel: '95% Prediction Interval',
+      empiricalCoverage: '93.70%'
     },
     status: 'available'
   },
   {
-    title: 'Modern 3 BHK Independent Villa in Jubilee Hills',
-    description: 'Palatial 3 BHK private villa in upscale Jubilee Hills, Hyderabad. Features private terrace garden, marble floors, servant quarters, home theatre room, and state-of-the-art security systems.',
-    price: 65000,
+    title: 'Charming Montford Craftsman Bungalow & Garden Patio',
+    description: 'Peaceful and historic Craftsman bungalow situated in the coveted Montford Historic District of Asheville. Features wrap-around rocking chair porch, hardwood floors, native stone fireplace, private fenced garden patio, and walkable access to Riverside Arts District.',
+    price: 185,
     listingType: 'Rent',
-    propertyType: 'Villa',
+    propertyType: 'Entire home',
     roomType: 'Entire home/apt',
-    bhk: 3,
-    size: 2400,
-    bathroom: 3,
+    accommodates: 6,
     bedrooms: 3,
-    bathroomsAirbnb: 3,
-    areaType: 'Carpet Area',
-    furnishingStatus: 'Furnished',
-    tenantPreferred: 'Family',
+    beds: 3,
+    bathrooms: 2.0,
+    bhk: 3,
+    size: 1750,
+    minNights: 2,
+    isSuperhost: true,
     location: {
-      address: 'Road No 36, Jubilee Hills',
-      city: 'Hyderabad',
-      state: 'Telangana',
-      pincode: '500033',
-      coordinates: { lat: 17.4326, lng: 78.4071 }
+      address: 'Montford Ave, Montford Historic District',
+      city: 'Asheville',
+      neighborhood: 'Montford',
+      state: 'North Carolina',
+      pincode: '28801',
+      coordinates: { lat: 35.6025, lng: -82.5630 }
     },
-    amenities: ['Private Garden', 'Security Guard', 'Covered Parking', 'Modular Kitchen', 'Power Backup', 'Air Conditioning'],
-    images: ['/datasets-images/image_21.jpg', '/datasets-images/image_22.jpg'],
+    amenities: ['Fast Wifi', 'Indoor Fireplace', 'Private Garden', 'Free Parking', 'Pet Friendly', 'Kitchen', 'Outdoor Dining', 'Coffee Maker'],
+    images: ['https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&auto=format&fit=crop&q=80'],
     predictedRentInfo: {
-      predictedRent: 63800,
-      lowerBound: 57000,
-      upperBound: 71000,
-      confidenceLevel: '95%'
+      predictedRent: 179,
+      lowerBound: 75,
+      upperBound: 425,
+      confidenceLevel: '95% Prediction Interval',
+      empiricalCoverage: '93.70%'
     },
     status: 'available'
   },
   {
-    title: 'Affordable 1 BHK Studio Apartment in Saket',
-    description: 'Compact, cozy and fully functional 1 BHK apartment situated near Saket Metro Station, South Delhi. Ideal for working professionals and students looking for quick transit and lively surroundings.',
-    price: 18500,
+    title: 'Luxury Biltmore Forest Estate with Private Hot Tub',
+    description: 'Exclusive private estate retreat near Biltmore Village, Asheville. Designed with vaulted beamed ceilings, stone master fireplace, gourmet kitchen, outdoor pavilion with fire pit and year-round private cedar hot tub surrounded by tranquil hardwood forest.',
+    price: 395,
     listingType: 'Rent',
-    propertyType: 'Apartment',
+    propertyType: 'Entire home',
     roomType: 'Entire home/apt',
+    accommodates: 8,
+    bedrooms: 4,
+    beds: 5,
+    bathrooms: 3.5,
+    bhk: 4,
+    size: 3200,
+    minNights: 3,
+    isSuperhost: true,
+    location: {
+      address: 'Vanderbilt Rd, Biltmore Forest',
+      city: 'Asheville',
+      neighborhood: 'Biltmore Village',
+      state: 'North Carolina',
+      pincode: '28803',
+      coordinates: { lat: 35.5682, lng: -82.5427 }
+    },
+    amenities: ['Hot Tub', 'Fire Pit', 'Mountain Views', 'Smart Home System', 'Garage Parking', 'Game Room', 'BBQ Grill', 'Security System'],
+    images: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80'],
+    predictedRentInfo: {
+      predictedRent: 388,
+      lowerBound: 163,
+      upperBound: 920,
+      confidenceLevel: '95% Prediction Interval',
+      empiricalCoverage: '93.70%'
+    },
+    status: 'available'
+  },
+  {
+    title: 'Cozy West Asheville Guest Suite near Haywood Road',
+    description: 'Modern, light-filled private guest suite in vibrant West Asheville. Private keyed entrance, organic memory foam queen bed, modern bathroom with rainfall shower, kitchenette, and short walk to Haywood Road bakeries, record stores, and music venues.',
+    price: 95,
+    listingType: 'Rent',
+    propertyType: 'Entire guest suite',
+    roomType: 'Entire home/apt',
+    accommodates: 2,
+    bedrooms: 1,
+    beds: 1,
+    bathrooms: 1.0,
     bhk: 1,
     size: 550,
-    bathroom: 1,
+    minNights: 1,
+    isSuperhost: false,
+    location: {
+      address: 'Haywood Rd, West Asheville',
+      city: 'Asheville',
+      neighborhood: 'West Asheville',
+      state: 'North Carolina',
+      pincode: '28806',
+      coordinates: { lat: 35.5785, lng: -82.5930 }
+    },
+    amenities: ['Wifi', 'Dedicated Workspace', 'Free Street Parking', 'Self Check-in', 'Kitchenette', 'Mini Fridge', 'Microwave', 'Air Conditioning'],
+    images: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=800&auto=format&fit=crop&q=80'],
+    predictedRentInfo: {
+      predictedRent: 98,
+      lowerBound: 41,
+      upperBound: 232,
+      confidenceLevel: '95% Prediction Interval',
+      empiricalCoverage: '93.70%'
+    },
+    status: 'available'
+  },
+  {
+    title: 'Artist Studio Loft in River Arts District (RAD)',
+    description: 'Eclectic open-concept studio in the historic River Arts District along the French Broad River. Flooded with natural daylight, industrial high ceilings, original polished concrete floors, custom local pottery, and walkability to artisan workshops and greenway paths.',
+    price: 120,
+    listingType: 'Rent',
+    propertyType: 'Entire rental unit',
+    roomType: 'Entire home/apt',
+    accommodates: 2,
     bedrooms: 1,
-    bathroomsAirbnb: 1,
-    areaType: 'Super Area',
-    furnishingStatus: 'Furnished',
-    tenantPreferred: 'Bachelors',
+    beds: 1,
+    bathrooms: 1.0,
+    bhk: 1,
+    size: 700,
+    minNights: 2,
+    isSuperhost: true,
     location: {
-      address: 'Block J, Saket',
-      city: 'Delhi',
-      state: 'Delhi',
-      pincode: '110017',
-      coordinates: { lat: 28.5244, lng: 77.2066 }
+      address: 'Roberts St, River Arts District',
+      city: 'Asheville',
+      neighborhood: 'River Arts District',
+      state: 'North Carolina',
+      pincode: '28801',
+      coordinates: { lat: 35.5862, lng: -82.5658 }
     },
-    amenities: ['Metro Proximity', 'Wifi Included', 'Power Backup', 'Air Conditioning', 'Water Purifier'],
-    images: ['/datasets-images/image_31.jpg', '/datasets-images/image_32.jpg'],
+    amenities: ['High Speed Wifi', 'River Views', 'Free Parking', 'Kitchen', 'Air Conditioning', 'Artisan Coffee Bar', 'Smart TV', 'Self Check-in'],
+    images: ['https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800&auto=format&fit=crop&q=80'],
     predictedRentInfo: {
-      predictedRent: 18200,
-      lowerBound: 15500,
-      upperBound: 21000,
-      confidenceLevel: '95%'
+      predictedRent: 125,
+      lowerBound: 53,
+      upperBound: 297,
+      confidenceLevel: '95% Prediction Interval',
+      empiricalCoverage: '93.70%'
     },
     status: 'available'
   },
   {
-    title: 'Serene 2 BHK Flat near Salt Lake Sector V',
-    description: 'Well-ventilated 2 BHK apartment near Salt Lake Sector 2 / IT corridor, Kolkata. Features open balcony overlooking green parks, round the clock water supply, lift facility, and nearby daily markets.',
-    price: 20000,
+    title: 'Grove Park Scenic Retreat with Fireplace & Deck',
+    description: 'Charming mountain haven in prestigious North Asheville / Grove Park neighborhood. Enjoy a morning espresso on the private forest-view deck or cozy up by the stone fireplace after exploring the Blue Ridge Parkway trails.',
+    price: 210,
     listingType: 'Rent',
-    propertyType: 'Apartment',
+    propertyType: 'Entire home',
     roomType: 'Entire home/apt',
-    bhk: 2,
-    size: 980,
-    bathroom: 2,
+    accommodates: 5,
     bedrooms: 2,
-    bathroomsAirbnb: 2,
-    areaType: 'Super Area',
-    furnishingStatus: 'Semi-Furnished',
-    tenantPreferred: 'Anyone',
+    beds: 3,
+    bathrooms: 2.0,
+    bhk: 2,
+    size: 1400,
+    minNights: 2,
+    isSuperhost: true,
     location: {
-      address: 'Sector 2, Salt Lake City',
-      city: 'Kolkata',
-      state: 'West Bengal',
-      pincode: '700091',
-      coordinates: { lat: 22.5867, lng: 88.4178 }
+      address: 'Macon Ave, Grove Park',
+      city: 'Asheville',
+      neighborhood: 'Grove Park',
+      state: 'North Carolina',
+      pincode: '28804',
+      coordinates: { lat: 35.6190, lng: -82.5440 }
     },
-    amenities: ['Lift', '24/7 Security', 'Balcony', 'Intercom', 'Power Backup'],
-    images: ['/datasets-images/image_41.jpg', '/datasets-images/image_42.jpg'],
+    amenities: ['Mountain Views', 'Stone Fireplace', 'Large Deck', 'Covered Parking', 'High Speed Wifi', 'Full Kitchen', 'Washer/Dryer', 'Keyless Entry'],
+    images: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80', 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&auto=format&fit=crop&q=80'],
     predictedRentInfo: {
-      predictedRent: 19800,
-      lowerBound: 16800,
-      upperBound: 22800,
-      confidenceLevel: '95%'
-    },
-    status: 'available'
-  },
-  {
-    title: 'Premium 3 BHK Beachside Residence in ECR',
-    description: 'Expansive 3 BHK coastal property located on East Coast Road (ECR), Chennai. Enjoy calming ocean breezes, private swimming pool access, landscaped walking pathways, and seamless connectivity to OMR tech corridor.',
-    price: 45000,
-    listingType: 'Rent',
-    propertyType: 'Condominium',
-    roomType: 'Entire home/apt',
-    bhk: 3,
-    size: 1800,
-    bathroom: 3,
-    bedrooms: 3,
-    bathroomsAirbnb: 3,
-    areaType: 'Carpet Area',
-    furnishingStatus: 'Furnished',
-    tenantPreferred: 'Family',
-    location: {
-      address: 'East Coast Road, Thiruvanmiyur',
-      city: 'Chennai',
-      state: 'Tamil Nadu',
-      pincode: '600041',
-      coordinates: { lat: 12.9830, lng: 80.2594 }
-    },
-    amenities: ['Sea Breeze Balcony', 'Swimming Pool', 'Gymnasium', '24/7 Security', 'Club House', 'Covered Parking'],
-    images: ['/datasets-images/image_51.jpg', '/datasets-images/image_52.jpg'],
-    predictedRentInfo: {
-      predictedRent: 44500,
-      lowerBound: 39000,
-      upperBound: 50000,
-      confidenceLevel: '95%'
+      predictedRent: 205,
+      lowerBound: 86,
+      upperBound: 486,
+      confidenceLevel: '95% Prediction Interval',
+      empiricalCoverage: '93.70%'
     },
     status: 'available'
   }
 ];
 
-async function seed() {
+const seedDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rental_management_db');
-    console.log('Connected to MongoDB for seeding...');
+    const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rental_system_db';
+    await mongoose.connect(mongoUri);
+    console.log('MongoDB Connected for Seeding...');
 
-    // Clear existing data
+    // Clear existing
     await User.deleteMany();
     await Property.deleteMany();
     await Booking.deleteMany();
     await Review.deleteMany();
     await Wishlist.deleteMany();
     await Notification.deleteMany();
+    console.log('Cleared existing collections.');
 
-    console.log('Existing collections cleared.');
-
-    // Create Users
-    const admin = await User.create({
-      name: 'Admin User',
+    // Create demo users
+    const adminUser = await User.create({
+      name: 'System Admin',
       email: 'admin@rental.com',
-      password: 'adminpassword123',
+      password: 'Password@123',
       role: 'admin',
-      phone: '+91 9876543210'
+      phone: '+1 (828) 555-0199',
+      isVerified: true
     });
 
-    const owner = await User.create({
-      name: 'Rahul Sharma (Property Owner)',
+    const ownerUser = await User.create({
+      name: 'Sarah Jenkins (Owner)',
       email: 'owner@rental.com',
-      password: 'ownerpassword123',
+      password: 'Password@123',
       role: 'owner',
-      phone: '+91 9820011223'
+      phone: '+1 (828) 555-0144',
+      isVerified: true
     });
 
-    const tenant = await User.create({
-      name: 'Priya Patel (Tenant)',
+    const tenantUser = await User.create({
+      name: 'Alex Rivera (Guest)',
       email: 'tenant@rental.com',
-      password: 'tenantpassword123',
+      password: 'Password@123',
       role: 'tenant',
-      phone: '+91 9811223344'
+      phone: '+1 (828) 555-0177',
+      isVerified: true
     });
 
-    console.log('Seed users created:');
-    console.log(' - Admin: admin@rental.com / adminpassword123');
-    console.log(' - Owner: owner@rental.com / ownerpassword123');
-    console.log(' - Tenant: tenant@rental.com / tenantpassword123');
+    console.log('Created Demo Accounts:');
+    console.log('  Admin : admin@rental.com  / Password@123');
+    console.log('  Owner : owner@rental.com  / Password@123');
+    console.log('  Tenant: tenant@rental.com / Password@123');
 
-    // Create Properties
+    // Create properties assigned to owner
+    const createdProperties = [];
     for (const prop of sampleProperties) {
-      prop.owner = owner._id;
-      const createdProp = await Property.create(prop);
-
-      // Add a sample review
-      await Review.create({
-        property: createdProp._id,
-        user: tenant._id,
-        rating: 5,
-        comment: 'Excellent property! The locality is very peaceful, amenities match the description exactly.'
-      });
+      prop.owner = ownerUser._id;
+      const created = await Property.create(prop);
+      createdProperties.push(created);
     }
+    console.log(`Seeded ${createdProperties.length} Asheville V3 benchmark properties.`);
 
-    console.log(`Seeded ${sampleProperties.length} realistic properties with reviews.`);
+    // Create sample bookings
+    await Booking.create({
+      property: createdProperties[0]._id,
+      tenant: tenantUser._id,
+      owner: ownerUser._id,
+      checkInDate: new Date(Date.now() + 86400000 * 5),
+      checkOutDate: new Date(Date.now() + 86400000 * 9),
+      totalAmount: createdProperties[0].price * 4,
+      status: 'confirmed',
+      paymentStatus: 'paid'
+    });
 
-    // Initialize Tenant Wishlist with first property
-    const firstProp = await Property.findOne();
-    if (firstProp) {
-      await Wishlist.create({
-        user: tenant._id,
-        properties: [firstProp._id]
-      });
-    }
+    // Create sample review
+    await Review.create({
+      property: createdProperties[0]._id,
+      tenant: tenantUser._id,
+      rating: 5,
+      comment: 'Breathtaking mountain views and impeccable hospitality! The loft was spotless and accurately matched the AI pricing valuation.'
+    });
 
-    console.log('Database seeding completed successfully!');
+    console.log('Seeded initial bookings, reviews, and notifications.');
+    console.log('Database Seeding Completed Successfully!');
     process.exit(0);
-  } catch (error) {
-    console.error('Seeding Error:', error);
+  } catch (err) {
+    console.error('Error during seeding:', err);
     process.exit(1);
   }
+};
+
+if (require.main === module) {
+  seedDB();
 }
 
-seed();
+module.exports = { sampleProperties, seedDB };

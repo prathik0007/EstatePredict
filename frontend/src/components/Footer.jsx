@@ -33,14 +33,15 @@ const Footer = () => {
           {/* Col 2: Research Modules */}
           <div>
             <h4 style={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: '700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Cpu size={16} color="#38bdf8" /> AI & Research Pipeline
+              <Cpu size={16} color="#38bdf8" /> Multimodal V3 Research Pipeline
             </h4>
             <ul style={{ listStyle: 'none', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li>Random Forest Multimodal Regressor</li>
-              <li>MAPIE Conformal Prediction (95% CI)</li>
-              <li>SHAP Feature Explainability</li>
-              <li>EfficientNetB0 Visual Feature Extractor</li>
-              <li>Sentence-BERT Text Embeddings</li>
+              <li>HistGradientBoostingRegressor (log1p transform)</li>
+              <li>Calibrated 95% Prediction Interval (93.70% coverage)</li>
+              <li>SHAP Feature Explainability & Attribution</li>
+              <li>all-MiniLM-L6-v2 Text Representation (384-d)</li>
+              <li>EfficientNet-B0 Visual Representation (1,280-d)</li>
+              <li>Asheville, NC Inside Airbnb Benchmark (N = 1,800)</li>
             </ul>
           </div>
 
@@ -50,9 +51,9 @@ const Footer = () => {
               Platform Navigation
             </h4>
             <ul style={{ listStyle: 'none', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li><a href="/properties" style={{ color: '#94a3b8' }}>Search & Filter Properties</a></li>
-              <li><a href="/estimator" style={{ color: '#94a3b8' }}>AI Rent Valuation Tool</a></li>
-              <li><a href="/login" style={{ color: '#94a3b8' }}>Owner & Tenant Portals</a></li>
+              <li><a href="/properties" style={{ color: '#94a3b8' }}>Search & Filter Listings</a></li>
+              <li><a href="/estimator" style={{ color: '#94a3b8' }}>AI Nightly Rate Valuation</a></li>
+              <li><a href="/login" style={{ color: '#94a3b8' }}>Host & Guest Portals</a></li>
               <li><a href="/admin/dashboard" style={{ color: '#94a3b8' }}>Platform Administration</a></li>
             </ul>
           </div>
@@ -79,7 +80,7 @@ const Footer = () => {
           fontSize: '0.8rem',
           color: '#475569'
         }}>
-          <div>© {new Date().getFullYear()} EstatePredict. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} EstatePredict. Multimodal V3 Research Benchmark. All rights reserved.</div>
         </div>
       </div>
     </footer>

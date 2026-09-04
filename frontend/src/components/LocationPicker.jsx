@@ -3,12 +3,14 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
 const CITY_COORDINATES = {
-  'Mumbai': [19.0760, 72.8777],
-  'Bangalore': [12.9716, 77.5946],
-  'Delhi': [28.6139, 77.2090],
-  'Hyderabad': [17.3850, 78.4867],
-  'Chennai': [13.0827, 80.2707],
-  'Kolkata': [22.5726, 88.3639]
+  'Downtown': [35.5951, -82.5515],
+  'Montford': [35.6025, -82.5620],
+  'West Asheville': [35.5785, -82.5930],
+  'Biltmore Village': [35.5670, -82.5400],
+  'Grove Park': [35.6180, -82.5480],
+  'River Arts District': [35.5840, -82.5660],
+  'North Asheville': [35.6200, -82.5550],
+  'South Asheville': [35.5350, -82.5300]
 };
 
 function LocationMarker({ position, setPosition, onChange }) {
@@ -25,8 +27,8 @@ function LocationMarker({ position, setPosition, onChange }) {
   );
 }
 
-const LocationPicker = ({ city = 'Mumbai', value = { lat: 19.0760, lng: 72.8777 }, onChange }) => {
-  const [position, setPosition] = useState([value.lat, value.lng]);
+const LocationPicker = ({ city = 'Downtown', value = { lat: 35.5951, lng: -82.5515 }, onChange }) => {
+  const [position, setPosition] = useState([value.lat || 35.5951, value.lng || -82.5515]);
 
   useEffect(() => {
     if (CITY_COORDINATES[city]) {
@@ -47,7 +49,7 @@ const LocationPicker = ({ city = 'Mumbai', value = { lat: 19.0760, lng: 72.8777 
     }}>
       <MapContainer
         center={position}
-        zoom={12}
+        zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer

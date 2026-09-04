@@ -77,7 +77,7 @@ const OwnerDashboard = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '80px 0', color: '#64748b', fontWeight: '600' }}>
-        Loading Owner Dashboard...
+        Loading Host Dashboard...
       </div>
     );
   }
@@ -90,10 +90,10 @@ const OwnerDashboard = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#3b82f6', textTransform: 'uppercase' }}>
-            Landlord Portal
+            Host Portal
           </span>
           <h1 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a' }}>
-            Owner Dashboard
+            Host Dashboard
           </h1>
         </div>
         <Link to="/add-property" className="btn btn-primary">
@@ -109,7 +109,7 @@ const OwnerDashboard = () => {
         </div>
 
         <div className="card" style={{ padding: '20px' }}>
-          <div style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: '600' }}>Pending Visit Inquiries</div>
+          <div style={{ color: '#64748b', fontSize: '0.85rem', fontWeight: '600' }}>Pending Inquiries</div>
           <div style={{ fontSize: '2rem', fontWeight: '900', color: '#f59e0b', marginTop: '4px' }}>{pendingRequestsCount}</div>
         </div>
 
@@ -153,7 +153,7 @@ const OwnerDashboard = () => {
             gap: '8px'
           }}
         >
-          Visit Inquiries ({requests.length})
+          Stay / Visit Inquiries ({requests.length})
           {pendingRequestsCount > 0 && (
             <span className="badge badge-warning" style={{ fontSize: '0.7rem' }}>
               {pendingRequestsCount} new
@@ -170,7 +170,7 @@ const OwnerDashboard = () => {
               <Home size={44} color="#94a3b8" style={{ margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '1.15rem', fontWeight: '700' }}>No property listings yet</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '6px 0 20px' }}>
-                List your first rental property and leverage our AI model for market valuation.
+                List your first Asheville rental property and leverage our Multimodal V3 model for nightly price valuation.
               </p>
               <Link to="/add-property" className="btn btn-primary btn-sm">
                 <PlusCircle size={16} /> Add Property
@@ -190,10 +190,10 @@ const OwnerDashboard = () => {
                     <div>
                       <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#0f172a' }}>{prop.title}</h4>
                       <p style={{ fontSize: '0.825rem', color: '#64748b', marginTop: '2px' }}>
-                        {prop.location?.city} • {prop.bhk} BHK • {prop.size} sq.ft • {prop.propertyType}
+                        {prop.location?.city || 'Asheville'} • {prop.bedrooms || prop.bhk || 2} Beds • {prop.bathrooms || prop.bathroom || 1} Baths • {prop.propertyType}
                       </p>
                       <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#2563eb', marginTop: '4px' }}>
-                        ₹{Number(prop.price).toLocaleString('en-IN')}/mo
+                        ${Number(prop.price).toLocaleString('en-US')}/night
                       </div>
                     </div>
                   </div>
@@ -222,7 +222,7 @@ const OwnerDashboard = () => {
         <div>
           {requests.length === 0 ? (
             <div className="card" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>
-              No visit inquiries received yet.
+              No inquiries received yet.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -232,7 +232,7 @@ const OwnerDashboard = () => {
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <h4 style={{ fontSize: '1.05rem', fontWeight: '800', color: '#0f172a' }}>
-                          {req.tenant?.name || 'Prospective Tenant'}
+                          {req.tenant?.name || 'Prospective Guest'}
                         </h4>
                         <span className={`badge ${req.status === 'accepted' ? 'badge-success' : (req.status === 'rejected' ? 'badge-danger' : 'badge-warning')}`}>
                           {req.status}
@@ -242,7 +242,7 @@ const OwnerDashboard = () => {
                         Property: {req.property?.title}
                       </p>
                       <div style={{ fontSize: '0.825rem', color: '#475569', marginTop: '6px' }}>
-                        📅 <strong>Visit Date:</strong> {new Date(req.visitDate).toLocaleDateString()} ({req.timeSlot})
+                        📅 <strong>Date:</strong> {new Date(req.visitDate).toLocaleDateString()} ({req.timeSlot})
                       </div>
                       <div style={{ fontSize: '0.825rem', color: '#475569' }}>
                         📞 <strong>Contact:</strong> {req.contactNumber} • ✉️ {req.tenant?.email}
@@ -262,7 +262,7 @@ const OwnerDashboard = () => {
                           className="btn btn-primary btn-sm"
                           style={{ background: '#10b981' }}
                         >
-                          <Check size={16} /> Accept Visit
+                          <Check size={16} /> Accept Request
                         </button>
                         <button
                           onClick={() => handleUpdateStatus(req._id, 'rejected')}

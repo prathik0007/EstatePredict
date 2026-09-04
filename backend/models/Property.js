@@ -19,78 +19,75 @@ const propertySchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: [true, 'Please provide monthly rental price']
+    required: [true, 'Please provide nightly rental price ($ USD/night)']
   },
   listingType: {
     type: String,
-    enum: ['Rent', 'Sale'],
+    enum: ['Rent', 'Short-Stay', 'Sale'],
     default: 'Rent'
   },
   propertyType: {
     type: String,
-    enum: ['Apartment', 'House', 'Villa', 'Condominium'],
-    default: 'Apartment'
+    enum: ['Entire home', 'Entire rental unit', 'Entire guest suite', 'Entire guesthouse', 'Private room in home', 'Entire cottage', 'Apartment', 'House', 'Villa', 'Condominium', 'Other'],
+    default: 'Entire home'
   },
   roomType: {
     type: String,
-    enum: ['Entire home/apt', 'Private room', 'Shared room'],
+    enum: ['Entire home/apt', 'Private room', 'Shared room', 'Hotel room'],
     default: 'Entire home/apt'
+  },
+  accommodates: {
+    type: Number,
+    default: 4,
+    min: 1,
+    max: 30
+  },
+  bedrooms: {
+    type: Number,
+    default: 2,
+    min: 0,
+    max: 20
+  },
+  beds: {
+    type: Number,
+    default: 2,
+    min: 1,
+    max: 30
+  },
+  bathrooms: {
+    type: Number,
+    default: 1.5,
+    min: 0.5,
+    max: 20
   },
   bhk: {
     type: Number,
-    required: [true, 'Please specify BHK'],
-    min: 1,
-    max: 10,
     default: 2
   },
   size: {
     type: Number,
-    required: [true, 'Please specify size in sq.ft'],
-    min: 50,
-    max: 50000
+    default: 1000
   },
-  bathroom: {
-    type: Number,
-    required: [true, 'Please specify number of bathrooms'],
-    min: 1,
-    max: 10,
-    default: 2
-  },
-  bedrooms: {
+  minNights: {
     type: Number,
     default: 2
   },
-  bathroomsAirbnb: {
-    type: Number,
-    default: 2.0
-  },
-  areaType: {
-    type: String,
-    enum: ['Super Area', 'Carpet Area', 'Built Area'],
-    default: 'Super Area'
-  },
-  furnishingStatus: {
-    type: String,
-    enum: ['Unfurnished', 'Semi-Furnished', 'Furnished'],
-    default: 'Semi-Furnished'
-  },
-  tenantPreferred: {
-    type: String,
-    enum: ['Bachelors', 'Family', 'Anyone'],
-    default: 'Anyone'
+  isSuperhost: {
+    type: Boolean,
+    default: false
   },
   location: {
     address: { type: String, required: true },
     city: {
       type: String,
-      enum: ['Bangalore', 'Chennai', 'Delhi', 'Hyderabad', 'Kolkata', 'Mumbai'],
-      required: true
+      default: 'Asheville'
     },
-    state: { type: String, default: '' },
-    pincode: { type: String, default: '' },
+    neighborhood: { type: String, default: 'Downtown' },
+    state: { type: String, default: 'NC' },
+    pincode: { type: String, default: '28801' },
     coordinates: {
-      lat: { type: Number, required: true, default: 19.0760 },
-      lng: { type: Number, required: true, default: 72.8777 }
+      lat: { type: Number, required: true, default: 35.5951 },
+      lng: { type: Number, required: true, default: -82.5515 }
     }
   },
   amenities: [{
@@ -104,7 +101,8 @@ const propertySchema = new mongoose.Schema({
     predictedRent: { type: Number },
     lowerBound: { type: Number },
     upperBound: { type: Number },
-    confidenceLevel: { type: String, default: '95%' },
+    confidenceLevel: { type: String, default: '95% Prediction Interval' },
+    empiricalCoverage: { type: String, default: '93.70%' },
     estimatedAt: { type: Date }
   },
   status: {
@@ -127,7 +125,8 @@ propertySchema.index({
   title: 'text',
   description: 'text',
   'location.address': 'text',
-  'location.city': 'text'
+  'location.city': 'text',
+  'location.neighborhood': 'text'
 });
 
 module.exports = mongoose.model('Property', propertySchema);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, BedDouble, Bath, Maximize2, Sparkles, Heart, ShieldCheck } from 'lucide-react';
+import { MapPin, BedDouble, Bath, Users, Sparkles, Heart, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
@@ -19,7 +19,7 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
       return;
     }
     if (!isTenant) {
-      showToast('Only tenant accounts can save favorites.', 'info');
+      showToast('Only tenant / guest accounts can save favorites.', 'info');
       return;
     }
 
@@ -61,7 +61,7 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
         {/* City Badge */}
         <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
           <span className="badge badge-primary" style={{ background: 'rgba(255, 255, 255, 0.95)', color: '#1e293b', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
-            <MapPin size={12} color="#3b82f6" /> {property.location?.city || 'India'}
+            <MapPin size={12} color="#3b82f6" /> {property.location?.city || 'Asheville'}, NC
           </span>
         </div>
 
@@ -111,10 +111,10 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#a78bfa' }}>
               <Sparkles size={13} />
-              <span>AI Rent Estimate</span>
+              <span>AI Predicted Rate</span>
             </div>
             <span style={{ color: '#34d399' }}>
-              ₹{Number(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}/mo
+              ${Number(property.predictedRentInfo.predictedRent).toLocaleString('en-US')}/night
             </span>
           </div>
         )}
@@ -126,9 +126,9 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '8px' }}>
           <div>
             <span style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>
-              ₹{Number(property.price).toLocaleString('en-IN')}
+              ${Number(property.price).toLocaleString('en-US')}
             </span>
-            <span style={{ fontSize: '0.825rem', color: '#64748b', marginLeft: '4px' }}>/month</span>
+            <span style={{ fontSize: '0.825rem', color: '#64748b', marginLeft: '4px' }}>/night</span>
           </div>
           <span className="badge badge-ai" style={{ fontSize: '0.7rem' }}>
             {property.propertyType}
@@ -176,21 +176,21 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
             <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}>
-              <BedDouble size={14} /> BHK
+              <BedDouble size={14} /> Beds
             </span>
-            <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>{property.bhk} BHK</span>
+            <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>{property.bedrooms || property.bhk || 2}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
             <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}>
               <Bath size={14} /> Baths
             </span>
-            <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>{property.bathroom || 2}</span>
+            <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>{property.bathrooms || property.bathroom || 1.5}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
             <span style={{ color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem' }}>
-              <Maximize2 size={14} /> Area
+              <Users size={14} /> Guests
             </span>
-            <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>{property.size} sq.ft</span>
+            <span style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>{property.accommodates || 4}</span>
           </div>
         </div>
 

@@ -23,8 +23,8 @@ const MapUpdater = ({ center, zoom }) => {
 };
 
 const MapViewer = ({ properties = [], singleProperty = null, height = '450px', zoom = 12 }) => {
-  // Determine center coordinates
-  let center = [19.0760, 72.8777]; // Default Mumbai
+  // Determine center coordinates (Default: Downtown Asheville, NC)
+  let center = [35.5951, -82.5515];
 
   if (singleProperty && singleProperty.location?.coordinates?.lat) {
     center = [
@@ -82,10 +82,10 @@ const MapViewer = ({ properties = [], singleProperty = null, height = '450px', z
                   />
                   <h4 style={{ margin: '0 0 4px', fontSize: '0.9rem', fontWeight: '700' }}>{prop.title}</h4>
                   <div style={{ color: '#2563eb', fontWeight: '800', fontSize: '0.95rem', marginBottom: '6px' }}>
-                    ₹{Number(prop.price).toLocaleString('en-IN')}/mo
+                    ${Number(prop.price).toLocaleString('en-US')}/night
                   </div>
                   <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px' }}>
-                    {prop.bhk} BHK • {prop.size} sq.ft
+                    {prop.bedrooms || prop.bhk || 2} Beds • {prop.bathrooms || prop.bathroom || 1} Baths • {prop.accommodates || 4} Guests
                   </div>
                   <Link
                     to={`/properties/${prop._id}`}
@@ -101,7 +101,7 @@ const MapViewer = ({ properties = [], singleProperty = null, height = '450px', z
                       textDecoration: 'none'
                     }}
                   >
-                    View Property
+                    View Listing
                   </Link>
                 </div>
               </Popup>

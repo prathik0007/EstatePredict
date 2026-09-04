@@ -90,7 +90,7 @@ const AdminDashboard = () => {
             {stats?.users?.total || 0}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '2px' }}>
-            {stats?.users?.owners} Owners • {stats?.users?.tenants} Tenants
+            {stats?.users?.owners} Hosts • {stats?.users?.tenants} Guests
           </div>
         </div>
 
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="card" style={{ padding: '20px', borderLeft: '4px solid #f59e0b' }}>
-          <div style={{ color: '#64748b', fontSize: '0.825rem', fontWeight: '600' }}>Tenant Reviews</div>
+          <div style={{ color: '#64748b', fontSize: '0.825rem', fontWeight: '600' }}>Guest Reviews</div>
           <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a', marginTop: '4px' }}>
             {stats?.reviews || 0}
           </div>
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
             cursor: 'pointer'
           }}
         >
-          City Analytics
+          Neighborhood Analytics
         </button>
 
         <button
@@ -173,20 +173,20 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      {/* Tab 1: City Analytics */}
+      {/* Tab 1: Neighborhood Analytics */}
       {activeTab === 'overview' && (
         <div className="card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MapPin size={18} color="#3b82f6" /> City-Wise Market Distribution
+            <MapPin size={18} color="#3b82f6" /> Neighborhood-Wise Market Distribution (Asheville, NC)
           </h3>
 
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
               <thead>
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
-                  <th style={{ padding: '12px' }}>City</th>
+                  <th style={{ padding: '12px' }}>Neighborhood</th>
                   <th style={{ padding: '12px' }}>Active Listings</th>
-                  <th style={{ padding: '12px' }}>Average Rental Price</th>
+                  <th style={{ padding: '12px' }}>Average Nightly Price</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,7 +197,7 @@ const AdminDashboard = () => {
                       <span className="badge badge-primary">{city.count} properties</span>
                     </td>
                     <td style={{ padding: '12px', fontWeight: '700', color: '#2563eb' }}>
-                      ₹{Math.round(city.avgPrice || 0).toLocaleString('en-IN')}/mo
+                      ${Math.round(city.avgPrice || 0).toLocaleString('en-US')}/night
                     </td>
                   </tr>
                 ))}
@@ -219,9 +219,9 @@ const AdminDashboard = () => {
               <thead>
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
                   <th style={{ padding: '12px' }}>Property</th>
-                  <th style={{ padding: '12px' }}>City</th>
-                  <th style={{ padding: '12px' }}>Price</th>
-                  <th style={{ padding: '12px' }}>Owner</th>
+                  <th style={{ padding: '12px' }}>Neighborhood</th>
+                  <th style={{ padding: '12px' }}>Nightly Price</th>
+                  <th style={{ padding: '12px' }}>Host</th>
                   <th style={{ padding: '12px' }}>Status</th>
                   <th style={{ padding: '12px', textAlign: 'right' }}>Actions</th>
                 </tr>
@@ -234,9 +234,9 @@ const AdminDashboard = () => {
                         {prop.title}
                       </div>
                     </td>
-                    <td style={{ padding: '12px' }}>{prop.location?.city}</td>
-                    <td style={{ padding: '12px', fontWeight: '700' }}>₹{Number(prop.price).toLocaleString('en-IN')}</td>
-                    <td style={{ padding: '12px', color: '#64748b' }}>{prop.owner?.name || 'Owner'}</td>
+                    <td style={{ padding: '12px' }}>{prop.location?.city || 'Asheville'}</td>
+                    <td style={{ padding: '12px', fontWeight: '700' }}>${Number(prop.price).toLocaleString('en-US')}/night</td>
+                    <td style={{ padding: '12px', color: '#64748b' }}>{prop.owner?.name || 'Host'}</td>
                     <td style={{ padding: '12px' }}>
                       <span className={`badge ${prop.status === 'available' ? 'badge-success' : 'badge-danger'}`}>
                         {prop.status}

@@ -17,7 +17,8 @@ import {
   MessageSquare,
   Heart,
   Share2,
-  ArrowLeft
+  ArrowLeft,
+  Users
 } from 'lucide-react';
 import MapViewer from '../components/MapViewer';
 import { useAuth } from '../context/AuthContext';
@@ -39,7 +40,7 @@ const PropertyDetailsPage = () => {
   const [visitDate, setVisitDate] = useState('');
   const [timeSlot, setTimeSlot] = useState('Morning (9 AM - 12 PM)');
   const [contactNumber, setContactNumber] = useState(user?.phone || '');
-  const [bookingMessage, setBookingMessage] = useState('I am interested in scheduling a site visit for this property.');
+  const [bookingMessage, setBookingMessage] = useState('I am interested in reserving / touring this property.');
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
@@ -79,7 +80,7 @@ const PropertyDetailsPage = () => {
       return;
     }
     if (!isTenant) {
-      showToast('Only tenant accounts can submit booking requests.', 'error');
+      showToast('Only tenant / guest accounts can submit booking requests.', 'error');
       return;
     }
     if (!visitDate) {
@@ -99,7 +100,7 @@ const PropertyDetailsPage = () => {
 
       if (res.data.success) {
         setBookingSuccess(true);
-        showToast('Visit request sent to property owner!', 'success');
+        showToast('Reservation / Visit request sent to host!', 'success');
       }
     } catch (err) {
       showToast(err.response?.data?.message || 'Failed to submit booking', 'error');
@@ -173,23 +174,23 @@ const PropertyDetailsPage = () => {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="badge badge-primary">{property.propertyType}</span>
-            <span className="badge badge-success">{property.furnishingStatus}</span>
-            <span className="badge badge-warning">For {property.listingType}</span>
+            <span className="badge badge-success">{property.roomType || 'Entire home/apt'}</span>
+            <span className="badge badge-warning">Asheville, NC</span>
           </div>
           <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '6px' }}>
             {property.title}
           </h1>
           <p style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.95rem' }}>
-            <MapPin size={16} color="#3b82f6" /> {property.location?.address}, {property.location?.city}
+            <MapPin size={16} color="#3b82f6" /> {property.location?.address}, {property.location?.city || 'Asheville'}, NC
           </p>
         </div>
 
         {/* Price Box */}
         <div style={{ textAlign: 'right' }}>
-          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Monthly Rent</span>
+          <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Nightly Price</span>
           <div style={{ fontSize: '2.2rem', fontWeight: '900', color: '#0f172a' }}>
-            ₹{Number(property.price).toLocaleString('en-IN')}
-            <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: '500' }}> /mo</span>
+            ${Number(property.price).toLocaleString('en-US')}
+            <span style={{ fontSize: '1rem', color: '#64748b', fontWeight: '500' }}> /night</span>
           </div>
         </div>
       </div>
@@ -252,29 +253,39 @@ const PropertyDetailsPage = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '20px' }}>
               <div>
                 <div style={{ color: '#64748b', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <BedDouble size={16} /> Bedrooms (BHK)
+                  <Users size={16} /> Capacity
                 </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>{property.bhk} BHK</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>
+                  {property.accommodates || 4} Guests
+                </div>
+              </div>
+              <div>
+                <div style={{ color: '#64748b', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <BedDouble size={16} /> Bedrooms
+                </div>
+                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>
+                  {property.bedrooms || property.bhk || 2} Bedrooms
+                </div>
               </div>
               <div>
                 <div style={{ color: '#64748b', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Bath size={16} /> Bathrooms
                 </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>{property.bathroom || 2}</div>
-              </div>
-              <div>
-                <div style={{ color: '#64748b', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Maximize2 size={16} /> Super Area
+                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>
+                  {property.bathrooms || property.bathroom || 1.5} Baths
                 </div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>{property.size} sq.ft</div>
               </div>
               <div>
-                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Tenant Preferred</div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>{property.tenantPreferred}</div>
+                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Min Stay</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>
+                  {property.minNights || 2} Nights
+                </div>
               </div>
               <div>
-                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Area Classification</div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>{property.areaType}</div>
+                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Room Type</div>
+                <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a', marginTop: '2px' }}>
+                  {property.roomType || 'Entire home/apt'}
+                </div>
               </div>
             </div>
           </div>
@@ -285,11 +296,11 @@ const PropertyDetailsPage = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <Sparkles size={18} color="#7c3aed" />
                 <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  AI Rental Price Valuation & Uncertainty Range
+                  AI Nightly Rental Price Valuation & Uncertainty Range
                 </span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#334155', lineHeight: 1.5, marginBottom: '14px' }}>
-                Our research-trained multimodal Random Forest and MAPIE Conformal Prediction algorithms estimated fair market rent for this property:
+                Our research-trained HistGradientBoosting model (with log1p target transformation) and calibrated 95% conformal prediction intervals estimated fair market nightly rates for this property:
               </p>
               <div style={{
                 background: '#ffffff',
@@ -303,20 +314,20 @@ const PropertyDetailsPage = () => {
                 border: '1px solid #c4b5fd'
               }}>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>AI Point Prediction</span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>AI Predicted Nightly Price</span>
                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#6d28d9' }}>
-                    ₹{Number(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}/mo
+                    ${Number(property.predictedRentInfo.predictedRent).toLocaleString('en-US')}/night
                   </div>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>95% Statistical Confidence Band</span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>Calibrated 95% Prediction Interval</span>
                   <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#0f172a' }}>
-                    ₹{Number(property.predictedRentInfo.lowerBound).toLocaleString('en-IN')} – ₹{Number(property.predictedRentInfo.upperBound).toLocaleString('en-IN')}
+                    ${Number(property.predictedRentInfo.lowerBound).toLocaleString('en-US')} – ${Number(property.predictedRentInfo.upperBound).toLocaleString('en-US')}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span className="badge badge-success" style={{ fontSize: '0.75rem' }}>
-                    <ShieldCheck size={13} /> High Accuracy
+                    <ShieldCheck size={13} /> Empirical coverage: 93.70%
                   </span>
                 </div>
               </div>
@@ -369,7 +380,7 @@ const PropertyDetailsPage = () => {
               Location & Neighborhood
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '16px' }}>
-              {property.location?.address}, {property.location?.city}
+              {property.location?.address}, {property.location?.city || 'Asheville'}, NC
             </p>
             <MapViewer singleProperty={property} height="320px" zoom={14} />
           </div>
@@ -378,13 +389,13 @@ const PropertyDetailsPage = () => {
           <div className="card" style={{ padding: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>Tenant Reviews</h3>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Verified feedback from visitors</p>
+                <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>Guest Reviews</h3>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Verified feedback from guests</p>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fef3c7', padding: '6px 12px', borderRadius: '10px' }}>
                 <Star size={18} fill="#f59e0b" color="#f59e0b" />
                 <span style={{ fontWeight: '800', fontSize: '1.1rem', color: '#92400e' }}>
-                  {avgRating > 0 ? avgRating : '5.0'}
+                  {avgRating > 0 ? avgRating : (property.reviewScoresRating || '4.9')}
                 </span>
                 <span style={{ fontSize: '0.8rem', color: '#b45309' }}>({reviews.length} reviews)</span>
               </div>
@@ -401,7 +412,7 @@ const PropertyDetailsPage = () => {
                   <div key={rev._id} style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
                       <div style={{ fontWeight: '700', fontSize: '0.9rem', color: '#0f172a' }}>
-                        {rev.user?.name || 'Verified Tenant'}
+                        {rev.user?.name || 'Verified Guest'}
                       </div>
                       <div style={{ display: 'flex', gap: '2px' }}>
                         {[...Array(5)].map((_, i) => (
@@ -439,7 +450,7 @@ const PropertyDetailsPage = () => {
                 </div>
                 <div className="form-group">
                   <textarea
-                    placeholder="Share details about the property condition, neighborhood, and landlord..."
+                    placeholder="Share details about the property condition, neighborhood, and host..."
                     value={reviewComment}
                     onChange={(e) => setReviewComment(e.target.value)}
                     className="form-textarea"
@@ -460,10 +471,10 @@ const PropertyDetailsPage = () => {
             {/* Booking Form Card */}
             <div className="card" style={{ padding: '24px', marginBottom: '24px', boxShadow: 'var(--shadow-lg)' }}>
               <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#0f172a', marginBottom: '6px' }}>
-                Schedule a Site Visit
+                Schedule a Visit / Stay
               </h3>
               <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '18px' }}>
-                Select your preferred date to inspect this property in person.
+                Select your preferred date to tour or book this property in Asheville.
               </p>
 
               {bookingSuccess ? (
@@ -471,7 +482,7 @@ const PropertyDetailsPage = () => {
                   <CheckCircle size={36} color="#10b981" style={{ margin: '0 auto 8px' }} />
                   <h4 style={{ color: '#065f46', fontWeight: '800' }}>Request Submitted!</h4>
                   <p style={{ fontSize: '0.825rem', color: '#047857', marginTop: '4px' }}>
-                    The property owner has been notified. You can monitor the approval status in your Tenant Dashboard.
+                    The property host has been notified. You can monitor the approval status in your Guest Dashboard.
                   </p>
                   <Link to="/tenant/dashboard" className="btn btn-primary btn-sm" style={{ marginTop: '12px' }}>
                     View My Bookings
@@ -480,7 +491,7 @@ const PropertyDetailsPage = () => {
               ) : (
                 <form onSubmit={handleBookingSubmit}>
                   <div className="form-group">
-                    <label className="form-label">Preferred Visit Date</label>
+                    <label className="form-label">Preferred Date</label>
                     <input
                       type="date"
                       min={new Date().toISOString().split('T')[0]}
@@ -508,7 +519,7 @@ const PropertyDetailsPage = () => {
                     <label className="form-label">Your Contact Phone</label>
                     <input
                       type="tel"
-                      placeholder="e.g. +91 9876543210"
+                      placeholder="e.g. +1 (828) 555-0199"
                       value={contactNumber}
                       onChange={(e) => setContactNumber(e.target.value)}
                       className="form-input"
@@ -533,7 +544,7 @@ const PropertyDetailsPage = () => {
                     style={{ width: '100%', fontWeight: '700' }}
                   >
                     <Calendar size={18} />
-                    {bookingSubmitting ? 'Sending Request...' : 'Request Site Visit'}
+                    {bookingSubmitting ? 'Sending Request...' : 'Request Visit / Stay'}
                   </button>
                 </form>
               )}
@@ -542,7 +553,7 @@ const PropertyDetailsPage = () => {
             {/* Owner Info Card */}
             <div className="card" style={{ padding: '20px' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>
-                Property Owner
+                Property Host
               </span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px' }}>
                 <div style={{
@@ -557,20 +568,20 @@ const PropertyDetailsPage = () => {
                   fontWeight: '700',
                   fontSize: '1.1rem'
                 }}>
-                  {property.owner?.name?.charAt(0) || 'O'}
+                  {property.owner?.name?.charAt(0) || 'H'}
                 </div>
                 <div>
                   <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a' }}>
-                    {property.owner?.name || 'Property Owner'}
+                    {property.owner?.name || 'Verified Host'}
                   </h4>
                   <span className="badge badge-success" style={{ fontSize: '0.65rem' }}>
-                    Verified Landlord
+                    Superhost
                   </span>
                 </div>
               </div>
               <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', color: '#475569' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Phone size={15} color="#3b82f6" /> {property.owner?.phone || '+91 Contact on Booking'}
+                  <Phone size={15} color="#3b82f6" /> {property.owner?.phone || '+1 (828) 555-0100'}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Mail size={15} color="#3b82f6" /> {property.owner?.email}

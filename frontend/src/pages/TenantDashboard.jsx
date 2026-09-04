@@ -64,7 +64,7 @@ const TenantDashboard = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '80px 0', color: '#64748b', fontWeight: '600' }}>
-        Loading Tenant Dashboard...
+        Loading Guest Dashboard...
       </div>
     );
   }
@@ -75,7 +75,7 @@ const TenantDashboard = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#10b981', textTransform: 'uppercase' }}>
-            Tenant Account
+            Guest / Tenant Account
           </span>
           <h1 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a' }}>
             My Bookings & Inquiries
@@ -90,15 +90,15 @@ const TenantDashboard = () => {
         {/* Bookings Tracker List */}
         <div>
           <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#1e293b', marginBottom: '16px' }}>
-            Site Visit Requests ({bookings.length})
+            Stay & Visit Requests ({bookings.length})
           </h3>
 
           {bookings.length === 0 ? (
             <div className="card" style={{ padding: '60px', textAlign: 'center' }}>
               <CalendarCheck size={44} color="#94a3b8" style={{ margin: '0 auto 12px' }} />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: '700' }}>No site visit requests yet</h3>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '700' }}>No visit requests yet</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '6px 0 20px' }}>
-                Browse properties and schedule visit requests directly with verified owners.
+                Browse Asheville properties and schedule stay requests directly with verified hosts.
               </p>
               <Link to="/properties" className="btn btn-primary btn-sm">
                 Explore Properties
@@ -121,13 +121,13 @@ const TenantDashboard = () => {
                           {booking.property?.title || 'Property Listing'}
                         </h4>
                         <p style={{ fontSize: '0.825rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                          <MapPin size={13} /> {booking.property?.location?.city} • ₹{Number(booking.property?.price).toLocaleString('en-IN')}/mo
+                          <MapPin size={13} /> {booking.property?.location?.city || 'Asheville'} • ${Number(booking.property?.price).toLocaleString('en-US')}/night
                         </p>
                         <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '8px' }}>
-                          📅 <strong>Requested Visit:</strong> {new Date(booking.visitDate).toLocaleDateString()} ({booking.timeSlot})
+                          📅 <strong>Requested Date:</strong> {new Date(booking.visitDate).toLocaleDateString()} ({booking.timeSlot})
                         </div>
                         <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '2px' }}>
-                          Landlord Contact: {booking.owner?.name} ({booking.owner?.email})
+                          Host Contact: {booking.owner?.name} ({booking.owner?.email})
                         </div>
                       </div>
                     </div>
@@ -189,7 +189,7 @@ const TenantDashboard = () => {
                 <label className="form-label">Phone Number</label>
                 <input
                   type="tel"
-                  placeholder="+91 9876543210"
+                  placeholder="+1 (828) 555-0199"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="form-input"

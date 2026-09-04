@@ -21,7 +21,7 @@ const HomePage = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState('All');
-  const [searchBhk, setSearchBhk] = useState('All');
+  const [searchBedrooms, setSearchBedrooms] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
@@ -46,7 +46,7 @@ const HomePage = () => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (searchCity !== 'All') params.append('city', searchCity);
-    if (searchBhk !== 'All') params.append('bhk', searchBhk);
+    if (searchBedrooms !== 'All') params.append('bedrooms', searchBedrooms);
     if (searchQuery.trim()) params.append('search', searchQuery.trim());
     navigate(`/properties?${params.toString()}`);
   };
@@ -99,7 +99,7 @@ const HomePage = () => {
               letterSpacing: '-0.03em',
               marginBottom: '20px'
             }}>
-              Discover Verified Rentals & Predict Fair Prices with <span style={{ color: '#38bdf8' }}>Machine Learning</span>
+              Discover Verified Rentals & Predict Fair Nightly Prices with <span style={{ color: '#38bdf8' }}>Machine Learning</span>
             </h1>
 
             <p style={{
@@ -108,7 +108,7 @@ const HomePage = () => {
               lineHeight: 1.6,
               marginBottom: '32px'
             }}>
-              Direct connection between verified owners and tenants with statistical 95% confidence rent bounds and SHAP feature explainability.
+              Direct connection between verified hosts and guests with calibrated 95% prediction intervals and SHAP feature explainability.
             </p>
 
             {/* Hero Quick Search Box */}
@@ -122,7 +122,7 @@ const HomePage = () => {
               gap: '10px',
               alignItems: 'center'
             }}>
-              {/* City selector */}
+              {/* Neighborhood selector */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
                 <MapPin size={18} color="#3b82f6" />
                 <select
@@ -130,29 +130,31 @@ const HomePage = () => {
                   onChange={(e) => setSearchCity(e.target.value)}
                   style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
                 >
-                  <option value="All">All Cities</option>
-                  <option value="Mumbai">Mumbai</option>
-                  <option value="Bangalore">Bangalore</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Hyderabad">Hyderabad</option>
-                  <option value="Chennai">Chennai</option>
-                  <option value="Kolkata">Kolkata</option>
+                  <option value="All">All Neighborhoods</option>
+                  <option value="Downtown">Downtown Asheville</option>
+                  <option value="Montford">Montford</option>
+                  <option value="West Asheville">West Asheville</option>
+                  <option value="Biltmore Village">Biltmore Village</option>
+                  <option value="Grove Park">Grove Park</option>
+                  <option value="River Arts District">River Arts District</option>
+                  <option value="North Asheville">North Asheville</option>
+                  <option value="South Asheville">South Asheville</option>
                 </select>
               </div>
 
-              {/* BHK selector */}
+              {/* Bedrooms selector */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: '#f8fafc', borderRadius: '10px' }}>
                 <Home size={18} color="#3b82f6" />
                 <select
-                  value={searchBhk}
-                  onChange={(e) => setSearchBhk(e.target.value)}
+                  value={searchBedrooms}
+                  onChange={(e) => setSearchBedrooms(e.target.value)}
                   style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
                 >
-                  <option value="All">Any BHK</option>
-                  <option value="1">1 BHK</option>
-                  <option value="2">2 BHK</option>
-                  <option value="3">3 BHK</option>
-                  <option value="4">4+ BHK</option>
+                  <option value="All">Any Bedrooms</option>
+                  <option value="1">1 Bedroom</option>
+                  <option value="2">2 Bedrooms</option>
+                  <option value="3">3 Bedrooms</option>
+                  <option value="4">4+ Bedrooms</option>
                 </select>
               </div>
 
@@ -161,7 +163,7 @@ const HomePage = () => {
                 <Search size={18} color="#94a3b8" />
                 <input
                   type="text"
-                  placeholder="Locality, building or keyword..."
+                  placeholder="Neighborhood, title or keyword..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '500', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
@@ -191,8 +193,8 @@ const HomePage = () => {
                 <Cpu size={24} />
               </div>
               <div>
-                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>Multimodal Fusion</h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Text + Image + Tabular model</p>
+                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>HistGradientBoosting</h4>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>log1p target transformation</p>
               </div>
             </div>
 
@@ -201,8 +203,8 @@ const HomePage = () => {
                 <ShieldCheck size={24} />
               </div>
               <div>
-                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>MAPIE Conformal CI</h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>95% statistical rent bounds</p>
+                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>Calibrated 95% Interval</h4>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Empirical coverage: 93.70%</p>
               </div>
             </div>
 
@@ -212,7 +214,7 @@ const HomePage = () => {
               </div>
               <div>
                 <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>SHAP Explainability</h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Transparent factor valuation</p>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Transparent factor attribution</p>
               </div>
             </div>
 
@@ -222,7 +224,7 @@ const HomePage = () => {
               </div>
               <div>
                 <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>OpenStreetMap</h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Leaflet interactive geolocation</p>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Asheville Leaflet geolocation</p>
               </div>
             </div>
           </div>
@@ -272,7 +274,7 @@ const HomePage = () => {
               Explore Properties on OpenStreetMap
             </h2>
             <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
-              View properties across Mumbai, Bangalore, Delhi, Hyderabad, Chennai, and Kolkata directly on Leaflet.js
+              View verified Airbnb properties across Asheville, NC (Downtown, Montford, West Asheville, Biltmore Village) directly on Leaflet.js
             </p>
           </div>
 

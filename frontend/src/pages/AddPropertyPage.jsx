@@ -18,20 +18,20 @@ import api from '../services/api';
 
 const AMENITIES_LIST = [
   'Air Conditioning',
-  'Swimming Pool',
-  'Gymnasium',
-  'Club House',
-  'Covered Parking',
-  '24/7 Security',
-  'Power Backup',
-  'High Speed Elevators',
-  'Children Play Area',
-  'Gated Community',
-  'Balcony',
   'Wifi Included',
-  'Modular Kitchen',
-  'Water Purifier',
-  'Private Garden'
+  'Free Parking on Premises',
+  'Full Kitchen',
+  'Mountain Views',
+  'Patio or Balcony',
+  'Washer & Dryer',
+  'Dedicated Workspace',
+  'Heating',
+  'Self Check-in',
+  'Hot Tub',
+  'Fire Pit',
+  'Pet Friendly',
+  'Coffee Maker',
+  'BBQ Grill'
 ];
 
 const AddPropertyPage = () => {
@@ -43,24 +43,21 @@ const AddPropertyPage = () => {
     description: '',
     price: '',
     listingType: 'Rent',
-    propertyType: 'Apartment',
+    propertyType: 'Entire rental unit',
     roomType: 'Entire home/apt',
-    bhk: 2,
-    size: 1000,
-    bathroom: 2,
+    accommodates: 4,
     bedrooms: 2,
-    bathroomsAirbnb: 2.0,
-    areaType: 'Super Area',
-    furnishingStatus: 'Semi-Furnished',
-    tenantPreferred: 'Anyone',
+    bathrooms: 2,
+    minNights: 2,
+    reviewScoresRating: 4.90,
     address: '',
-    city: 'Mumbai',
-    state: '',
-    pincode: '',
-    coordinates: { lat: 19.0760, lng: 72.8777 }
+    city: 'Downtown',
+    state: 'NC',
+    pincode: '28801',
+    coordinates: { lat: 35.5951, lng: -82.5515 }
   });
 
-  const [selectedAmenities, setSelectedAmenities] = useState(['24/7 Security', 'Power Backup', 'Covered Parking']);
+  const [selectedAmenities, setSelectedAmenities] = useState(['Wifi Included', 'Air Conditioning', 'Free Parking on Premises']);
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -99,7 +96,7 @@ const AddPropertyPage = () => {
       confidenceLevel: aiData.confidence_level || '95%',
       estimatedAt: new Date()
     });
-    showToast(`AI Suggested Price of ₹${Math.round(suggestedPrice).toLocaleString('en-IN')} applied!`, 'success');
+    showToast(`AI Suggested Price of $${Math.round(suggestedPrice).toLocaleString('en-US')}/night applied!`, 'success');
   };
 
   const handleSubmit = async (e) => {
@@ -119,14 +116,11 @@ const AddPropertyPage = () => {
       data.append('listingType', formData.listingType);
       data.append('propertyType', formData.propertyType);
       data.append('roomType', formData.roomType);
-      data.append('bhk', formData.bhk);
-      data.append('size', formData.size);
-      data.append('bathroom', formData.bathroom);
-      data.append('bedrooms', formData.bedrooms || formData.bhk);
-      data.append('bathroomsAirbnb', formData.bathroomsAirbnb || formData.bathroom);
-      data.append('areaType', formData.areaType);
-      data.append('furnishingStatus', formData.furnishingStatus);
-      data.append('tenantPreferred', formData.tenantPreferred);
+      data.append('accommodates', formData.accommodates);
+      data.append('bedrooms', formData.bedrooms);
+      data.append('bathrooms', formData.bathrooms);
+      data.append('minNights', formData.minNights);
+      data.append('reviewScoresRating', formData.reviewScoresRating);
 
       // Location object
       const locationObj = {
@@ -170,7 +164,7 @@ const AddPropertyPage = () => {
           Create New Property Listing
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-          Fill in details about your property and use our built-in Multimodal AI to calculate fair market rent.
+          Fill in details about your Asheville property and use our built-in Multimodal V3 AI to calculate fair nightly market rates.
         </p>
       </div>
 
@@ -186,7 +180,7 @@ const AddPropertyPage = () => {
             <input
               type="text"
               name="title"
-              placeholder="e.g. Spacious 3 BHK Sea-View Flat in Bandra West"
+              placeholder="e.g. Historic Montford Craftsman with Mountain Views"
               value={formData.title}
               onChange={handleInputChange}
               className="form-input"
@@ -198,10 +192,11 @@ const AddPropertyPage = () => {
             <div className="form-group">
               <label className="form-label">Property Type</label>
               <select name="propertyType" value={formData.propertyType} onChange={handleInputChange} className="form-select">
-                <option value="Apartment">Apartment</option>
-                <option value="House">House</option>
-                <option value="Villa">Villa</option>
-                <option value="Condominium">Condominium</option>
+                <option value="Entire rental unit">Entire rental unit</option>
+                <option value="Entire home">Entire home</option>
+                <option value="Entire guest suite">Entire guest suite</option>
+                <option value="Entire townhouse">Entire townhouse</option>
+                <option value="Private room in home">Private room in home</option>
               </select>
             </div>
 
@@ -211,14 +206,15 @@ const AddPropertyPage = () => {
                 <option value="Entire home/apt">Entire home/apt</option>
                 <option value="Private room">Private room</option>
                 <option value="Shared room">Shared room</option>
+                <option value="Hotel room">Hotel room</option>
               </select>
             </div>
 
             <div className="form-group">
               <label className="form-label">Listing Type</label>
               <select name="listingType" value={formData.listingType} onChange={handleInputChange} className="form-select">
-                <option value="Rent">Rent</option>
-                <option value="Sale">Sale</option>
+                <option value="Rent">Nightly Short-Term Rent</option>
+                <option value="MidTerm">Mid-Term Lease</option>
               </select>
             </div>
           </div>
@@ -226,7 +222,7 @@ const AddPropertyPage = () => {
 
         {/* Section 2: Specifications & AI Rent Estimator Banner */}
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>
               2. Dimensions & Specifications
             </h3>
@@ -238,68 +234,51 @@ const AddPropertyPage = () => {
               className="btn btn-accent btn-sm"
               style={{ fontWeight: '700' }}
             >
-              <Sparkles size={16} /> Estimate Rent with AI
+              <Sparkles size={16} /> Estimate Nightly Rate with AI
             </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px' }}>
             <div className="form-group">
-              <label className="form-label">BHK *</label>
-              <input type="number" name="bhk" min="1" max="10" value={formData.bhk} onChange={handleInputChange} className="form-input" required />
+              <label className="form-label">Accommodates (Guests) *</label>
+              <input type="number" name="accommodates" min="1" max="16" value={formData.accommodates} onChange={handleInputChange} className="form-input" required />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Super / Carpet Size (sq.ft) *</label>
-              <input type="number" name="size" min="100" max="50000" value={formData.size} onChange={handleInputChange} className="form-input" required />
+              <label className="form-label">Bedrooms *</label>
+              <input type="number" name="bedrooms" min="0" max="10" value={formData.bedrooms} onChange={handleInputChange} className="form-input" required />
             </div>
 
             <div className="form-group">
               <label className="form-label">Bathrooms *</label>
-              <input type="number" name="bathroom" min="1" max="10" value={formData.bathroom} onChange={handleInputChange} className="form-input" required />
+              <input type="number" step="0.5" name="bathrooms" min="1" max="10" value={formData.bathrooms} onChange={handleInputChange} className="form-input" required />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Area Type</label>
-              <select name="areaType" value={formData.areaType} onChange={handleInputChange} className="form-select">
-                <option value="Super Area">Super Area</option>
-                <option value="Carpet Area">Carpet Area</option>
-                <option value="Built Area">Built Area</option>
-              </select>
+              <label className="form-label">Minimum Nights</label>
+              <input type="number" name="minNights" min="1" max="30" value={formData.minNights} onChange={handleInputChange} className="form-input" />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Furnishing Status</label>
-              <select name="furnishingStatus" value={formData.furnishingStatus} onChange={handleInputChange} className="form-select">
-                <option value="Furnished">Furnished</option>
-                <option value="Semi-Furnished">Semi-Furnished</option>
-                <option value="Unfurnished">Unfurnished</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Tenant Preferred</label>
-              <select name="tenantPreferred" value={formData.tenantPreferred} onChange={handleInputChange} className="form-select">
-                <option value="Anyone">Anyone</option>
-                <option value="Family">Family</option>
-                <option value="Bachelors">Bachelors</option>
-              </select>
+              <label className="form-label">Review Rating</label>
+              <input type="number" step="0.01" name="reviewScoresRating" min="1" max="5" value={formData.reviewScoresRating} onChange={handleInputChange} className="form-input" />
             </div>
           </div>
 
           {/* Pricing input with AI badge indicator */}
           <div className="form-group" style={{ marginTop: '10px' }}>
             <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span>Monthly Rental Price (₹) *</span>
+              <span>Nightly Rental Price ($) *</span>
               {aiValuationInfo && (
                 <span className="badge badge-ai" style={{ fontSize: '0.7rem' }}>
-                  <Sparkles size={12} /> AI Valuated
+                  <Sparkles size={12} /> AI Valuated (${aiValuationInfo.predictedRent}/night)
                 </span>
               )}
             </label>
             <input
               type="number"
               name="price"
-              placeholder="e.g. 35000"
+              placeholder="e.g. 175"
               value={formData.price}
               onChange={handleInputChange}
               className="form-input"
@@ -312,28 +291,30 @@ const AddPropertyPage = () => {
         {/* Section 3: Location & Leaflet OpenStreetMap Pin Picker */}
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', marginBottom: '16px' }}>
-            3. Property Location & Map Pin
+            3. Property Location (Asheville, NC)
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div className="form-group">
-              <label className="form-label">City *</label>
+              <label className="form-label">Neighborhood *</label>
               <select name="city" value={formData.city} onChange={handleInputChange} className="form-select">
-                <option value="Mumbai">Mumbai</option>
-                <option value="Bangalore">Bangalore</option>
-                <option value="Delhi">Delhi</option>
-                <option value="Hyderabad">Hyderabad</option>
-                <option value="Chennai">Chennai</option>
-                <option value="Kolkata">Kolkata</option>
+                <option value="Downtown">Downtown Asheville</option>
+                <option value="Montford">Montford</option>
+                <option value="West Asheville">West Asheville</option>
+                <option value="Biltmore Village">Biltmore Village</option>
+                <option value="Grove Park">Grove Park</option>
+                <option value="River Arts District">River Arts District</option>
+                <option value="North Asheville">North Asheville</option>
+                <option value="South Asheville">South Asheville</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Locality / Address *</label>
+              <label className="form-label">Street Address *</label>
               <input
                 type="text"
                 name="address"
-                placeholder="e.g. 12th Main Road, Indiranagar"
+                placeholder="e.g. 45 Haywood Street"
                 value={formData.address}
                 onChange={handleInputChange}
                 className="form-input"
@@ -392,11 +373,11 @@ const AddPropertyPage = () => {
         {/* Section 5: Image Uploads & Description */}
         <div className="card" style={{ padding: '24px', marginBottom: '28px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', marginBottom: '16px' }}>
-            5. Photos & Description
+            5. Property Photo & Description
           </h3>
 
           <div className="form-group">
-            <label className="form-label">Upload Property Photos (Up to 8 images)</label>
+            <label className="form-label">Upload Property Photo (Evaluated with EfficientNet-B0 Visual Model)</label>
             <input
               type="file"
               multiple
@@ -421,10 +402,10 @@ const AddPropertyPage = () => {
           )}
 
           <div className="form-group">
-            <label className="form-label">Property Description</label>
+            <label className="form-label">Property Description (all-MiniLM-L6-v2 Text Embedding)</label>
             <textarea
               name="description"
-              placeholder="Describe the condition, natural lighting, nearby landmarks, metro connectivity..."
+              placeholder="Describe property ambiance, interior highlights, proximity to Downtown Asheville..."
               value={formData.description}
               onChange={handleInputChange}
               className="form-textarea"

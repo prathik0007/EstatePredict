@@ -15,9 +15,9 @@ const PropertiesPage = () => {
 
   // Filters State initialized from searchParams
   const [city, setCity] = useState(searchParams.get('city') || 'All');
-  const [bhk, setBhk] = useState(searchParams.get('bhk') || 'All');
+  const [bedrooms, setBedrooms] = useState(searchParams.get('bedrooms') || searchParams.get('bhk') || 'All');
   const [propertyType, setPropertyType] = useState(searchParams.get('propertyType') || 'All');
-  const [furnishingStatus, setFurnishingStatus] = useState(searchParams.get('furnishingStatus') || 'All');
+  const [roomType, setRoomType] = useState(searchParams.get('roomType') || 'All');
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -28,9 +28,12 @@ const PropertiesPage = () => {
     try {
       const params = new URLSearchParams();
       if (city !== 'All') params.append('city', city);
-      if (bhk !== 'All') params.append('bhk', bhk);
+      if (bedrooms !== 'All') {
+        params.append('bedrooms', bedrooms);
+        params.append('bhk', bedrooms);
+      }
       if (propertyType !== 'All') params.append('propertyType', propertyType);
-      if (furnishingStatus !== 'All') params.append('furnishingStatus', furnishingStatus);
+      if (roomType !== 'All') params.append('roomType', roomType);
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
       if (search) params.append('search', search);
@@ -50,7 +53,7 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, [city, bhk, propertyType, furnishingStatus, sort]);
+  }, [city, bedrooms, propertyType, roomType, sort]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -59,9 +62,9 @@ const PropertiesPage = () => {
 
   const handleResetFilters = () => {
     setCity('All');
-    setBhk('All');
+    setBedrooms('All');
     setPropertyType('All');
-    setFurnishingStatus('All');
+    setRoomType('All');
     setMinPrice('');
     setMaxPrice('');
     setSearch('');
@@ -74,10 +77,10 @@ const PropertiesPage = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em' }}>
-            Find Your Next Home
+            Find Verified Asheville Rentals
           </h1>
           <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-            Showing {totalCount} verified rental properties
+            Showing {totalCount} verified rental listings (Asheville, NC)
           </p>
         </div>
 
@@ -151,27 +154,29 @@ const PropertiesPage = () => {
             />
           </div>
 
-          {/* City */}
+          {/* Neighborhood */}
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={city} onChange={(e) => setCity(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
-              <option value="All">All Cities</option>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Bangalore">Bangalore</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Hyderabad">Hyderabad</option>
-              <option value="Chennai">Chennai</option>
-              <option value="Kolkata">Kolkata</option>
+              <option value="All">All Neighborhoods</option>
+              <option value="Downtown">Downtown Asheville</option>
+              <option value="Montford">Montford</option>
+              <option value="West Asheville">West Asheville</option>
+              <option value="Biltmore Village">Biltmore Village</option>
+              <option value="Grove Park">Grove Park</option>
+              <option value="River Arts District">River Arts District</option>
+              <option value="North Asheville">North Asheville</option>
+              <option value="South Asheville">South Asheville</option>
             </select>
           </div>
 
-          {/* BHK */}
+          {/* Bedrooms */}
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <select value={bhk} onChange={(e) => setBhk(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
-              <option value="All">All BHK</option>
-              <option value="1">1 BHK</option>
-              <option value="2">2 BHK</option>
-              <option value="3">3 BHK</option>
-              <option value="4">4+ BHK</option>
+            <select value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
+              <option value="All">All Bedrooms</option>
+              <option value="1">1 Bedroom</option>
+              <option value="2">2 Bedrooms</option>
+              <option value="3">3 Bedrooms</option>
+              <option value="4">4+ Bedrooms</option>
             </select>
           </div>
 
@@ -179,20 +184,22 @@ const PropertiesPage = () => {
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={propertyType} onChange={(e) => setPropertyType(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
               <option value="All">All Types</option>
-              <option value="Apartment">Apartment</option>
-              <option value="House">House</option>
-              <option value="Villa">Villa</option>
-              <option value="Condominium">Condominium</option>
+              <option value="Entire rental unit">Entire rental unit</option>
+              <option value="Entire home">Entire home</option>
+              <option value="Entire guest suite">Entire guest suite</option>
+              <option value="Entire townhouse">Entire townhouse</option>
+              <option value="Private room in home">Private room in home</option>
             </select>
           </div>
 
-          {/* Furnishing */}
+          {/* Room Type */}
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <select value={furnishingStatus} onChange={(e) => setFurnishingStatus(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
-              <option value="All">All Furnishing</option>
-              <option value="Furnished">Furnished</option>
-              <option value="Semi-Furnished">Semi-Furnished</option>
-              <option value="Unfurnished">Unfurnished</option>
+            <select value={roomType} onChange={(e) => setRoomType(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
+              <option value="All">All Room Types</option>
+              <option value="Entire home/apt">Entire home/apt</option>
+              <option value="Private room">Private room</option>
+              <option value="Shared room">Shared room</option>
+              <option value="Hotel room">Hotel room</option>
             </select>
           </div>
 
@@ -202,7 +209,7 @@ const PropertiesPage = () => {
               <option value="newest">Latest Added</option>
               <option value="price_asc">Price: Low to High</option>
               <option value="price_desc">Price: High to Low</option>
-              <option value="size_desc">Size: Largest First</option>
+              <option value="rating_desc">Highest Rated</option>
             </select>
           </div>
 
