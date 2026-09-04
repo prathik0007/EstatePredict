@@ -94,20 +94,22 @@ const Navbar = () => {
           <Link to="/properties" style={{ fontWeight: '600', color: '#1e293b', fontSize: '0.95rem' }}>
             Explore Properties
           </Link>
-          <Link to="/estimator" style={{
-            fontWeight: '700',
-            color: '#6d28d9',
-            fontSize: '0.95rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            border: '1px solid #c4b5fd'
-          }}>
-            <Sparkles size={16} color="#7c3aed" /> AI Rent Estimator
-          </Link>
+          {isAuthenticated && (
+            <Link to="/estimator" style={{
+              fontWeight: '700',
+              color: '#6d28d9',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              border: '1px solid #c4b5fd'
+            }}>
+              <Sparkles size={16} color="#7c3aed" /> AI Rent Estimator
+            </Link>
+          )}
           {isOwner && (
             <Link to="/add-property" className="btn btn-primary btn-sm">
               <PlusCircle size={16} /> List Property
@@ -117,7 +119,7 @@ const Navbar = () => {
 
         {/* Right Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <>
               {/* Notification Bell */}
               <div ref={notificationRef} style={{ position: 'relative' }}>
@@ -328,6 +330,15 @@ const Navbar = () => {
                 )}
               </div>
             </>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Link to="/login" className="btn btn-secondary btn-sm">
+                Log In
+              </Link>
+              <Link to="/register" className="btn btn-primary btn-sm">
+                Sign Up
+              </Link>
+            </div>
           )}
         </div>
       </div>
