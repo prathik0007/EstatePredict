@@ -165,9 +165,6 @@ const EstimatorPage = () => {
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
-                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 10px', marginTop: '6px', fontSize: '0.72rem', color: '#475569', lineHeight: '1.35' }}>
-                  <strong>Model Notice:</strong> V5 was trained on 5,050 Austin, TX benchmark listings. City selection configures local presentation and INR conversion. Reference coordinates maintain geometric contract integrity without fabricating Indian geographic training data.
-                </div>
               </div>
 
               <div className="form-group">

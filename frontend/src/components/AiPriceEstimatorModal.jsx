@@ -158,10 +158,6 @@ const AiPriceEstimatorModal = ({
           </div>
         </div>
 
-        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '6px 10px', marginBottom: '14px', fontSize: '0.7rem', color: '#64748b', lineHeight: '1.3' }}>
-          <strong>Model Notice:</strong> V5 was trained on 5,050 Austin benchmark listings. City selection configures local presentation and INR pricing while reference coordinates preserve geometric feature contracts.
-        </div>
-
         <button
           onClick={handlePredict}
           disabled={loading}
