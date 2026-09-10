@@ -158,6 +158,10 @@ const AiPriceEstimatorModal = ({
           </div>
         </div>
 
+        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '6px 10px', marginBottom: '14px', fontSize: '0.7rem', color: '#64748b', lineHeight: '1.3' }}>
+          <strong>Model Notice:</strong> V5 was trained on 5,050 Austin benchmark listings. City selection configures local presentation and INR pricing while reference coordinates preserve geometric feature contracts.
+        </div>
+
         <button
           onClick={handlePredict}
           disabled={loading}
@@ -195,13 +199,16 @@ const AiPriceEstimatorModal = ({
                 <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>
                   USD: ${Number(predictionResult.predicted_rent).toFixed(2)} (1 USD = ₹{USD_TO_INR_RATE})
                 </div>
+                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
+                  Model: {predictionResult.model_name?.includes('HistGradient') ? 'V5 LightGBM Multimodal Regressor (log1p)' : (predictionResult.model_name || 'V5 LightGBM Multimodal Regressor (log1p)')}
+                </div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: '800' }}>
-                  <ShieldCheck size={12} /> EMPIRICAL COVERAGE: 96.63%
+                  <ShieldCheck size={12} /> Empirical coverage: 96.63%
                 </span>
                 <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#059669', marginTop: '4px' }}>
-                  95% Nominal Conformal Interval
+                  95% Nominal Conformal Prediction Interval
                 </div>
                 <div style={{ fontSize: '1rem', fontWeight: '800', color: '#334155', marginTop: '2px' }}>
                   ₹{usdToInr(predictionResult.lower_bound).toLocaleString('en-IN')} – ₹{usdToInr(predictionResult.upper_bound).toLocaleString('en-IN')}
@@ -212,31 +219,36 @@ const AiPriceEstimatorModal = ({
             {/* Top Influencing Factors (SHAP) */}
             {predictionResult.top_factors && predictionResult.top_factors.length > 0 && (
               <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution:
+                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution — Tabular + Geographic Features
+                </div>
+                <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '8px' }}>
+                  Mathematical feature contributions to log-scale prediction on physical characteristics (not causal effects). Austin landmark features excluded for geographic consistency.
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {predictionResult.top_factors.map((factor, idx) => {
-                    const impactNum = typeof factor.impact === 'number' ? factor.impact : parseFloat(factor.impact);
-                    const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
-                    const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
-                    const isPositive = impactNum >= 0;
+                  {predictionResult.top_factors
+                    .filter(factor => !/austin|downtown|congress|zilker|domain|cota|airport|location/i.test(factor.feature))
+                    .map((factor, idx) => {
+                      const impactNum = typeof factor.impact === 'number' ? factor.impact : parseFloat(factor.impact);
+                      const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                      const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                      const isPositive = impactNum >= 0;
 
-                    return (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
-                        <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
-                        <span style={{
-                          fontWeight: '700',
-                          color: isPositive ? '#16a34a' : '#dc2626',
-                          background: isPositive ? '#dcfce7' : '#fee2e2',
-                          padding: '2px 8px',
-                          borderRadius: '4px'
-                        }}>
-                          {formattedVal}
-                        </span>
-                      </div>
-                    );
-                  })}
+                      return (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
+                          <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
+                          <span style={{
+                            fontWeight: '700',
+                            color: isPositive ? '#16a34a' : '#dc2626',
+                            background: isPositive ? '#dcfce7' : '#fee2e2',
+                            padding: '2px 8px',
+                            borderRadius: '4px'
+                          }}>
+                            {formattedVal}
+                          </span>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )}

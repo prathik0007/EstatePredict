@@ -6,6 +6,6 @@ const upload = require('../middleware/upload');
 const router = express.Router();
 
 router.get('/health', checkMlHealth);
-router.post('/predict-rent', protect, upload.single('image'), predictRent);
+router.post('/predict-rent', upload.single('image'), predictRent);
 
 module.exports = router;

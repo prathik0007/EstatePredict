@@ -28,6 +28,7 @@ def health_check():
     }), 200
 
 @app.route("/api/predict-rent", methods=["POST"])
+@app.route("/api/ml/predict-rent", methods=["POST"])
 def predict_rent_endpoint():
     try:
         # Check if json or multipart/form-data

@@ -2,7 +2,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 
-const FLASK_ML_URL = process.env.FLASK_ML_URL || 'https://rental-price-prediction-1.onrender.com';
+const FLASK_ML_URL = process.env.FLASK_ML_URL || 'http://127.0.0.1:5000';
 
 // @desc    Predict Rental Price using Flask ML API (Multimodal V5 LightGBM + Conformal Intervals)
 // @route   POST /api/ml/predict-rent
@@ -103,7 +103,7 @@ exports.predictRent = async (req, res) => {
         upper_bound_inr: upperBoundInr,
         usd_to_inr_rate: usdToInrRate,
         unit: 'USD/night',
-        model_name: 'LightGBM Multimodal Concatenation (V5 Fallback)',
+        model_name: 'V5 LightGBM Multimodal Regressor (log1p)',
         benchmark_dataset: 'Austin, TX Inside Airbnb (5,050 aligned multimodal listings)',
         prediction_interval: {
           nominal_coverage: '95%',
@@ -119,7 +119,7 @@ exports.predictRent = async (req, res) => {
         top_factors: [
           { feature: 'Accommodates (Guests)', impact: Math.round((occ - 3.5) * 18) },
           { feature: 'Bathrooms', impact: Math.round((baths - 1.5) * 15) },
-          { feature: 'Downtown Austin Proximity', impact: 22 },
+          { feature: 'Bedrooms', impact: 14 },
           { feature: 'Room Type (Entire home)', impact: isEntire > 1 ? 25 : -25 }
         ],
         research_benchmark: {

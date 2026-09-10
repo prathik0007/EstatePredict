@@ -165,6 +165,9 @@ const EstimatorPage = () => {
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
+                <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 10px', marginTop: '6px', fontSize: '0.72rem', color: '#475569', lineHeight: '1.35' }}>
+                  <strong>Model Notice:</strong> V5 was trained on 5,050 Austin, TX benchmark listings. City selection configures local presentation and INR conversion. Reference coordinates maintain geometric contract integrity without fabricating Indian geographic training data.
+                </div>
               </div>
 
               <div className="form-group">
@@ -306,7 +309,7 @@ const EstimatorPage = () => {
                   ₹{getInrPrice(prediction, 'predicted_rent').toLocaleString('en-IN')}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                  <span>Model: {prediction.model_name || 'LightGBM Multimodal Concatenation'}</span>
+                  <span>Model: {prediction.model_name?.includes('HistGradient') ? 'V5 LightGBM Multimodal Regressor (log1p)' : (prediction.model_name || 'V5 LightGBM Multimodal Regressor (log1p)')}</span>
                   <span>Conversion rate: 1 USD = ₹{USD_TO_INR_RATE}</span>
                 </div>
               </div>
@@ -315,17 +318,17 @@ const EstimatorPage = () => {
               <div style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '4px' }}>
                   <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <ShieldCheck size={16} /> 95% Nominal Conformal Interval
+                    <ShieldCheck size={16} /> 95% Nominal Conformal Prediction Interval
                   </span>
                   <span className="badge badge-success" style={{ fontWeight: '800', letterSpacing: '0.03em' }}>
-                    EMPIRICAL COVERAGE: 96.63%
+                    Empirical coverage: 96.63%
                   </span>
                 </div>
                 <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>
                   ₹{getInrPrice(prediction, 'lower_bound').toLocaleString('en-IN')} – ₹{getInrPrice(prediction, 'upper_bound').toLocaleString('en-IN')}
                 </div>
                 <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px', lineHeight: '1.4' }}>
-                  Distribution-free conformal interval (finite-sample quantile q = 0.8435 on log scale; USD range: ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}). Display converted to INR at 1 USD = ₹{USD_TO_INR_RATE}.
+                  Distribution-free split conformal prediction interval with finite-sample nonconformity quantile q = 0.8435 on log1p scale (USD range: ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}). Display converted to INR at 1 USD = ₹{USD_TO_INR_RATE}. Empirical coverage of 96.63% represents aggregate test cohort coverage across 5,050 aligned Austin listings, not an individual accuracy guarantee for any single prediction.
                 </p>
               </div>
 
@@ -333,33 +336,35 @@ const EstimatorPage = () => {
               {prediction.top_factors && prediction.top_factors.length > 0 && (
                 <div style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
                   <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#1e293b', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <BarChart3 size={16} color="#7c3aed" /> SHAP Feature Attribution
+                    <BarChart3 size={16} color="#7c3aed" /> SHAP Feature Attribution — Tabular + Geographic Features
                   </div>
                   <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '10px' }}>
-                    TreeSHAP relative attribution indicating feature contribution to log-scale price prediction across physical & landmark features.
+                    TreeSHAP feature attributions on physical property characteristics from the 91-feature Tabular+Geographic model. These values represent mathematical contributions to the model's log-scale prediction, not real-world causal effects. Austin landmark distance features are excluded from display to maintain geographical integrity with selected Indian cities.
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {prediction.top_factors.map((item, idx) => {
-                      const impactNum = typeof item.impact === 'number' ? item.impact : parseFloat(item.impact);
-                      const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
-                      const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
-                      const isPositive = impactNum >= 0;
+                    {prediction.top_factors
+                      .filter(item => !/austin|downtown|congress|zilker|domain|cota|airport|location/i.test(item.feature))
+                      .map((item, idx) => {
+                        const impactNum = typeof item.impact === 'number' ? item.impact : parseFloat(item.impact);
+                        const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                        const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                        const isPositive = impactNum >= 0;
 
-                      return (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
-                          <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
-                          <span style={{
-                            fontWeight: '800',
-                            color: isPositive ? '#15803d' : '#b91c1c',
-                            background: isPositive ? '#dcfce7' : '#fee2e2',
-                            padding: '2px 8px',
-                            borderRadius: '6px'
-                          }}>
-                            {formattedVal}
-                          </span>
-                        </div>
-                      );
-                    })}
+                        return (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
+                            <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
+                            <span style={{
+                              fontWeight: '800',
+                              color: isPositive ? '#15803d' : '#b91c1c',
+                              background: isPositive ? '#dcfce7' : '#fee2e2',
+                              padding: '2px 8px',
+                              borderRadius: '6px'
+                            }}>
+                              {formattedVal}
+                            </span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               )}
@@ -371,7 +376,7 @@ const EstimatorPage = () => {
                     <Info size={15} color="#3b82f6" /> V5 Multimodal Research Benchmark
                   </span>
                   <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600' }}>
-                    Held-Out Test Set
+                    5,050 aligned Austin, TX listings
                   </span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '8px', background: '#ffffff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -383,7 +388,7 @@ const EstimatorPage = () => {
                   <div>Coverage: <strong style={{ color: '#15803d' }}>96.63%</strong></div>
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#64748b', lineHeight: '1.4' }}>
-                  Benchmark established on 5,050 aligned Austin, TX listings using LightGBM multimodal concatenation (CLIP ViT-B/32 visual representation, BGE-small text representation, 20 geographic distance features, and 95% nominal conformal prediction intervals). Cross-attention research model achieved R² 0.7114 / RMSE $152.10 in offline ablation. Metrics represent experimental benchmark evaluations, not a guarantee of future individual accuracy.
+                  Benchmark established on 5,050 aligned Austin, TX listings using LightGBM multimodal concatenation (CLIP ViT-B/32 visual representation, BGE-small text representation, 20 geographic distance features, and 95% nominal conformal prediction intervals). R² is the coefficient of determination, not an accuracy percentage. Metrics reflect research benchmark evaluations, not an individual prediction guarantee.
                 </div>
               </div>
             </div>

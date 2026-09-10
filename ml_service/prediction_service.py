@@ -280,17 +280,17 @@ class MultimodalV5Predictor:
             X_full = np.hstack([X_tab, X_geo, text_emb, img_emb])
             pred_log = float(self.lgb_multimodal_concat.predict(X_full)[0])
             active_pipeline = "V5 LightGBM Multimodal Concatenation (987 features: Tabular + Geo + BGE-small + CLIP ViT-B/32)"
-            model_name = "LightGBM Multimodal Concatenation (V5)"
+            model_name = "V5 LightGBM Multimodal Regressor (log1p)"
         elif self.lgb_tab_geo is not None:
             # Clean 91-feature Tabular + Geographic Fallback
             pred_log = float(self.lgb_tab_geo.predict(X_tab_geo)[0])
-            active_pipeline = "V5 Tabular + Geographic Fallback (91 features: 71 Tabular + 20 Austin Landmark Distances)"
-            model_name = "LightGBM Tabular+Geographic (V5 Fallback)"
+            active_pipeline = "V5 Tabular + Geographic Fallback (91 features: 71 Tabular + 20 Reference Landmark Distances)"
+            model_name = "V5 LightGBM Tabular+Geographic Regressor (log1p)"
         else:
-            # Ultra-safe baseline fallback
+            # Safe baseline fallback
             pred_log = np.log1p(185.0)
-            active_pipeline = "Baseline Fallback ($185 Austin median)"
-            model_name = "Baseline Fallback"
+            active_pipeline = "Baseline Fallback ($185 median reference)"
+            model_name = "V5 Baseline Fallback"
 
         # 5. Invert log1p scale to original USD
         predicted_price_usd = float(np.expm1(pred_log))
@@ -302,7 +302,9 @@ class MultimodalV5Predictor:
         lower_bound_usd = float(np.maximum(10.0, np.expm1(lower_bound_log)))
         upper_bound_usd = float(np.expm1(upper_bound_log))
 
-        # 7. SHAP Feature Attribution on Tabular+Geo Model (instant TreeExplainer)
+        # 7. SHAP Feature Attribution on Tabular Features (TreeExplainer)
+        # Austin geographic landmarks are excluded from display as the UI presents Indian cities,
+        # preventing misleading geographic attribution while preserving physical property insights.
         shap_dict = {}
         if self.explainer is not None:
             try:
@@ -319,25 +321,28 @@ class MultimodalV5Predictor:
         accommodates_shap = float(shap_dict.get('accommodates_num', 0.0))
         bathrooms_shap = float(shap_dict.get('bathrooms_num', 0.0))
         bedrooms_shap = float(shap_dict.get('bedrooms_num', 0.0))
-        city_center_shap = float(shap_dict.get('dist_city_center_km', 0.0)) + float(shap_dict.get('log_dist_city_center_km', 0.0))
-        airport_shap = float(shap_dict.get('dist_airport_km', 0.0)) + float(shap_dict.get('log_dist_airport_km', 0.0))
-        soco_shap = float(shap_dict.get('dist_south_congress_km', 0.0)) + float(shap_dict.get('log_dist_south_congress_km', 0.0))
-        zilker_shap = float(shap_dict.get('dist_zilker_park_km', 0.0)) + float(shap_dict.get('log_dist_zilker_park_km', 0.0))
-        domain_shap = float(shap_dict.get('dist_the_domain_km', 0.0)) + float(shap_dict.get('log_dist_the_domain_km', 0.0))
-        rating_shap = float(shap_dict.get('review_scores_rating_num', 0.0))
+        beds_shap = float(shap_dict.get('beds_num', 0.0))
         min_nights_shap = float(shap_dict.get('minimum_nights_num', 0.0))
+        rating_shap = float(shap_dict.get('review_scores_rating_num', 0.0))
+        cleanliness_shap = float(shap_dict.get('review_scores_cleanliness_num', 0.0))
+        reviews_shap = float(shap_dict.get('number_of_reviews_num', 0.0))
+        avail_shap = float(shap_dict.get('availability_365_num', 0.0))
 
-        top_factors = [
+        candidate_factors = [
             {"feature": "Accommodates (Guests)", "impact": format_shap(accommodates_shap)},
             {"feature": "Bathrooms", "impact": format_shap(bathrooms_shap)},
-            {"feature": "Downtown Austin Proximity", "impact": format_shap(city_center_shap)},
             {"feature": "Bedrooms", "impact": format_shap(bedrooms_shap)},
-            {"feature": "South Congress Corridor", "impact": format_shap(soco_shap)},
-            {"feature": "Zilker Park / Barton Springs", "impact": format_shap(zilker_shap)},
+            {"feature": "Beds", "impact": format_shap(beds_shap)},
             {"feature": "Minimum Nights", "impact": format_shap(min_nights_shap)},
-            {"feature": "Review Rating", "impact": format_shap(rating_shap)}
+            {"feature": "Review Rating", "impact": format_shap(rating_shap)},
+            {"feature": "Cleanliness Rating", "impact": format_shap(cleanliness_shap)},
+            {"feature": "Number of Reviews", "impact": format_shap(reviews_shap)},
+            {"feature": "Availability (365d)", "impact": format_shap(avail_shap)}
         ]
+        top_factors = [f for f in candidate_factors if f["impact"] != 0.0]
         top_factors.sort(key=lambda x: abs(x["impact"]), reverse=True)
+        if len(top_factors) < 3:
+            top_factors = candidate_factors[:5]
 
         usd_to_inr_rate = float(os.environ.get("USD_TO_INR_RATE", 83.50))
         predicted_price_inr = int(round(predicted_price_usd * usd_to_inr_rate))
@@ -379,17 +384,15 @@ class MultimodalV5Predictor:
                 "Accommodates (Guests)": round(accommodates_shap, 4),
                 "Bathrooms": round(bathrooms_shap, 4),
                 "Bedrooms": round(bedrooms_shap, 4),
-                "Downtown Austin Proximity": round(city_center_shap, 4),
-                "South Congress Corridor": round(soco_shap, 4),
-                "Zilker Park / Barton Springs": round(zilker_shap, 4),
-                "The Domain Proximity": round(domain_shap, 4),
-                "Airport Proximity": round(airport_shap, 4),
+                "Beds": round(beds_shap, 4),
                 "Minimum Nights": round(min_nights_shap, 4),
                 "Review Rating": round(rating_shap, 4),
-                "Number of Reviews": round(float(shap_dict.get('number_of_reviews_num', 0.0)), 4),
-                "Cleanliness Rating": round(float(shap_dict.get('review_scores_cleanliness_num', 0.0)), 4),
-                "Availability (365d)": round(float(shap_dict.get('availability_365_num', 0.0)), 4)
+                "Cleanliness Rating": round(cleanliness_shap, 4),
+                "Number of Reviews": round(reviews_shap, 4),
+                "Availability (365d)": round(avail_shap, 4)
             },
+            "shap_attribution_type": "SHAP Feature Attribution — Tabular + Geographic Features",
+            "shap_attribution_note": "Model feature attributions represent mathematical contributions to the log-scale prediction, not causal effects. Austin landmark distance features are omitted from display to prevent confusion with selected Indian cities.",
             "image_used": img_emb is not None,
             "description_used": text_emb is not None,
             "research_benchmark": {
