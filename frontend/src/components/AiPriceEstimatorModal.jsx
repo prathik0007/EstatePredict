@@ -3,6 +3,19 @@ import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshC
 import mlApi from '../services/mlApi';
 import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
 
+const AUSTIN_DISTRICTS = [
+  { name: 'Downtown Austin', lat: 30.2747, lng: -97.7404 },
+  { name: 'South Congress (SoCo)', lat: 30.2505, lng: -97.7497 },
+  { name: 'East Austin', lat: 30.2625, lng: -97.7215 },
+  { name: 'Zilker / Barton Hills', lat: 30.2670, lng: -97.7730 },
+  { name: 'The Domain / North Austin', lat: 30.4014, lng: -97.7247 },
+  { name: 'UT Austin / West Campus', lat: 30.2849, lng: -97.7341 },
+  { name: 'South Lamar', lat: 30.2510, lng: -97.7610 },
+  { name: 'Mueller', lat: 30.3015, lng: -97.7050 },
+  { name: 'Hyde Park', lat: 30.3050, lng: -97.7300 },
+  { name: 'Rainey Street / Convention Center', lat: 30.2635, lng: -97.7397 }
+];
+
 const AiPriceEstimatorModal = ({
   isOpen,
   onClose,
@@ -11,14 +24,16 @@ const AiPriceEstimatorModal = ({
   onApplyPrice = null
 }) => {
   const [formData, setFormData] = useState({
-    city: initialData.city || 'Mumbai',
+    city: initialData.city || 'Downtown Austin',
+    latitude: initialData.latitude || 30.2747,
+    longitude: initialData.longitude || -97.7404,
     accommodates: initialData.accommodates || 4,
     bedrooms: initialData.bedrooms || initialData.bhk || 2,
     bathrooms: initialData.bathrooms || initialData.bathroom || 2,
     min_nights: initialData.minNights || 2,
     room_type: initialData.roomType || 'Entire home/apt',
     property_type: initialData.propertyType || 'Entire rental unit',
-    review_scores_rating: initialData.reviewScoresRating || 4.90,
+    review_scores_rating: initialData.reviewScoresRating || 4.85,
     description: initialData.description || ''
   });
 
@@ -28,6 +43,18 @@ const AiPriceEstimatorModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'city') {
+      const selected = AUSTIN_DISTRICTS.find(d => d.name === value);
+      if (selected) {
+        setFormData(prev => ({
+          ...prev,
+          city: value,
+          latitude: selected.lat,
+          longitude: selected.lng
+        }));
+        return;
+      }
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -43,6 +70,7 @@ const AiPriceEstimatorModal = ({
       });
       if (formData.review_scores_rating !== undefined) {
         data.append('rating', formData.review_scores_rating);
+        data.append('review_scores_rating', formData.review_scores_rating);
       }
       if (imageFile) {
         data.append('image', imageFile);
@@ -64,7 +92,7 @@ const AiPriceEstimatorModal = ({
         const msg = err.response.data?.error || err.response.data?.message || err.message;
         setError(`ML Service Error (HTTP ${status}): ${msg}`);
       } else if (err.request) {
-        setError('Connection failure: Unable to reach the Python Flask ML service on Render. Please verify the service is active.');
+        setError('Connection failure: Unable to reach the Python Flask ML service. Please verify the service is running.');
       } else {
         setError(`Unable to fetch AI prediction: ${err.message}`);
       }
@@ -92,7 +120,7 @@ const AiPriceEstimatorModal = ({
             <div>
               <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '800' }}>AI Rental Price Valuation</h3>
               <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748b' }}>
-                HistGradientBoosting (log1p) & Conformal Prediction
+                V5 LightGBM Multimodal & Conformal Prediction
               </p>
             </div>
           </div>
@@ -107,18 +135,11 @@ const AiPriceEstimatorModal = ({
         {/* Input Controls */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '16px' }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.75rem' }}>Neighborhood / Area</label>
+            <label className="form-label" style={{ fontSize: '0.75rem' }}>Austin District</label>
             <select name="city" value={formData.city} onChange={handleChange} className="form-select" style={{ padding: '0.5rem' }}>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Bengaluru">Bengaluru</option>
-              <option value="Hyderabad">Hyderabad</option>
-              <option value="Chennai">Chennai</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Kolkata">Kolkata</option>
-              <option value="Pune">Pune</option>
-              <option value="Ahmedabad">Ahmedabad</option>
-              <option value="Jaipur">Jaipur</option>
-              <option value="Lucknow">Lucknow</option>
+              {AUSTIN_DISTRICTS.map(d => (
+                <option key={d.name} value={d.name}>{d.name}</option>
+              ))}
             </select>
           </div>
 
@@ -151,7 +172,7 @@ const AiPriceEstimatorModal = ({
         >
           {loading ? (
             <>
-              <RefreshCw size={16} className="pulse-badge" /> Computing Multimodal Predictions...
+              <RefreshCw size={16} className="pulse-badge" /> Computing V5 Multimodal Predictions...
             </>
           ) : (
             <>
@@ -183,10 +204,10 @@ const AiPriceEstimatorModal = ({
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: '800' }}>
-                  <ShieldCheck size={12} /> EMPIRICAL COVERAGE: 93.70%
+                  <ShieldCheck size={12} /> EMPIRICAL COVERAGE: 96.63%
                 </span>
                 <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#059669', marginTop: '4px' }}>
-                  Calibrated 95% Prediction Interval
+                  95% Nominal Conformal Interval
                 </div>
                 <div style={{ fontSize: '1rem', fontWeight: '800', color: '#334155', marginTop: '2px' }}>
                   ₹{usdToInr(predictionResult.lower_bound).toLocaleString('en-IN')} – ₹{usdToInr(predictionResult.upper_bound).toLocaleString('en-IN')}

@@ -23,8 +23,8 @@ const MapUpdater = ({ center, zoom }) => {
 };
 
 const MapViewer = ({ properties = [], singleProperty = null, height = '450px', zoom = 12 }) => {
-  // Determine center coordinates (Default: Downtown Asheville, NC)
-  let center = [35.5951, -82.5515];
+  // Determine center coordinates (Default: Downtown Austin, TX)
+  let center = [30.2747, -97.7404];
 
   if (singleProperty && singleProperty.location?.coordinates?.lat) {
     center = [

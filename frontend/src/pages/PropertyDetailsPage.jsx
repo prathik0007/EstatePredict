@@ -300,7 +300,7 @@ const PropertyDetailsPage = () => {
                 </span>
               </div>
               <p style={{ fontSize: '0.85rem', color: '#334155', lineHeight: 1.5, marginBottom: '14px' }}>
-                Our research-trained HistGradientBoosting model (with log1p target transformation) and calibrated 95% conformal prediction intervals estimated fair market rental rates for this property:
+                Our research-trained LightGBM multimodal concatenation model (with log1p target transformation) and calibrated 95% nominal conformal prediction intervals estimated fair market rental rates for this property:
               </p>
               <div style={{
                 background: '#ffffff',
@@ -325,14 +325,14 @@ const PropertyDetailsPage = () => {
                   </div>
                 </div>
                 <div>
-                  <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: '700' }}>Calibrated 95% Prediction Interval</span>
+                  <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: '700' }}>95% Nominal Conformal Interval</span>
                   <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>
                     ₹{usdToInr(property.predictedRentInfo.lowerBound).toLocaleString('en-IN')} – ₹{usdToInr(property.predictedRentInfo.upperBound).toLocaleString('en-IN')}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <span className="badge badge-success" style={{ fontSize: '0.75rem', fontWeight: '800' }}>
-                    <ShieldCheck size={13} /> EMPIRICAL COVERAGE: 93.70%
+                    <ShieldCheck size={13} /> EMPIRICAL COVERAGE: 96.63%
                   </span>
                 </div>
               </div>

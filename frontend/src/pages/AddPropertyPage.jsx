@@ -51,10 +51,10 @@ const AddPropertyPage = () => {
     minNights: 2,
     reviewScoresRating: 4.90,
     address: '',
-    city: 'Downtown',
-    state: 'NC',
-    pincode: '28801',
-    coordinates: { lat: 35.5951, lng: -82.5515 }
+    city: 'Downtown Austin',
+    state: 'TX',
+    pincode: '78701',
+    coordinates: { lat: 30.2747, lng: -97.7404 }
   });
 
   const [selectedAmenities, setSelectedAmenities] = useState(['Wifi Included', 'Air Conditioning', 'Free Parking on Premises']);
@@ -164,7 +164,7 @@ const AddPropertyPage = () => {
           Create New Property Listing
         </h1>
         <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-          Fill in details about your Asheville property and use our built-in Multimodal V3 AI to calculate fair rental market rates.
+          Fill in details about your Austin property and use our built-in V5 LightGBM AI to calculate fair rental market rates.
         </p>
       </div>
 
@@ -291,21 +291,23 @@ const AddPropertyPage = () => {
         {/* Section 3: Location & Leaflet OpenStreetMap Pin Picker */}
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', marginBottom: '16px' }}>
-            3. Property Location (Asheville, NC)
+            3. Property Location (Austin, TX)
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
             <div className="form-group">
-              <label className="form-label">Neighborhood *</label>
+              <label className="form-label">Austin District *</label>
               <select name="city" value={formData.city} onChange={handleInputChange} className="form-select">
-                <option value="Downtown">Downtown Asheville</option>
-                <option value="Montford">Montford</option>
-                <option value="West Asheville">West Asheville</option>
-                <option value="Biltmore Village">Biltmore Village</option>
-                <option value="Grove Park">Grove Park</option>
-                <option value="River Arts District">River Arts District</option>
-                <option value="North Asheville">North Asheville</option>
-                <option value="South Asheville">South Asheville</option>
+                <option value="Downtown Austin">Downtown Austin</option>
+                <option value="South Congress">South Congress (SoCo)</option>
+                <option value="East Austin">East Austin</option>
+                <option value="Zilker / Barton Hills">Zilker / Barton Hills</option>
+                <option value="The Domain">The Domain / North Austin</option>
+                <option value="UT Austin / Campus">UT Austin / Campus</option>
+                <option value="South Lamar">South Lamar</option>
+                <option value="Mueller">Mueller</option>
+                <option value="Hyde Park">Hyde Park</option>
+                <option value="Rainey Street">Rainey Street / Convention Center</option>
               </select>
             </div>
 
@@ -377,7 +379,7 @@ const AddPropertyPage = () => {
           </h3>
 
           <div className="form-group">
-            <label className="form-label">Upload Property Photo (Evaluated with EfficientNet-B0 Visual Model)</label>
+            <label className="form-label">Upload Property Photo (Evaluated with CLIP ViT-B/32 Visual Representation)</label>
             <input
               type="file"
               multiple
@@ -402,10 +404,10 @@ const AddPropertyPage = () => {
           )}
 
           <div className="form-group">
-            <label className="form-label">Property Description (all-MiniLM-L6-v2 Text Embedding)</label>
+            <label className="form-label">Property Description (BGE-small 384-d Text Representation)</label>
             <textarea
               name="description"
-              placeholder="Describe property ambiance, interior highlights, proximity to Downtown Asheville..."
+              placeholder="Describe property ambiance, interior highlights, proximity to Downtown Austin..."
               value={formData.description}
               onChange={handleInputChange}
               className="form-textarea"

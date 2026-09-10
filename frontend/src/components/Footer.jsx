@@ -33,15 +33,15 @@ const Footer = () => {
           {/* Col 2: Research Modules */}
           <div>
             <h4 style={{ color: '#ffffff', fontSize: '0.95rem', fontWeight: '700', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Cpu size={16} color="#38bdf8" /> Multimodal V3 Research Pipeline
+              <Cpu size={16} color="#38bdf8" /> V5 Multimodal Research Benchmark
             </h4>
             <ul style={{ listStyle: 'none', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li>HistGradientBoostingRegressor (log1p transform)</li>
-              <li>Calibrated 95% Prediction Interval (93.70% coverage)</li>
-              <li>SHAP Feature Explainability & Attribution</li>
-              <li>all-MiniLM-L6-v2 Text Representation (384-d)</li>
-              <li>EfficientNet-B0 Visual Representation (1,280-d)</li>
-              <li>Asheville, NC Inside Airbnb Benchmark (N = 1,800)</li>
+              <li>LightGBM multimodal concatenation (987 features)</li>
+              <li>95% nominal conformal prediction intervals (96.63% coverage)</li>
+              <li>20 geographic distance features (8 Austin landmarks)</li>
+              <li>BGE-small text representation (384-d normalized)</li>
+              <li>CLIP ViT-B/32 visual representation (512-d normalized)</li>
+              <li>5,050 aligned Austin, TX listings benchmark</li>
             </ul>
           </div>
 
@@ -80,7 +80,7 @@ const Footer = () => {
           fontSize: '0.8rem',
           color: '#475569'
         }}>
-          <div>© {new Date().getFullYear()} EstatePredict. Multimodal V3 Research Benchmark. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} EstatePredict. V5 Multimodal Research Benchmark. All rights reserved.</div>
         </div>
       </div>
     </footer>

@@ -3,14 +3,18 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
 const CITY_COORDINATES = {
-  'Downtown': [35.5951, -82.5515],
-  'Montford': [35.6025, -82.5620],
-  'West Asheville': [35.5785, -82.5930],
-  'Biltmore Village': [35.5670, -82.5400],
-  'Grove Park': [35.6180, -82.5480],
-  'River Arts District': [35.5840, -82.5660],
-  'North Asheville': [35.6200, -82.5550],
-  'South Asheville': [35.5350, -82.5300]
+  'Downtown Austin': [30.2747, -97.7404],
+  'Downtown': [30.2747, -97.7404],
+  'South Congress': [30.2505, -97.7497],
+  'East Austin': [30.2625, -97.7215],
+  'Zilker / Barton Hills': [30.2670, -97.7730],
+  'The Domain': [30.4014, -97.7247],
+  'UT Austin / Campus': [30.2849, -97.7341],
+  'South Lamar': [30.2510, -97.7610],
+  'Mueller': [30.3015, -97.7050],
+  'Hyde Park': [30.3050, -97.7300],
+  'Rainey Street': [30.2635, -97.7397],
+  'Austin Airport': [30.1975, -97.6664]
 };
 
 function LocationMarker({ position, setPosition, onChange }) {
@@ -27,8 +31,8 @@ function LocationMarker({ position, setPosition, onChange }) {
   );
 }
 
-const LocationPicker = ({ city = 'Downtown', value = { lat: 35.5951, lng: -82.5515 }, onChange }) => {
-  const [position, setPosition] = useState([value.lat || 35.5951, value.lng || -82.5515]);
+const LocationPicker = ({ city = 'Downtown Austin', value = { lat: 30.2747, lng: -97.7404 }, onChange }) => {
+  const [position, setPosition] = useState([value.lat || 30.2747, value.lng || -97.7404]);
 
   useEffect(() => {
     if (CITY_COORDINATES[city]) {

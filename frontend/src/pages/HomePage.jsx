@@ -273,8 +273,8 @@ const HomePage = () => {
                 <Cpu size={24} />
               </div>
               <div>
-                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>HistGradientBoosting</h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>log1p target transformation</p>
+                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>LightGBM Multimodal</h4>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Concatenation with log1p target transform</p>
               </div>
             </div>
 
@@ -283,8 +283,8 @@ const HomePage = () => {
                 <ShieldCheck size={24} />
               </div>
               <div>
-                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>Calibrated 95% Prediction Interval</h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Empirical coverage: 93.70%</p>
+                <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>95% Nominal Conformal Interval</h4>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Empirical coverage: 96.63%</p>
               </div>
             </div>
 

@@ -170,7 +170,7 @@ const OwnerDashboard = () => {
               <Home size={44} color="#94a3b8" style={{ margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '1.15rem', fontWeight: '700' }}>No property listings yet</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '6px 0 20px' }}>
-                List your first Asheville rental property and leverage our Multimodal V3 model for rental price valuation.
+                List your first Austin rental property and leverage our V5 Multimodal model for rental price valuation.
               </p>
               <Link to="/add-property" className="btn btn-primary btn-sm">
                 <PlusCircle size={16} /> Add Property
