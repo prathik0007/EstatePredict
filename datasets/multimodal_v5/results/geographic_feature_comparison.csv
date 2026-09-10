@@ -1,0 +1,3 @@
+Configuration,Features,MAE,RMSE,R2,MAPE,MedAE
+Tabular Baseline (LightGBM),71,87.09,172.958,0.6267,30.021,37.144
+Tabular + Geographic Features,91,80.778,158.951,0.6847,28.0,36.02

@@ -1,0 +1,5 @@
+Text Representation,Checkpoint,Dimension,Extraction Time (s),MAE,RMSE,R2,MAPE,MedAE
+BGE-small-en-v1.5,BAAI/bge-small-en-v1.5,384,0.5,80.754,167.298,0.6508,28.157,36.266
+E5-small-v2,intfloat/e5-small-v2,384,0.5,81.6,168.249,0.6468,28.416,34.834
+MiniLM-L6-v2,sentence-transformers/all-MiniLM-L6-v2,384,0.5,82.059,173.28,0.6253,28.461,34.513
+CLIP-Text (ViT-B/32),openai/clip-vit-base-patch32,512,313.6,82.213,165.185,0.6595,28.822,37.277

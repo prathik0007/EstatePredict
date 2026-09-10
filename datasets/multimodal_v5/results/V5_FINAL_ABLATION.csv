@@ -1,0 +1,9 @@
+Configuration,Model / Fusion,Features,MAE,RMSE,R2,MAPE,MedAE
+1. V3-style Tabular Baseline (HistGB),HistGradientBoosting,71,85.851,170.302,0.6381,29.802,37.995
+2. V5 Tabular Reference (LightGBM),LightGBM,71,87.09,172.958,0.6267,30.021,37.144
+3. Tabular + Geographic Features,LightGBM,91,80.778,158.951,0.6847,28.0,36.02
+4. Tabular + Best Text Embedding,LightGBM,455,80.754,167.298,0.6508,28.157,36.266
+5. Tabular + CLIP Image Embedding,LightGBM,583,82.366,164.725,0.6614,29.474,38.04
+6. Tabular + Text + CLIP Image,LightGBM,967,80.941,167.079,0.6517,28.593,35.524
+7. Full Multimodal + Geographic,LightGBM (Concat),987,77.742,159.105,0.6841,27.728,34.261
+8. Full Multimodal + Attention Fusion,Cross-Attention (PyTorch),987,79.033,152.095,0.7114,30.261,40.601

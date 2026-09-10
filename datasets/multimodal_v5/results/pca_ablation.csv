@@ -1,0 +1,5 @@
+Configuration,Original Dimensions,Reduced Dimensions,Explained Variance (%),MAE,RMSE,R2,MAPE,MedAE
+"Aggressive PCA (32 dims, historical V3 reference)",512,32,69.88,80.12,162.569,0.6702,28.114,35.811
+PCA retaining 95% variance,512,206,95.0,81.994,166.82,0.6528,28.835,37.012
+No PCA (Full Raw Embeddings),512,512,100.0,82.366,164.725,0.6614,29.474,38.04
+PCA retaining 99% variance,512,364,99.0,83.739,170.133,0.6388,29.395,38.306

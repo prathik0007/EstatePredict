@@ -1,0 +1,3 @@
+Fusion_Architecture,Projection_Dimension,Attention_Heads,MAE,RMSE,R2,MAPE,MedAE,Test_N
+Simple Concatenation Baseline (MLP),64,0,85.48,193.23,0.3053,34.51,36.94,360
+Learned Attention-Based Multimodal Fusion,64,4,85.42,182.75,0.3786,37.79,37.93,360

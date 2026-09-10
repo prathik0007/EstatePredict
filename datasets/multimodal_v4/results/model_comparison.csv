@@ -1,0 +1,5 @@
+Model,Target_Transform,Feature_Dim,MAE,RMSE,R2,MAPE,MedAE,Test_N
+HistGradientBoosting (V3 Baseline),log1p,23,74.07,158.64,0.5318,33.66,34.88,360
+XGBoost,log1p,23,77.92,173.15,0.4422,33.49,33.82,360
+CatBoost,log1p,23,77.82,169.96,0.4625,33.01,34.84,360
+LightGBM,log1p,23,76.85,161.22,0.5164,34.15,33.85,360

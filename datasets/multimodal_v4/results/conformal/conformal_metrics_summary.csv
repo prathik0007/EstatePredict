@@ -1,0 +1,2 @@
+Nominal_Coverage_Target,Empirical_Test_Coverage,Mean_Interval_Width_USD,Median_Interval_Width_USD,Point_MAE,Point_RMSE,Point_R2,Point_MAPE,Point_MedAE,Train_N,Cal_N,Test_N
+95.0%,91.48,318.88,240.38,80.02,186.12,0.4217,34.81,32.34,1260,270,270

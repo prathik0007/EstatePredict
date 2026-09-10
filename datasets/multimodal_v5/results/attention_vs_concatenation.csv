@@ -1,0 +1,3 @@
+Architecture,Total Features / Params,MAE,RMSE,R2,MAPE,MedAE
+Multimodal Concatenation (LightGBM),987,77.742,159.105,0.6841,27.728,34.261
+Multimodal Cross-Attention Fusion (PyTorch),326657,79.033,152.095,0.7114,30.261,40.601

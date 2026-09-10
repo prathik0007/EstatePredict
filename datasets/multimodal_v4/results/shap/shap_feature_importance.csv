@@ -1,0 +1,31 @@
+Feature_Raw,Feature_Name,Mean_Absolute_SHAP,Relative_Weight_Pct
+accommodates_numeric,Accommodates (Guests),0.22453561613435893,24.903603820975217
+bathrooms_numeric,Bathrooms Count,0.10759811025145771,11.933878267154247
+min_nights,Minimum Nights Requirement,0.06845797667432846,7.592783536233647
+dist_city_center_km,Distance to City Center (km),0.05679294002953925,6.298995690188071
+rating,Overall Rating Score,0.0532824914509798,5.909646231338579
+beds_numeric,Beds Count,0.05219396741996823,5.7889162924334645
+inv_dist_city_center,Proximity Index to City Center,0.043007542404226565,4.770035221083828
+num_reviews,Number of Reviews,0.04274841225942617,4.741294682833008
+latitude_numeric,Latitude,0.026324832852730365,2.919729258566704
+room_type_clean_Entire home/apt,Room Type Clean Entire Home/Apt,0.02401745740691784,2.6638145624573046
+dist_blue_ridge_pkwy_km,Distance to Blue Ridge Pkwy (km),0.020318037471924233,2.253505988634566
+avail_365,Annual Availability (Days),0.01854807697606341,2.0571968430007663
+min_dist_attraction_km,Min Distance to Major Attraction (km),0.01849125575169918,2.050894710249841
+dist_river_arts_km,Distance to River Arts District (km),0.017254604123913365,1.9137357029923312
+property_type_grouped_Entire home,Property Type Grouped Entire Home,0.015449672197491042,1.713547820137461
+dist_biltmore_km,Distance to Biltmore Estate (km),0.015258117059670069,1.692302133843705
+rating_cleanliness,Cleanliness Rating,0.015137908826479621,1.678969646700093
+longitude_numeric,Longitude,0.014694811089535497,1.6298249689656523
+dist_airport_km,Distance to Airport (km),0.014226353570184978,1.5778675972590577
+property_type_grouped_Private room in home,Property Type Grouped Private Room In Home,0.012564271671339809,1.3935234391274318
+property_type_grouped_Other,Property Type Grouped Other,0.011867902828980696,1.316288058558653
+is_superhost_0,Is Superhost 0,0.01058678795763665,1.1741975619399756
+room_type_clean_Private room,Room Type Clean Private Room,0.007429421624282054,0.8240090188604801
+property_type_grouped_Entire rental unit,Property Type Grouped Entire Rental Unit,0.0047047687961865765,0.5218134217932121
+is_superhost_1,Is Superhost 1,0.0038638957030350442,0.42855084396220516
+property_type_grouped_Entire guest suite,Property Type Grouped Entire Guest Suite,0.002071083104651323,0.2297071351374772
+property_type_grouped_Entire guesthouse,Property Type Grouped Entire Guesthouse,0.00019265384419897368,0.02136754557302929
+room_type_clean_Hotel room,Room Type Clean Hotel Room,0.0,0.0
+room_type_clean_Shared room,Room Type Clean Shared Room,0.0,0.0
+property_type_grouped_Entire cottage,Property Type Grouped Entire Cottage,0.0,0.0

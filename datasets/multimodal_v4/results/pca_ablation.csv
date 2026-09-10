@@ -1,0 +1,5 @@
+Configuration,Text_Dim,Text_Explained_Var_Pct,Image_Dim,Image_Explained_Var_Pct,Total_Train_Dim,Total_Test_Dim,MAE,RMSE,R2,MAPE,MedAE
+Existing PCA Config (V3),32,73.65,64,57.88,119,119,79.65,174.78,0.4316,34.17,35.93
+No PCA (Full Raw Embeddings),384,100.0,1280,100.0,1687,1687,80.55,173.75,0.4383,34.64,36.12
+PCA Retaining ~95% Variance,127,95.08,529,95.01,679,679,81.24,175.14,0.4293,35.21,35.2
+PCA Retaining ~99% Variance,222,99.01,833,99.0,1078,1078,84.27,177.18,0.4159,37.45,39.47

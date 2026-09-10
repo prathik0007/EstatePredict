@@ -1,0 +1,5 @@
+Price Tier,Sample Count,Empirical Coverage (%),Mean Width ($),Median Width ($)
+Budget (<= $100),182,92.31,153.82,146.89
+Mid-tier ($101 - $250),442,98.87,365.71,341.25
+Premium ($251 - $500),253,98.02,615.46,590.84
+Luxury (> $500),133,92.48,1147.96,1000.48

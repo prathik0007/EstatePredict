@@ -1,0 +1,4 @@
+Nominal Coverage (%),Empirical Coverage (%),Quantile Q,Mean Interval Width ($),Median Interval Width ($)
+80.0,79.8,0.4125,220.91,174.92
+90.0,91.19,0.6113,338.46,267.99
+95.0,96.63,0.8435,493.1,390.43

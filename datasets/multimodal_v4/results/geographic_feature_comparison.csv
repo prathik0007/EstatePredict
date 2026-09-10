@@ -1,0 +1,6 @@
+Model,Features,Feature_Dimension,MAE,RMSE,R2,MAPE,MedAE,Test_N
+HistGradientBoosting (V3 Baseline),Tabular Only (23-d),23,74.07,158.64,0.5318,33.66,34.88,360
+HistGradientBoosting,Tabular + Geographic (30-d),30,76.72,165.88,0.488,33.13,32.12,360
+LightGBM,Tabular + Geographic (30-d),30,77.45,167.69,0.4768,33.39,33.52,360
+CatBoost,Tabular + Geographic (30-d),30,76.99,170.98,0.4561,32.6,36.04,360
+XGBoost,Tabular + Geographic (30-d),30,75.39,168.31,0.4729,33.0,32.9,360

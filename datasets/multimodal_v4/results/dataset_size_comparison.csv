@@ -1,0 +1,5 @@
+Scale_Condition,Train_N,Test_N,Total_Cohort_N,MAE,RMSE,R2,MAPE,MedAE
+Subset Scale (N=500),500,360,860,67.63,147.55,0.4083,42.38,37.77
+Subset Scale (N=1000),1000,360,1360,63.49,143.63,0.4394,40.4,35.96
+"V3 Training Scale (N=1,440)",1440,360,1800,61.47,144.41,0.4332,38.57,32.23
+Full Authentic Available Pool (N=1847),1847,360,2207,58.99,143.98,0.4366,36.62,32.38

@@ -1,0 +1,13 @@
+Model,Checkpoint,Configuration,Raw Dimension,PCA Dimension,Explained Variance (%),Total Downstream Features,Extraction Time (s),Downstream Time (s),MAE,RMSE,R2,MAPE,MedAE
+BGE-large-en-v1.5,BAAI/bge-large-en-v1.5,No PCA,1024,1024,100.0,1095,4722.9,32.5,81.654,168.032,0.6477,28.345,36.11
+BGE-large-en-v1.5,BAAI/bge-large-en-v1.5,PCA 95% variance,1024,317,95.01,388,4722.9,10.0,83.103,171.777,0.6318,29.431,37.561
+BGE-large-en-v1.5,BAAI/bge-large-en-v1.5,PCA 99% variance,1024,539,99.01,610,4722.9,15.7,83.381,172.865,0.6271,29.297,35.954
+E5-large-v2,intfloat/e5-large-v2,No PCA,1024,1024,100.0,1095,7798.5,22.3,81.043,166.501,0.6541,28.242,34.29
+E5-large-v2,intfloat/e5-large-v2,PCA 95% variance,1024,393,95.02,464,7798.5,7.6,81.336,163.542,0.6663,28.398,36.743
+E5-large-v2,intfloat/e5-large-v2,PCA 99% variance,1024,607,99.01,678,7798.5,12.5,83.321,170.269,0.6383,29.211,37.219
+BGE-small-en-v1.5,BAAI/bge-small-en-v1.5,No PCA,384,384,100.0,455,0.5,1.2,80.754,167.298,0.6508,28.157,36.266
+E5-small-v2,intfloat/e5-small-v2,No PCA,384,384,100.0,455,0.5,1.2,81.6,168.249,0.6468,28.416,34.834
+all-MiniLM-L6-v2,sentence-transformers/all-MiniLM-L6-v2,No PCA,384,384,100.0,455,0.5,1.1,82.059,173.28,0.6253,28.461,34.513
+CLIP-Text (ViT-B/32),openai/clip-vit-base-patch32,No PCA,512,512,100.0,583,313.6,1.5,82.213,165.185,0.6595,28.822,37.277
+Instructor-XL,hkunlp/instructor-xl,NOT EXECUTED,768,N/A,N/A,N/A,N/A,N/A,NOT EXECUTED,NOT EXECUTED,NOT EXECUTED,NOT EXECUTED,NOT EXECUTED
+Sentence-T5-large,sentence-transformers/sentence-t5-large,NOT EXECUTED,768,N/A,N/A,N/A,N/A,N/A,NOT EXECUTED,NOT EXECUTED,NOT EXECUTED,NOT EXECUTED,NOT EXECUTED

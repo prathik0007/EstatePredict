@@ -1,0 +1,4 @@
+Price_Tier,Sample_Size_N,Empirical_Coverage_Pct,Mean_Interval_Width_USD,Median_Interval_Width_USD,Tier_MAE_USD
+Low Tier (<= $104),90,93.33,194.98,185.42,31.71
+Mid Tier ($104 - $189),90,100.0,250.51,240.38,31.33
+High Tier (> $189),90,81.11,511.17,418.89,177.02

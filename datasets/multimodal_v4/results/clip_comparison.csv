@@ -1,0 +1,8 @@
+Representation,Feature_Dimension,MAE,RMSE,R2,MAPE,MedAE,Test_N
+Tabular Only (V3 Baseline),23,74.07,158.64,0.5318,33.66,34.88,360
+Tabular + V3 Text (MiniLM 32-d),55,77.58,165.03,0.4933,35.19,35.88,360
+Tabular + V3 Image (EfficientNet 64-d),87,79.59,174.16,0.4357,33.45,33.55,360
+Full Multimodal V3 (MiniLM + EfficientNet 119-d),119,79.65,174.78,0.4316,34.17,35.93,360
+Tabular + CLIP Text (PCA 32-d),55,73.95,164.37,0.4973,33.89,34.25,360
+Tabular + CLIP Image (PCA 64-d),87,81.32,175.03,0.43,34.8,36.56,360
+Full Multimodal CLIP (CLIP Text + Image 119-d),119,76.8,164.97,0.4936,33.61,33.86,360
