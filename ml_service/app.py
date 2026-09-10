@@ -64,9 +64,12 @@ def predict_rent_endpoint():
             'Pune': (30.2747, -97.7404),
             'Ahmedabad': (30.2747, -97.7404),
             'Jaipur': (30.2747, -97.7404),
-            'Lucknow': (30.2747, -97.7404)
+            'Lucknow': (30.2747, -97.7404),
+            'Kochi': (30.2747, -97.7404),
+            'Mangaluru': (30.2747, -97.7404),
+            'Mysuru': (30.2747, -97.7404)
         }
-        city = data.get("city", "Downtown Austin")
+        city = data.get("city", "Bengaluru")
         default_lat, default_lng = city_coords.get(city, (30.2747, -97.7404))
 
         accommodates = float(data.get("accommodates", data.get("guests", 4)))

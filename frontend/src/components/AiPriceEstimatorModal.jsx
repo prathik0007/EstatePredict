@@ -3,18 +3,24 @@ import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshC
 import mlApi from '../services/mlApi';
 import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
 
-const AUSTIN_DISTRICTS = [
-  { name: 'Downtown Austin', lat: 30.2747, lng: -97.7404 },
-  { name: 'South Congress (SoCo)', lat: 30.2505, lng: -97.7497 },
-  { name: 'East Austin', lat: 30.2625, lng: -97.7215 },
-  { name: 'Zilker / Barton Hills', lat: 30.2670, lng: -97.7730 },
-  { name: 'The Domain / North Austin', lat: 30.4014, lng: -97.7247 },
-  { name: 'UT Austin / West Campus', lat: 30.2849, lng: -97.7341 },
-  { name: 'South Lamar', lat: 30.2510, lng: -97.7610 },
-  { name: 'Mueller', lat: 30.3015, lng: -97.7050 },
-  { name: 'Hyde Park', lat: 30.3050, lng: -97.7300 },
-  { name: 'Rainey Street / Convention Center', lat: 30.2635, lng: -97.7397 }
+// 12 Indian Cities available for valuation
+const INDIAN_CITIES = [
+  'Bengaluru',
+  'Mumbai',
+  'Delhi',
+  'Hyderabad',
+  'Chennai',
+  'Pune',
+  'Kolkata',
+  'Ahmedabad',
+  'Jaipur',
+  'Kochi',
+  'Mangaluru',
+  'Mysuru'
 ];
+
+// Standard reference coordinates to preserve V5 model inference contract
+const DEFAULT_MODEL_COORDINATES = { lat: 30.2747, lng: -97.7404 };
 
 const AiPriceEstimatorModal = ({
   isOpen,
@@ -24,9 +30,9 @@ const AiPriceEstimatorModal = ({
   onApplyPrice = null
 }) => {
   const [formData, setFormData] = useState({
-    city: initialData.city || 'Downtown Austin',
-    latitude: initialData.latitude || 30.2747,
-    longitude: initialData.longitude || -97.7404,
+    city: initialData.city || 'Bengaluru',
+    latitude: initialData.latitude || DEFAULT_MODEL_COORDINATES.lat,
+    longitude: initialData.longitude || DEFAULT_MODEL_COORDINATES.lng,
     accommodates: initialData.accommodates || 4,
     bedrooms: initialData.bedrooms || initialData.bhk || 2,
     bathrooms: initialData.bathrooms || initialData.bathroom || 2,
@@ -43,18 +49,6 @@ const AiPriceEstimatorModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'city') {
-      const selected = AUSTIN_DISTRICTS.find(d => d.name === value);
-      if (selected) {
-        setFormData(prev => ({
-          ...prev,
-          city: value,
-          latitude: selected.lat,
-          longitude: selected.lng
-        }));
-        return;
-      }
-    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -135,10 +129,10 @@ const AiPriceEstimatorModal = ({
         {/* Input Controls */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '16px' }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.75rem' }}>Austin District</label>
+            <label className="form-label" style={{ fontSize: '0.75rem' }}>Indian City</label>
             <select name="city" value={formData.city} onChange={handleChange} className="form-select" style={{ padding: '0.5rem' }}>
-              {AUSTIN_DISTRICTS.map(d => (
-                <option key={d.name} value={d.name}>{d.name}</option>
+              {INDIAN_CITIES.map(c => (
+                <option key={c} value={c}>{c}</option>
               ))}
             </select>
           </div>

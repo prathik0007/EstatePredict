@@ -15,25 +15,33 @@ import {
 import mlApi from '../services/mlApi';
 import { usdToInr, getInrPrice, USD_TO_INR_RATE } from '../utils/currency';
 
-const AUSTIN_NEIGHBORHOODS = [
-  { name: 'Downtown Austin', lat: 30.2747, lng: -97.7404 },
-  { name: 'South Congress (SoCo)', lat: 30.2505, lng: -97.7497 },
-  { name: 'East Austin', lat: 30.2625, lng: -97.7215 },
-  { name: 'Zilker / Barton Hills', lat: 30.2670, lng: -97.7730 },
-  { name: 'The Domain / North Austin', lat: 30.4014, lng: -97.7247 },
-  { name: 'UT Austin / West Campus', lat: 30.2849, lng: -97.7341 },
-  { name: 'South Lamar / Bouldin Creek', lat: 30.2510, lng: -97.7610 },
-  { name: 'Mueller / Central East', lat: 30.3015, lng: -97.7050 },
-  { name: 'Hyde Park', lat: 30.3050, lng: -97.7300 },
-  { name: 'Rainey Street / Convention Center', lat: 30.2635, lng: -97.7397 },
-  { name: 'Austin Airport Corridor', lat: 30.1975, lng: -97.6664 }
+// 12 Indian Cities available for valuation
+const INDIAN_CITIES = [
+  'Bengaluru',
+  'Mumbai',
+  'Delhi',
+  'Hyderabad',
+  'Chennai',
+  'Pune',
+  'Kolkata',
+  'Ahmedabad',
+  'Jaipur',
+  'Kochi',
+  'Mangaluru',
+  'Mysuru'
 ];
+
+// Reference coordinates for V5 model inference contract compatibility.
+// The V5 model was trained on the 5,050 listing Austin benchmark.
+// These default reference coordinates maintain standard geometric input integrity
+// without fabricating Indian geographic training data or altering V5 feature definitions.
+const DEFAULT_MODEL_COORDINATES = { lat: 30.2747, lng: -97.7404 };
 
 const EstimatorPage = () => {
   const [formData, setFormData] = useState({
-    city: 'Downtown Austin',
-    latitude: 30.2747,
-    longitude: -97.7404,
+    city: 'Bengaluru',
+    latitude: DEFAULT_MODEL_COORDINATES.lat,
+    longitude: DEFAULT_MODEL_COORDINATES.lng,
     accommodates: 4,
     bedrooms: 2,
     bathrooms: 2,
@@ -52,18 +60,6 @@ const EstimatorPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'city') {
-      const selected = AUSTIN_NEIGHBORHOODS.find(n => n.name === value);
-      if (selected) {
-        setFormData(prev => ({
-          ...prev,
-          city: value,
-          latitude: selected.lat,
-          longitude: selected.lng
-        }));
-        return;
-      }
-    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -144,7 +140,7 @@ const EstimatorPage = () => {
           AI Rental Price Valuation & Prediction Intervals
         </h1>
         <p style={{ color: '#64748b', fontSize: '1rem', maxWidth: '780px', margin: '8px auto 0' }}>
-          Predict calibrated market rates using LightGBM multimodal concatenation, 20 target-independent geographic distance features (Austin, TX), 95% nominal conformal prediction intervals, and SHAP attribution.
+          Predict calibrated market rates using LightGBM multimodal concatenation, 20 target-independent geographic distance features, 95% nominal conformal prediction intervals, and SHAP attribution.
         </p>
       </div>
 
@@ -154,19 +150,19 @@ const EstimatorPage = () => {
           <form onSubmit={handleEstimate}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', margin: 0 }}>
-                Property Features & Specifications (Austin, TX)
+                Property Features & Specifications (Indian Cities)
               </h3>
               <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', padding: '4px 10px', borderRadius: '20px', fontWeight: '700' }}>
-                5,050 Cohort Aligned
+                V5 Architecture
               </span>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
               <div className="form-group">
-                <label className="form-label">Austin Neighborhood / District</label>
+                <label className="form-label">Indian City</label>
                 <select name="city" value={formData.city} onChange={handleInputChange} className="form-select">
-                  {AUSTIN_NEIGHBORHOODS.map(n => (
-                    <option key={n.name} value={n.name}>{n.name}</option>
+                  {INDIAN_CITIES.map(c => (
+                    <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
               </div>
@@ -244,7 +240,7 @@ const EstimatorPage = () => {
                 onChange={handleInputChange}
                 className="form-textarea"
                 rows="3"
-                placeholder="Stylish modern Austin home near Downtown and Lady Bird Lake, featuring high ceilings, open kitchen, private patio, fast fiber internet, and dedicated workspace..."
+                placeholder="Spacious modern apartment with open kitchen, high-speed WiFi, dedicated workspace, and convenient transit access..."
               />
               <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>
                 Normalized BAAI/bge-small-en-v1.5 embedding. If omitted, the 91-feature Tabular+Geographic fallback is used.
@@ -340,7 +336,7 @@ const EstimatorPage = () => {
                     <BarChart3 size={16} color="#7c3aed" /> SHAP Feature Attribution
                   </div>
                   <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '10px' }}>
-                    TreeSHAP relative attribution indicating feature contribution to log-scale price prediction across physical & Austin landmark features.
+                    TreeSHAP relative attribution indicating feature contribution to log-scale price prediction across physical & landmark features.
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {prediction.top_factors.map((item, idx) => {

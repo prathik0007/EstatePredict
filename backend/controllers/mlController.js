@@ -56,8 +56,8 @@ exports.predictRent = async (req, res) => {
     formData.append('review_scores_rating', String(ratingVal));
     formData.append('rating_cleanliness', String(ratingCleanliness || 4.90));
     formData.append('rating_location', String(ratingLocation || 4.85));
-    if (req.body.city) formData.append('city', String(req.body.city));
-    formData.append('description', description || 'Modern property in Austin, TX with city skyline views and contemporary amenities');
+    formData.append('city', String(req.body.city || 'Bengaluru'));
+    formData.append('description', description || 'Modern urban rental apartment with high-speed internet and contemporary amenities');
 
     // Attach image if uploaded
     if (req.file) {
