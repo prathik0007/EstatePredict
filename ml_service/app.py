@@ -10,8 +10,12 @@ from prediction_service import predictor
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/api/health", methods=["GET"])
+@app.route("/api/health", methods=["GET", "POST", "OPTIONS"], strict_slashes=False)
+@app.route("/api/ml/health", methods=["GET", "POST", "OPTIONS"], strict_slashes=False)
+@app.route("/health", methods=["GET", "POST", "OPTIONS"], strict_slashes=False)
 def health_check():
+    if request.method == "OPTIONS":
+        return "", 200
     return jsonify({
         "status": "healthy",
         "service": "Multimodal V5 Rental Price Prediction ML Service",
@@ -27,9 +31,12 @@ def health_check():
         }
     }), 200
 
-@app.route("/api/predict-rent", methods=["POST"])
-@app.route("/api/ml/predict-rent", methods=["POST"])
+@app.route("/api/predict-rent", methods=["POST", "OPTIONS"], strict_slashes=False)
+@app.route("/api/ml/predict-rent", methods=["POST", "OPTIONS"], strict_slashes=False)
+@app.route("/predict-rent", methods=["POST", "OPTIONS"], strict_slashes=False)
 def predict_rent_endpoint():
+    if request.method == "OPTIONS":
+        return "", 200
     try:
         # Check if json or multipart/form-data
         if request.is_json:

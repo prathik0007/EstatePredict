@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+const apiBase = import.meta.env.VITE_API_URL || 'https://rental-price-prediction-1ez4.onrender.com/api';
+const mlBase = import.meta.env.VITE_ML_API_URL || (import.meta.env.DEV ? '/api/ml' : `${apiBase}/ml`);
+
 const mlApi = axios.create({
-  baseURL: import.meta.env.VITE_ML_API_URL || '/api/ml'
+  baseURL: mlBase
 });
 
 // Request interceptor to attach JWT Token

@@ -2,7 +2,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 
-const FLASK_ML_URL = process.env.FLASK_ML_URL || 'http://127.0.0.1:5000';
+const FLASK_ML_URL = (process.env.FLASK_ML_URL || 'http://127.0.0.1:5000').replace(/\/+$/, '');
 
 // @desc    Predict Rental Price using Flask ML API (Multimodal V5 LightGBM + Conformal Intervals)
 // @route   POST /api/ml/predict-rent
@@ -57,7 +57,7 @@ exports.predictRent = async (req, res) => {
     formData.append('rating_cleanliness', String(ratingCleanliness || 4.90));
     formData.append('rating_location', String(ratingLocation || 4.85));
     formData.append('city', String(req.body.city || 'Bengaluru'));
-    formData.append('description', description || 'Modern urban rental apartment with high-speed internet and contemporary amenities');
+    formData.append('description', description ? String(description) : '');
 
     // Attach image if uploaded
     if (req.file) {
