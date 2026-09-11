@@ -133,7 +133,10 @@ class MultimodalV5Predictor:
         # 5. Text Encoder (BAAI/bge-small-en-v1.5)
         try:
             print("Loading BAAI/bge-small-en-v1.5 text encoder...")
-            self.text_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
+            try:
+                self.text_model = SentenceTransformer("BAAI/bge-small-en-v1.5", local_files_only=True)
+            except Exception:
+                self.text_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
             print("Loaded BAAI/bge-small-en-v1.5 text encoder (384d).")
         except Exception as e:
             print(f"Warning: Error loading text encoder: {e}")
@@ -141,7 +144,10 @@ class MultimodalV5Predictor:
         # 6. Image Encoder (sentence-transformers/clip-ViT-B-32)
         try:
             print("Loading sentence-transformers/clip-ViT-B-32 image encoder...")
-            self.image_model = SentenceTransformer("sentence-transformers/clip-ViT-B-32")
+            try:
+                self.image_model = SentenceTransformer("sentence-transformers/clip-ViT-B-32", local_files_only=True)
+            except Exception:
+                self.image_model = SentenceTransformer("sentence-transformers/clip-ViT-B-32")
             print("Loaded sentence-transformers/clip-ViT-B-32 image encoder (512d).")
         except Exception as e:
             print(f"Warning: Error loading image encoder: {e}")
@@ -231,6 +237,14 @@ class MultimodalV5Predictor:
         if 'bathroom' in kwargs:
             bathrooms = float(kwargs['bathroom'])
 
+        # Log parsed values immediately before V5 preprocessing (no secrets or image bytes)
+        print(f"[V5 DEBUG] Parsed inputs before preprocessing: accommodates={accommodates}, "
+              f"bedrooms={bedrooms}, beds={beds}, bathrooms={bathrooms}, min_nights={min_nights}, "
+              f"max_nights={max_nights}, avail_365={avail_365}, num_reviews={num_reviews}, "
+              f"rating={rating}, cleanliness={rating_cleanliness}, location={rating_location}, "
+              f"superhost={is_superhost}, room_type='{room_type}', property_type='{property_type}', "
+              f"has_description={bool(description and description.strip())}, has_image={image_file is not None}", flush=True)
+
         # 1. Tabular features (71-dimensional output via ColumnTransformer)
         tab_row = {
             'accommodates_num': float(accommodates),
@@ -257,6 +271,10 @@ class MultimodalV5Predictor:
         else:
             X_tab = np.zeros((1, 71))
 
+        # Log final tabular feature vector safe summary after preprocessing
+        print(f"[V5 DEBUG] Preprocessed X_tab shape: {X_tab.shape}, non-zero elements: {np.count_nonzero(X_tab)}, "
+              f"first 5 tabular values: {np.round(X_tab[0, :5], 4).tolist()}", flush=True)
+
         # 2. Geographic features (20-dimensional output)
         X_geo = self.extract_geo_features(latitude, longitude)
         X_tab_geo = np.hstack([X_tab, X_geo])  # Shape (1, 91)
@@ -278,11 +296,15 @@ class MultimodalV5Predictor:
         if use_full_multimodal:
             # Construct exact 987-feature vector: 71 tab + 20 geo + 384 text + 512 img
             X_full = np.hstack([X_tab, X_geo, text_emb, img_emb])
+            print(f"[V5 DEBUG] Full Multimodal input shape: {X_full.shape}, "
+                  f"first 5 model input values: {np.round(X_full[0, :5], 4).tolist()}", flush=True)
             pred_log = float(self.lgb_multimodal_concat.predict(X_full)[0])
             active_pipeline = "V5 LightGBM Multimodal Concatenation (987 features: Tabular + Geo + BGE-small + CLIP ViT-B/32)"
             model_name = "V5 LightGBM Multimodal Regressor (log1p)"
         elif self.lgb_tab_geo is not None:
             # Clean 91-feature Tabular + Geographic Fallback
+            print(f"[V5 DEBUG] Tab+Geo Fallback input shape: {X_tab_geo.shape}, "
+                  f"first 5 model input values: {np.round(X_tab_geo[0, :5], 4).tolist()}", flush=True)
             pred_log = float(self.lgb_tab_geo.predict(X_tab_geo)[0])
             active_pipeline = "V5 Tabular + Geographic Fallback (91 features: 71 Tabular + 20 Reference Landmark Distances)"
             model_name = "V5 LightGBM Tabular+Geographic Regressor (log1p)"

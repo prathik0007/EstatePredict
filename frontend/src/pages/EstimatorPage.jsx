@@ -81,17 +81,21 @@ const EstimatorPage = () => {
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
+      // Append camelCase aliases for maximum backend/ML service compatibility
+      if (formData.room_type) data.append('roomType', formData.room_type);
+      if (formData.property_type) data.append('propertyType', formData.property_type);
+      if (formData.min_nights !== undefined) data.append('minNights', formData.min_nights);
       if (formData.review_scores_rating !== undefined) {
         data.append('rating', formData.review_scores_rating);
         data.append('review_scores_rating', formData.review_scores_rating);
+        data.append('reviewScoresRating', formData.review_scores_rating);
       }
       if (imageFile) {
         data.append('image', imageFile);
       }
 
-      const res = await mlApi.post('/predict-rent', data, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      // Do NOT manually override Content-Type so Axios/browser sets boundary correctly
+      const res = await mlApi.post('/predict-rent', data);
 
       if (res.data && res.data.success && res.data.data) {
         setPrediction(res.data.data);
@@ -306,7 +310,7 @@ const EstimatorPage = () => {
                   ₹{getInrPrice(prediction, 'predicted_rent').toLocaleString('en-IN')}
                 </div>
                 <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                  <span>Model: {prediction.model_name?.includes('HistGradient') ? 'V5 LightGBM Multimodal Regressor (log1p)' : (prediction.model_name || 'V5 LightGBM Multimodal Regressor (log1p)')}</span>
+                  <span>Model: {prediction.model_name || 'V5 LightGBM Multimodal Regressor (log1p)'}</span>
                   <span>Conversion rate: 1 USD = ₹{USD_TO_INR_RATE}</span>
                 </div>
               </div>
