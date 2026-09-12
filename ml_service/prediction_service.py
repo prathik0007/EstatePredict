@@ -1,4 +1,5 @@
 import os
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
 import sys
 from pathlib import Path
 import joblib

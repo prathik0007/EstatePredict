@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
 import sys
 
 # Ensure current dir is in sys.path

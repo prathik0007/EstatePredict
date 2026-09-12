@@ -87,12 +87,49 @@ exports.predictRent = async (req, res) => {
   } catch (error) {
     console.error('[BACKEND ML CONTROLLER] Error contacting Flask ML Service:', error.message);
     
-    // Graceful fallback estimation consistent with Multimodal V5 Austin benchmark ($185 baseline)
+    // Comprehensive fallback estimation consistent with V5 Austin benchmark ($185 median reference)
     const occ = Number(req.body.accommodates || req.body.guests || 4);
+    const beds = Number(req.body.bedrooms || req.body.bhk || 2);
     const baths = Number(req.body.bathrooms || req.body.bathroom || 1.5);
+    const minNights = Number(req.body.min_nights || req.body.minNights || req.body.minimum_nights || 2);
+    const rating = Number(req.body.review_scores_rating || req.body.rating || req.body.reviewScoresRating || 4.85);
     const roomType = req.body.room_type || req.body.roomType || 'Entire home/apt';
-    const isEntire = roomType.includes('Entire') ? 1.3 : 0.7;
-    const estimated = Math.round((80 + occ * 24 + baths * 30) * isEntire);
+    const propertyType = req.body.property_type || req.body.propertyType || 'Entire home';
+
+    // Room type multiplier
+    let roomMultiplier = 1.0;
+    if (roomType.includes('Entire')) {
+      roomMultiplier = 1.25;
+    } else if (roomType.includes('Hotel')) {
+      roomMultiplier = 1.10;
+    } else if (roomType.includes('Private')) {
+      roomMultiplier = 0.70;
+    } else if (roomType.includes('Shared')) {
+      roomMultiplier = 0.40;
+    }
+
+    // Property type multiplier
+    let propMultiplier = 1.0;
+    const ptLower = propertyType.toLowerCase();
+    if (ptLower.includes('villa') || ptLower.includes('resort')) {
+      propMultiplier = 1.25;
+    } else if (ptLower.includes('condo') || ptLower.includes('townhouse') || ptLower.includes('loft')) {
+      propMultiplier = 1.08;
+    } else if (ptLower.includes('house') || ptLower.includes('home')) {
+      propMultiplier = 1.05;
+    } else if (ptLower.includes('guest') || ptLower.includes('tiny')) {
+      propMultiplier = 0.90;
+    }
+
+    // Rating adjustment
+    const ratingAdj = (rating - 4.5) * 12;
+
+    // Minimum nights adjustment: short stays have higher nightly rates
+    const minNightsAdj = minNights <= 2 ? 10 : (minNights >= 28 ? -20 : (minNights >= 7 ? -10 : 0));
+
+    // Base estimated price in USD
+    const rawEst = (45 + occ * 18 + beds * 24 + baths * 22 + ratingAdj + minNightsAdj) * roomMultiplier * propMultiplier;
+    const estimated = Math.max(20, Math.round(rawEst));
     
     // Conformal 95% log radius (q_hat = 0.8435: exp(-0.8435) = 0.4302, exp(+0.8435) = 2.3245)
     const lowerBound = Math.max(10, Math.round(estimated * 0.43));
@@ -116,6 +153,8 @@ exports.predictRent = async (req, res) => {
         usd_to_inr_rate: usdToInrRate,
         unit: 'USD/night',
         model_name: 'V5 Fallback Estimator (ML Service Offline)',
+        is_fallback: true,
+        fallback_notice: 'Python Flask ML service on port 5000 is currently offline. Start ml_service/app.py to run the trained LightGBM V5 model.',
         benchmark_dataset: 'Austin, TX Inside Airbnb (5,050 aligned multimodal listings)',
         prediction_interval: {
           nominal_coverage: '95%',
@@ -129,10 +168,12 @@ exports.predictRent = async (req, res) => {
           median_interval_width_usd: 390.43
         },
         top_factors: [
-          { feature: 'Accommodates (Guests)', impact: Math.round((occ - 3.5) * 18) },
+          { feature: 'Accommodates (Guests)', impact: Math.round((occ - 3.5) * 16) },
+          { feature: 'Bedrooms', impact: Math.round((beds - 2) * 20) },
           { feature: 'Bathrooms', impact: Math.round((baths - 1.5) * 15) },
-          { feature: 'Bedrooms', impact: 14 },
-          { feature: 'Room Type (Entire home)', impact: isEntire > 1 ? 25 : -25 }
+          { feature: 'Room Type', impact: Math.round((roomMultiplier - 1.0) * 50) },
+          { feature: 'Review Score Rating', impact: Math.round(ratingAdj) },
+          { feature: 'Minimum Nights', impact: minNightsAdj }
         ],
         research_benchmark: {
           benchmark_name: 'V5 Multimodal Research Benchmark',
