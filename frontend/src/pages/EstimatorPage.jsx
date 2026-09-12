@@ -370,13 +370,8 @@ const EstimatorPage = () => {
 
               {/* V5 Research Benchmark Metrics Card */}
               <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '0.78rem', color: '#475569' }}>
-                <div style={{ fontWeight: '800', color: '#1e293b', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Info size={15} color="#3b82f6" /> V5 Multimodal Research Benchmark
-                  </span>
-                  <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '600' }}>
-                    5,050 aligned Austin, TX listings
-                  </span>
+                <div style={{ fontWeight: '800', color: '#1e293b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Info size={15} color="#3b82f6" /> V5 Multimodal Research Benchmark
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '8px', background: '#ffffff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                   <div>MAE: <strong style={{ color: '#0f172a' }}>$77.74</strong></div>
@@ -387,7 +382,7 @@ const EstimatorPage = () => {
                   <div>Coverage: <strong style={{ color: '#15803d' }}>96.63%</strong></div>
                 </div>
                 <div style={{ fontSize: '0.72rem', color: '#64748b', lineHeight: '1.4' }}>
-                  Benchmark established on 5,050 aligned Austin, TX listings using LightGBM multimodal concatenation (CLIP ViT-B/32 visual representation, BGE-small text representation, 20 geographic distance features, and 95% nominal conformal prediction intervals). R² is the coefficient of determination, not an accuracy percentage. Metrics reflect research benchmark evaluations, not an individual prediction guarantee.
+                  Benchmark established on 5,050 aligned listings using LightGBM multimodal concatenation (CLIP ViT-B/32 visual representation, BGE-small text representation, 20 geographic distance features, and 95% nominal conformal prediction intervals). R² is the coefficient of determination, not an accuracy percentage. Metrics reflect research benchmark evaluations, not an individual prediction guarantee.
                 </div>
               </div>
             </div>
