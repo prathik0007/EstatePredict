@@ -8,7 +8,6 @@ import {
   RefreshCw,
   Image as ImageIcon,
   CheckCircle,
-  AlertCircle,
   Info,
   MapPin
 } from 'lucide-react';
@@ -296,14 +295,6 @@ const EstimatorPage = () => {
               </div>
 
               {/* Main Predicted Rental Price */}
-              {prediction.is_fallback && (
-                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', padding: '10px 14px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.78rem', color: '#92400e', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AlertCircle size={16} color="#d97706" style={{ flexShrink: 0 }} />
-                  <div>
-                    <strong>Offline Fallback Active:</strong> Python Flask service on port 5000 is unreachable. Run <code>python ml_service/app.py</code> to activate the real V5 LightGBM Multimodal Model.
-                  </div>
-                </div>
-              )}
               <div style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #c4b5fd', marginBottom: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
