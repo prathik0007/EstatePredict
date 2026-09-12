@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://rental-price-prediction-1ez4.onrender.com/api'
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'https://rental-price-prediction-1ez4.onrender.com/api')
 });
 
 // Request interceptor to attach JWT Token

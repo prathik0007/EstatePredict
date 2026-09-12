@@ -131,6 +131,9 @@ class MultimodalV5Predictor:
             geo_names.extend([lm, f'log_{lm}'])
         self.interpretable_feature_names = tab_names + geo_names
 
+        self.default_text_emb = None
+        self.default_img_emb = None
+
         # 5. Text Encoder (BAAI/bge-small-en-v1.5)
         try:
             print("Loading BAAI/bge-small-en-v1.5 text encoder...")
@@ -138,6 +141,7 @@ class MultimodalV5Predictor:
                 self.text_model = SentenceTransformer("BAAI/bge-small-en-v1.5", local_files_only=True)
             except Exception:
                 self.text_model = SentenceTransformer("BAAI/bge-small-en-v1.5")
+            self.default_text_emb = np.asarray(self.text_model.encode([""], normalize_embeddings=True), dtype=np.float32)
             print("Loaded BAAI/bge-small-en-v1.5 text encoder (384d).")
         except Exception as e:
             print(f"Warning: Error loading text encoder: {e}")
@@ -149,6 +153,8 @@ class MultimodalV5Predictor:
                 self.image_model = SentenceTransformer("sentence-transformers/clip-ViT-B-32", local_files_only=True)
             except Exception:
                 self.image_model = SentenceTransformer("sentence-transformers/clip-ViT-B-32")
+            blank_img = Image.new('RGB', (224, 224), (0, 0, 0))
+            self.default_img_emb = np.asarray(self.image_model.encode([blank_img], normalize_embeddings=True), dtype=np.float32)
             print("Loaded sentence-transformers/clip-ViT-B-32 image encoder (512d).")
         except Exception as e:
             print(f"Warning: Error loading image encoder: {e}")
@@ -178,24 +184,30 @@ class MultimodalV5Predictor:
     def extract_text_embedding(self, text):
         """
         Extracts 384-dimensional normalized text embedding using BAAI/bge-small-en-v1.5.
+        Falls back to neutral empty text representation if omitted.
         """
-        if not text or not text.strip():
-            return None
         if self.text_model is None:
-            return None
-        clean_text = text.strip()[:512]
-        emb = self.text_model.encode([clean_text], normalize_embeddings=True)
-        return np.asarray(emb, dtype=np.float32)
+            return self.default_text_emb
+        if not text or not str(text).strip():
+            return self.default_text_emb if self.default_text_emb is not None else np.asarray(self.text_model.encode([""], normalize_embeddings=True), dtype=np.float32)
+        try:
+            clean_text = str(text).strip()[:512]
+            emb = self.text_model.encode([clean_text], normalize_embeddings=True)
+            return np.asarray(emb, dtype=np.float32)
+        except Exception as e:
+            print(f"Note on text embedding extraction: {e}")
+            return self.default_text_emb
 
     def extract_image_embedding(self, image_file):
         """
         Extracts 512-dimensional normalized image embedding using sentence-transformers/clip-ViT-B-32.
         Pre-resizes PIL image to 224x224 matching V5 Phase 3.
+        Falls back to neutral blank image representation if omitted.
         """
-        if image_file is None:
-            return None
         if self.image_model is None:
-            return None
+            return self.default_img_emb
+        if image_file is None:
+            return self.default_img_emb
         try:
             if hasattr(image_file, "seek"):
                 image_file.seek(0)
@@ -204,7 +216,7 @@ class MultimodalV5Predictor:
             return np.asarray(emb, dtype=np.float32)
         except Exception as e:
             print(f"Note on image embedding extraction: {e}")
-            return None
+            return self.default_img_emb
 
     def predict(
         self,
@@ -281,17 +293,19 @@ class MultimodalV5Predictor:
         X_tab_geo = np.hstack([X_tab, X_geo])  # Shape (1, 91)
 
         # 3. Text & Image Embeddings
-        has_description = bool(description and description.strip())
-        text_emb = self.extract_text_embedding(description) if has_description else None
+        has_description = bool(description and str(description).strip())
+        text_emb = self.extract_text_embedding(description if has_description else "")
 
         has_image = image_file is not None
-        img_emb = self.extract_image_embedding(image_file) if has_image else None
+        img_emb = self.extract_image_embedding(image_file)
 
-        # 4. Pipeline Routing: Full Multimodal vs Fallback
+        # 4. Pipeline Routing: Full Multimodal (987 features) vs Tab+Geo Fallback (91 features)
         use_full_multimodal = (
+            self.lgb_multimodal_concat is not None and
             text_emb is not None and
             img_emb is not None and
-            self.lgb_multimodal_concat is not None
+            text_emb.shape[1] == 384 and
+            img_emb.shape[1] == 512
         )
 
         if use_full_multimodal:
@@ -387,8 +401,8 @@ class MultimodalV5Predictor:
             "modalities_used": {
                 "tabular": True,
                 "geographic": True,
-                "text": text_emb is not None,
-                "image": img_emb is not None
+                "text": has_description,
+                "image": has_image
             },
             "benchmark_dataset": "Austin, TX Inside Airbnb (5,050 aligned multimodal listings)",
             "prediction_interval": {
@@ -416,8 +430,8 @@ class MultimodalV5Predictor:
             },
             "shap_attribution_type": "SHAP Feature Attribution — Tabular + Geographic Features",
             "shap_attribution_note": "Model feature attributions represent mathematical contributions to the log-scale prediction, not causal effects. Austin landmark distance features are omitted from display to prevent confusion with selected Indian cities.",
-            "image_used": img_emb is not None,
-            "description_used": text_emb is not None,
+            "image_used": has_image,
+            "description_used": has_description,
             "research_benchmark": {
                 "benchmark_name": "V5 Multimodal Research Benchmark",
                 "cohort_size": "5,050 aligned Austin, TX listings",
