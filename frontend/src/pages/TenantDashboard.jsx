@@ -98,7 +98,7 @@ const TenantDashboard = () => {
               <CalendarCheck size={44} color="#94a3b8" style={{ margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '1.15rem', fontWeight: '700' }}>No visit requests yet</h3>
               <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '6px 0 20px' }}>
-                Browse Asheville properties and schedule stay requests directly with verified hosts.
+                Browse verified properties and schedule stay requests directly with verified hosts.
               </p>
               <Link to="/properties" className="btn btn-primary btn-sm">
                 Explore Properties
@@ -121,7 +121,7 @@ const TenantDashboard = () => {
                           {booking.property?.title || 'Property Listing'}
                         </h4>
                         <p style={{ fontSize: '0.825rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                          <MapPin size={13} /> {booking.property?.location?.city || 'Asheville'} • ${Number(booking.property?.price).toLocaleString('en-US')}
+                          <MapPin size={13} /> {booking.property?.location?.city || 'Verified'}{booking.property?.location?.state ? `, ${booking.property.location.state}` : ''} • ${Number(booking.property?.price).toLocaleString('en-US')}
                         </p>
                         <div style={{ fontSize: '0.85rem', color: '#334155', marginTop: '8px' }}>
                           📅 <strong>Requested Date:</strong> {new Date(booking.visitDate).toLocaleDateString()} ({booking.timeSlot})

@@ -190,7 +190,7 @@ const OwnerDashboard = () => {
                     <div>
                       <h4 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#0f172a' }}>{prop.title}</h4>
                       <p style={{ fontSize: '0.825rem', color: '#64748b', marginTop: '2px' }}>
-                        {prop.location?.city || 'Asheville'} • {prop.bedrooms || prop.bhk || 2} Beds • {prop.bathrooms || prop.bathroom || 1} Baths • {prop.propertyType}
+                        {prop.location?.city || 'Verified'}{prop.location?.state ? `, ${prop.location.state}` : ''} • {prop.bedrooms || prop.bhk || 2} Beds • {prop.bathrooms || prop.bathroom || 1} Baths • {prop.propertyType}
                       </p>
                       <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#2563eb', marginTop: '4px' }}>
                         ${Number(prop.price).toLocaleString('en-US')}

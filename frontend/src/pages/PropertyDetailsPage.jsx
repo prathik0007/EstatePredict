@@ -176,13 +176,13 @@ const PropertyDetailsPage = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="badge badge-primary">{property.propertyType}</span>
             <span className="badge badge-success">{property.roomType || 'Entire home/apt'}</span>
-            <span className="badge badge-warning">Asheville, NC</span>
+            <span className="badge badge-warning">{property.location?.city || 'Verified'}{property.location?.state ? `, ${property.location.state}` : ''}</span>
           </div>
           <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.2rem)', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '6px' }}>
             {property.title}
           </h1>
           <p style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.95rem' }}>
-            <MapPin size={16} color="#3b82f6" /> {property.location?.address}, {property.location?.city || 'Asheville'}, NC
+            <MapPin size={16} color="#3b82f6" /> {property.location?.address ? `${property.location.address}, ` : ''}{property.location?.city || 'Unknown'}{property.location?.state ? `, ${property.location.state}` : ''}
           </p>
         </div>
 
@@ -385,7 +385,7 @@ const PropertyDetailsPage = () => {
               Location & Neighborhood
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '16px' }}>
-              {property.location?.address}, {property.location?.city || 'Asheville'}, NC
+              {property.location?.address ? `${property.location.address}, ` : ''}{property.location?.city || 'Unknown'}{property.location?.state ? `, ${property.location.state}` : ''}
             </p>
             <MapViewer singleProperty={property} height="320px" zoom={14} />
           </div>
@@ -479,7 +479,7 @@ const PropertyDetailsPage = () => {
                 Schedule a Visit / Stay
               </h3>
               <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '18px' }}>
-                Select your preferred date to tour or book this property in Asheville.
+                Select your preferred date to tour or book this property.
               </p>
 
               {bookingSuccess ? (

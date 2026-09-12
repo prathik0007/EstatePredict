@@ -9,7 +9,10 @@ exports.getProperties = async (req, res) => {
     const {
       search,
       city,
+      neighborhood,
       bhk,
+      bedrooms,
+      roomType,
       minPrice,
       maxPrice,
       propertyType,
@@ -33,9 +36,19 @@ exports.getProperties = async (req, res) => {
     }
 
     // Filters
-    if (city && city !== 'All') query['location.city'] = city;
-    if (bhk && bhk !== 'All') query.bhk = Number(bhk);
+    if (city && city !== 'All') query['location.city'] = new RegExp(`^${city}$`, 'i');
+    if (neighborhood && neighborhood !== 'All') query['location.neighborhood'] = new RegExp(neighborhood, 'i');
+    const bedVal = bhk || bedrooms;
+    if (bedVal && bedVal !== 'All') {
+      const bedNum = Number(bedVal);
+      if (bedNum >= 4) {
+        query.$or = [{ bhk: { $gte: 4 } }, { bedrooms: { $gte: 4 } }];
+      } else {
+        query.$or = [{ bhk: bedNum }, { bedrooms: bedNum }];
+      }
+    }
     if (propertyType && propertyType !== 'All') query.propertyType = propertyType;
+    if (roomType && roomType !== 'All') query.roomType = roomType;
     if (furnishingStatus && furnishingStatus !== 'All') query.furnishingStatus = furnishingStatus;
     if (tenantPreferred && tenantPreferred !== 'All') query.tenantPreferred = tenantPreferred;
 

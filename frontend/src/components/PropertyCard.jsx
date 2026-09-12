@@ -62,7 +62,7 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
         {/* City Badge */}
         <div style={{ position: 'absolute', top: '12px', left: '12px' }}>
           <span className="badge badge-primary" style={{ background: 'rgba(255, 255, 255, 0.95)', color: '#1e293b', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}>
-            <MapPin size={12} color="#3b82f6" /> {property.location?.city || 'Asheville'}, NC
+            <MapPin size={12} color="#3b82f6" /> {property.location?.city || 'Unknown'}{property.location?.state ? `, ${property.location.state}` : ''}
           </span>
         </div>
 

@@ -15,6 +15,7 @@ const PropertiesPage = () => {
 
   // Filters State initialized from searchParams
   const [city, setCity] = useState(searchParams.get('city') || 'All');
+  const [neighborhood, setNeighborhood] = useState(searchParams.get('neighborhood') || 'All');
   const [bedrooms, setBedrooms] = useState(searchParams.get('bedrooms') || searchParams.get('bhk') || 'All');
   const [propertyType, setPropertyType] = useState(searchParams.get('propertyType') || 'All');
   const [roomType, setRoomType] = useState(searchParams.get('roomType') || 'All');
@@ -28,6 +29,7 @@ const PropertiesPage = () => {
     try {
       const params = new URLSearchParams();
       if (city !== 'All') params.append('city', city);
+      if (neighborhood !== 'All') params.append('neighborhood', neighborhood);
       if (bedrooms !== 'All') {
         params.append('bedrooms', bedrooms);
         params.append('bhk', bedrooms);
@@ -53,7 +55,7 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, [city, bedrooms, propertyType, roomType, sort]);
+  }, [city, neighborhood, bedrooms, propertyType, roomType, sort]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -62,6 +64,7 @@ const PropertiesPage = () => {
 
   const handleResetFilters = () => {
     setCity('All');
+    setNeighborhood('All');
     setBedrooms('All');
     setPropertyType('All');
     setRoomType('All');
@@ -77,10 +80,10 @@ const PropertiesPage = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <h1 style={{ fontSize: '1.85rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em' }}>
-            Find Verified Asheville Rentals
+            Find Verified Rental Listings
           </h1>
           <p style={{ color: '#64748b', fontSize: '0.9rem' }}>
-            Showing {totalCount} verified rental listings (Asheville, NC)
+            Showing {totalCount} verified rental {totalCount === 1 ? 'listing' : 'listings'}
           </p>
         </div>
 
@@ -154,18 +157,18 @@ const PropertiesPage = () => {
             />
           </div>
 
-          {/* Neighborhood */}
+          {/* City Filter */}
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={city} onChange={(e) => setCity(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
-              <option value="All">All Neighborhoods</option>
-              <option value="Downtown">Downtown Asheville</option>
-              <option value="Montford">Montford</option>
-              <option value="West Asheville">West Asheville</option>
-              <option value="Biltmore Village">Biltmore Village</option>
-              <option value="Grove Park">Grove Park</option>
-              <option value="River Arts District">River Arts District</option>
-              <option value="North Asheville">North Asheville</option>
-              <option value="South Asheville">South Asheville</option>
+              <option value="All">All Cities</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Kolkata">Kolkata</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Pune">Pune</option>
+              <option value="Ahmedabad">Ahmedabad</option>
             </select>
           </div>
 
@@ -184,6 +187,9 @@ const PropertiesPage = () => {
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={propertyType} onChange={(e) => setPropertyType(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
               <option value="All">All Types</option>
+              <option value="Apartment">Apartment</option>
+              <option value="Villa">Villa</option>
+              <option value="Condominium">Condominium</option>
               <option value="Entire rental unit">Entire rental unit</option>
               <option value="Entire home">Entire home</option>
               <option value="Entire guest suite">Entire guest suite</option>

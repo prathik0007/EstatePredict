@@ -177,7 +177,7 @@ const AdminDashboard = () => {
       {activeTab === 'overview' && (
         <div className="card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MapPin size={18} color="#3b82f6" /> Neighborhood-Wise Market Distribution (Asheville, NC)
+            <MapPin size={18} color="#3b82f6" /> Market Distribution by Location
           </h3>
 
           <div style={{ overflowX: 'auto' }}>
@@ -234,7 +234,7 @@ const AdminDashboard = () => {
                         {prop.title}
                       </div>
                     </td>
-                    <td style={{ padding: '12px' }}>{prop.location?.city || 'Asheville'}</td>
+                    <td style={{ padding: '12px' }}>{prop.location?.city || 'Unknown'}{prop.location?.state ? `, ${prop.location.state}` : ''}</td>
                     <td style={{ padding: '12px', fontWeight: '700' }}>${Number(prop.price).toLocaleString('en-US')}</td>
                     <td style={{ padding: '12px', color: '#64748b' }}>{prop.owner?.name || 'Host'}</td>
                     <td style={{ padding: '12px' }}>

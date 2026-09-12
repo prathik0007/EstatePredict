@@ -209,15 +209,15 @@ const HomePage = () => {
                     onChange={(e) => setSearchCity(e.target.value)}
                     style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
                   >
-                    <option value="All">All Neighborhoods</option>
-                    <option value="Downtown">Downtown Asheville</option>
-                    <option value="Montford">Montford</option>
-                    <option value="West Asheville">West Asheville</option>
-                    <option value="Biltmore Village">Biltmore Village</option>
-                    <option value="Grove Park">Grove Park</option>
-                    <option value="River Arts District">River Arts District</option>
-                    <option value="North Asheville">North Asheville</option>
-                    <option value="South Asheville">South Asheville</option>
+                    <option value="All">All Cities</option>
+                    <option value="Mumbai">Mumbai</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Kolkata">Kolkata</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Ahmedabad">Ahmedabad</option>
                   </select>
                 </div>
 
@@ -304,7 +304,7 @@ const HomePage = () => {
               </div>
               <div>
                 <h4 style={{ fontWeight: '700', fontSize: '0.95rem' }}>OpenStreetMap</h4>
-                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Asheville Leaflet geolocation</p>
+                <p style={{ fontSize: '0.8rem', color: '#64748b' }}>Interactive Leaflet geolocation</p>
               </div>
             </div>
           </div>
@@ -357,7 +357,7 @@ const HomePage = () => {
                   Explore Properties on OpenStreetMap
                 </h2>
                 <p style={{ color: '#64748b', fontSize: '0.95rem' }}>
-                  View verified Airbnb properties across Asheville, NC (Downtown, Montford, West Asheville, Biltmore Village) directly on Leaflet.js
+                  View verified rental properties across prime locations directly on Leaflet.js
                 </p>
               </div>
 
