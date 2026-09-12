@@ -4,29 +4,49 @@ const fs = require('fs');
 
 const FLASK_ML_URL = (process.env.FLASK_ML_URL || 'http://127.0.0.1:5000').replace(/\/+$/, '');
 
+const pickVal = (...vals) => {
+  for (const v of vals) {
+    if (v !== undefined && v !== null && v !== '') return v;
+  }
+  return undefined;
+};
+
+const parseNum = (val, defaultVal) => {
+  if (Array.isArray(val)) val = val[0];
+  if (val === undefined || val === null || val === '') return defaultVal;
+  const n = Number(val);
+  return isNaN(n) ? defaultVal : n;
+};
+
+const parseStr = (val, defaultVal = '') => {
+  if (Array.isArray(val)) val = val[0];
+  if (val === undefined || val === null) return defaultVal;
+  return String(val).trim();
+};
+
 // @desc    Predict Rental Price using Flask ML API (Multimodal V5 LightGBM + Conformal Intervals)
 // @route   POST /api/ml/predict-rent
 // @access  Public / Private
 exports.predictRent = async (req, res) => {
   try {
-    const accommodatesVal = req.body.accommodates !== undefined && req.body.accommodates !== '' ? req.body.accommodates : (req.body.guests !== undefined && req.body.guests !== '' ? req.body.guests : 4);
-    const bedroomsVal = req.body.bedrooms !== undefined && req.body.bedrooms !== '' ? req.body.bedrooms : (req.body.bhk !== undefined && req.body.bhk !== '' ? req.body.bhk : 2);
-    const bedsVal = req.body.beds !== undefined && req.body.beds !== '' ? req.body.beds : bedroomsVal;
-    const bathroomsVal = req.body.bathrooms !== undefined && req.body.bathrooms !== '' ? req.body.bathrooms : (req.body.bathroom !== undefined && req.body.bathroom !== '' ? req.body.bathroom : (req.body.bathroomsAirbnb !== undefined && req.body.bathroomsAirbnb !== '' ? req.body.bathroomsAirbnb : 1.5));
-    const latitudeVal = req.body.latitude || 30.2747;
-    const longitudeVal = req.body.longitude || -97.7404;
-    const roomTypeVal = req.body.room_type || req.body.roomType || 'Entire home/apt';
-    const propertyTypeVal = req.body.property_type || req.body.propertyType || 'Entire home';
-    const isSuperhostVal = (req.body.is_superhost !== undefined && req.body.is_superhost !== '') ? req.body.is_superhost : (req.body.isSuperhost !== undefined && req.body.isSuperhost !== '' ? req.body.isSuperhost : 0);
-    const minNightsVal = req.body.min_nights !== undefined && req.body.min_nights !== '' ? req.body.min_nights : (req.body.minimum_nights !== undefined && req.body.minimum_nights !== '' ? req.body.minimum_nights : (req.body.minNights !== undefined && req.body.minNights !== '' ? req.body.minNights : (req.body.minimumNights !== undefined && req.body.minimumNights !== '' ? req.body.minimumNights : 2)));
-    const maxNightsVal = req.body.max_nights !== undefined && req.body.max_nights !== '' ? req.body.max_nights : (req.body.maximum_nights !== undefined && req.body.maximum_nights !== '' ? req.body.maximum_nights : (req.body.maxNights !== undefined && req.body.maxNights !== '' ? req.body.maxNights : (req.body.maximumNights !== undefined && req.body.maximumNights !== '' ? req.body.maximumNights : 1125)));
-    const avail365Val = req.body.avail_365 !== undefined && req.body.avail_365 !== '' ? req.body.avail_365 : (req.body.availability_365 !== undefined && req.body.availability_365 !== '' ? req.body.availability_365 : (req.body.avail365 !== undefined && req.body.avail365 !== '' ? req.body.avail365 : (req.body.availability365 !== undefined && req.body.availability365 !== '' ? req.body.availability365 : 180)));
-    const numReviewsVal = req.body.num_reviews !== undefined && req.body.num_reviews !== '' ? req.body.num_reviews : (req.body.number_of_reviews !== undefined && req.body.number_of_reviews !== '' ? req.body.number_of_reviews : (req.body.numReviews !== undefined && req.body.numReviews !== '' ? req.body.numReviews : (req.body.numberOfReviews !== undefined && req.body.numberOfReviews !== '' ? req.body.numberOfReviews : 25)));
-    const ratingVal = req.body.rating !== undefined && req.body.rating !== '' ? req.body.rating : (req.body.review_scores_rating !== undefined && req.body.review_scores_rating !== '' ? req.body.review_scores_rating : (req.body.reviewScoresRating !== undefined && req.body.reviewScoresRating !== '' ? req.body.reviewScoresRating : 4.85));
-    const ratingCleanlinessVal = req.body.rating_cleanliness !== undefined && req.body.rating_cleanliness !== '' ? req.body.rating_cleanliness : (req.body.ratingCleanliness !== undefined && req.body.ratingCleanliness !== '' ? req.body.ratingCleanliness : 4.90);
-    const ratingLocationVal = req.body.rating_location !== undefined && req.body.rating_location !== '' ? req.body.rating_location : (req.body.ratingLocation !== undefined && req.body.ratingLocation !== '' ? req.body.ratingLocation : 4.85);
-    const cityVal = req.body.city || 'Bengaluru';
-    const descriptionVal = req.body.description ? String(req.body.description) : '';
+    const accommodatesVal = parseNum(pickVal(req.body.accommodates, req.body.guests), 4);
+    const bedroomsVal = parseNum(pickVal(req.body.bedrooms, req.body.bhk), 2);
+    const bedsVal = parseNum(pickVal(req.body.beds), bedroomsVal);
+    const bathroomsVal = parseNum(pickVal(req.body.bathrooms, req.body.bathroom, req.body.bathroomsAirbnb), 1.5);
+    const latitudeVal = parseNum(pickVal(req.body.latitude), 30.2747);
+    const longitudeVal = parseNum(pickVal(req.body.longitude), -97.7404);
+    const roomTypeVal = parseStr(pickVal(req.body.room_type, req.body.roomType), 'Entire home/apt');
+    const propertyTypeVal = parseStr(pickVal(req.body.property_type, req.body.propertyType), 'Entire home');
+    const isSuperhostVal = parseNum(pickVal(req.body.is_superhost, req.body.isSuperhost), 0);
+    const minNightsVal = parseNum(pickVal(req.body.min_nights, req.body.minimum_nights, req.body.minNights, req.body.minimumNights), 2);
+    const maxNightsVal = parseNum(pickVal(req.body.max_nights, req.body.maximum_nights, req.body.maxNights, req.body.maximumNights), 1125);
+    const avail365Val = parseNum(pickVal(req.body.avail_365, req.body.availability_365, req.body.avail365, req.body.availability365), 180);
+    const numReviewsVal = parseNum(pickVal(req.body.num_reviews, req.body.number_of_reviews, req.body.numReviews, req.body.numberOfReviews), 25);
+    const ratingVal = parseNum(pickVal(req.body.rating, req.body.review_scores_rating, req.body.reviewScoresRating), 4.85);
+    const ratingCleanlinessVal = parseNum(pickVal(req.body.rating_cleanliness, req.body.ratingCleanliness), 4.90);
+    const ratingLocationVal = parseNum(pickVal(req.body.rating_location, req.body.ratingLocation), 4.85);
+    const cityVal = parseStr(pickVal(req.body.city), 'Bengaluru');
+    const descriptionVal = parseStr(pickVal(req.body.description), '');
 
     const formData = new FormData();
     formData.append('accommodates', String(accommodatesVal));
@@ -88,13 +108,13 @@ exports.predictRent = async (req, res) => {
     console.error('[BACKEND ML CONTROLLER] Error contacting Flask ML Service:', error.message);
     
     // Comprehensive fallback estimation consistent with V5 Austin benchmark ($185 median reference)
-    const occ = Number(req.body.accommodates || req.body.guests || 4);
-    const beds = Number(req.body.bedrooms || req.body.bhk || 2);
-    const baths = Number(req.body.bathrooms || req.body.bathroom || 1.5);
-    const minNights = Number(req.body.min_nights || req.body.minNights || req.body.minimum_nights || 2);
-    const rating = Number(req.body.review_scores_rating || req.body.rating || req.body.reviewScoresRating || 4.85);
-    const roomType = req.body.room_type || req.body.roomType || 'Entire home/apt';
-    const propertyType = req.body.property_type || req.body.propertyType || 'Entire home';
+    const occ = parseNum(pickVal(req.body.accommodates, req.body.guests), 4);
+    const beds = parseNum(pickVal(req.body.bedrooms, req.body.bhk), 2);
+    const baths = parseNum(pickVal(req.body.bathrooms, req.body.bathroom), 1.5);
+    const minNights = parseNum(pickVal(req.body.min_nights, req.body.minNights, req.body.minimum_nights, req.body.minimumNights), 2);
+    const rating = parseNum(pickVal(req.body.review_scores_rating, req.body.rating, req.body.reviewScoresRating), 4.85);
+    const roomType = parseStr(pickVal(req.body.room_type, req.body.roomType), 'Entire home/apt');
+    const propertyType = parseStr(pickVal(req.body.property_type, req.body.propertyType), 'Entire home');
 
     // Room type multiplier
     let roomMultiplier = 1.0;
@@ -129,16 +149,16 @@ exports.predictRent = async (req, res) => {
 
     // Base estimated price in USD
     const rawEst = (45 + occ * 18 + beds * 24 + baths * 22 + ratingAdj + minNightsAdj) * roomMultiplier * propMultiplier;
-    const estimated = Math.max(20, Math.round(rawEst));
+    const estimated = Math.max(20, Math.round(isNaN(rawEst) ? 185 : rawEst));
     
     // Conformal 95% log radius (q_hat = 0.8435: exp(-0.8435) = 0.4302, exp(+0.8435) = 2.3245)
     const lowerBound = Math.max(10, Math.round(estimated * 0.43));
     const upperBound = Math.round(estimated * 2.32);
 
     const usdToInrRate = Number(process.env.USD_TO_INR_RATE) || 83.50;
-    const estimatedInr = Math.round(estimated * usdToInrRate);
-    const lowerBoundInr = Math.round(lowerBound * usdToInrRate);
-    const upperBoundInr = Math.round(upperBound * usdToInrRate);
+    const estimatedInr = Math.max(1, Math.round(estimated * usdToInrRate));
+    const lowerBoundInr = Math.max(1, Math.round(lowerBound * usdToInrRate));
+    const upperBoundInr = Math.max(1, Math.round(upperBound * usdToInrRate));
 
     res.status(200).json({
       success: true,

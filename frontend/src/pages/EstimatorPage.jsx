@@ -81,14 +81,13 @@ const EstimatorPage = () => {
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
-      // Append camelCase aliases for maximum backend/ML service compatibility
-      if (formData.room_type) data.append('roomType', formData.room_type);
-      if (formData.property_type) data.append('propertyType', formData.property_type);
-      if (formData.min_nights !== undefined) data.append('minNights', formData.min_nights);
+      // Append aliases for maximum backend/ML service compatibility
+      if (formData.room_type && !data.has('roomType')) data.append('roomType', formData.room_type);
+      if (formData.property_type && !data.has('propertyType')) data.append('propertyType', formData.property_type);
+      if (formData.min_nights !== undefined && !data.has('minNights')) data.append('minNights', formData.min_nights);
       if (formData.review_scores_rating !== undefined) {
-        data.append('rating', formData.review_scores_rating);
-        data.append('review_scores_rating', formData.review_scores_rating);
-        data.append('reviewScoresRating', formData.review_scores_rating);
+        if (!data.has('rating')) data.append('rating', formData.review_scores_rating);
+        if (!data.has('reviewScoresRating')) data.append('reviewScoresRating', formData.review_scores_rating);
       }
       if (imageFile) {
         data.append('image', imageFile);
