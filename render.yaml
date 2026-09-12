@@ -1,0 +1,38 @@
+services:
+  # Node.js Backend API Service
+  - type: web
+    name: rental-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: FLASK_ML_URL
+        fromService:
+          type: web
+          name: rental-ml-service
+          property: host
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: USD_TO_INR_RATE
+        value: "83.5"
+
+  # Python Flask V5 ML Inference Service
+  - type: web
+    name: rental-ml-service
+    env: python
+    rootDir: .
+    buildCommand: pip install -r ml_service/requirements.txt
+    startCommand: gunicorn --chdir ml_service app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 1
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: HF_HUB_OFFLINE
+        value: "1"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    plan: standard

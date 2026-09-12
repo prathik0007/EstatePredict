@@ -52,6 +52,19 @@ datasets/multimodal_v4/models/
 # ============================================================
 datasets/multimodal_v5/images/
 datasets/multimodal_v5/features/
-datasets/multimodal_v5/models/
 datasets/multimodal_v5/raw/
+
+# V5 large/experimental models (keep core inference models tracked)
+datasets/multimodal_v5/models/pca_*.joblib
+datasets/multimodal_v5/models/tabular_catboost.joblib
+datasets/multimodal_v5/models/tabular_histgradientboosting.joblib
+datasets/multimodal_v5/models/tabular_lightgbm.joblib
+datasets/multimodal_v5/models/tabular_xgboost.joblib
+datasets/multimodal_v5/models/multimodal_attention_fusion.pt
+
+# Core V5 inference models are tracked (small enough for deployment)
+# lgb_multimodal_concat.joblib (~1MB)
+# lgb_tab_geo.joblib (~900KB)
+# tabular_preprocessor.joblib (~10KB)
+# geo_scaler.joblib (~2KB)
 
