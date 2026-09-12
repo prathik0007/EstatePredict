@@ -1,7 +1,18 @@
 import axios from 'axios';
 
-const apiBase = import.meta.env.VITE_API_URL || 'https://rental-price-prediction-1ez4.onrender.com/api';
-const mlBase = import.meta.env.VITE_ML_API_URL || (import.meta.env.DEV ? '/api/ml' : `${apiBase}/ml`);
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '');
+
+const defaultApiBase = isLocalhost 
+  ? (import.meta.env.DEV ? '/api' : 'http://127.0.0.1:5001/api')
+  : 'https://rental-price-prediction-1ez4.onrender.com/api';
+
+const defaultMlBase = isLocalhost
+  ? (import.meta.env.DEV ? '/api/ml' : 'http://127.0.0.1:5001/api/ml')
+  : 'https://rental-price-prediction-1ez4.onrender.com/api/ml';
+
+const apiBase = import.meta.env.VITE_API_URL || defaultApiBase;
+const mlBase = import.meta.env.VITE_ML_API_URL || defaultMlBase;
 
 const mlApi = axios.create({
   baseURL: mlBase

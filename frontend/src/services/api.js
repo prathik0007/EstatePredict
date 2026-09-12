@@ -1,7 +1,14 @@
 import axios from 'axios';
 
+const isLocalhost = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '');
+
+const defaultApiBase = isLocalhost 
+  ? (import.meta.env.DEV ? '/api' : 'http://127.0.0.1:5001/api')
+  : 'https://rental-price-prediction-1ez4.onrender.com/api';
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '/api' : 'https://rental-price-prediction-1ez4.onrender.com/api')
+  baseURL: import.meta.env.VITE_API_URL || defaultApiBase
 });
 
 // Request interceptor to attach JWT Token
