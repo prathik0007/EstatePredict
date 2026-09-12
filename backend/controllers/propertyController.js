@@ -285,3 +285,30 @@ exports.getMyProperties = async (req, res) => {
     });
   }
 };
+
+// @desc    Get dynamic distinct filter options from available properties
+// @route   GET /api/properties/filters
+// @access  Public
+exports.getPropertyFilters = async (req, res) => {
+  try {
+    const cities = await Property.distinct('location.city', { status: 'available' });
+    const neighborhoods = await Property.distinct('location.neighborhood', { status: 'available' });
+    const propertyTypes = await Property.distinct('propertyType', { status: 'available' });
+    const roomTypes = await Property.distinct('roomType', { status: 'available' });
+
+    res.status(200).json({
+      success: true,
+      cities: cities.filter(Boolean).sort(),
+      neighborhoods: neighborhoods.filter(Boolean).sort(),
+      propertyTypes: propertyTypes.filter(Boolean).sort(),
+      roomTypes: roomTypes.filter(Boolean).sort()
+    });
+  } catch (error) {
+    console.error('Error fetching property filters:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching property filters',
+      error: error.message
+    });
+  }
+};

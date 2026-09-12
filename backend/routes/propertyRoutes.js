@@ -5,7 +5,8 @@ const {
   createProperty,
   updateProperty,
   deleteProperty,
-  getMyProperties
+  getMyProperties,
+  getPropertyFilters
 } = require('../controllers/propertyController');
 const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/upload');
@@ -13,6 +14,7 @@ const upload = require('../middleware/upload');
 const router = express.Router();
 
 router.get('/', getProperties);
+router.get('/filters', getPropertyFilters);
 router.get('/my-listings', protect, authorize('owner', 'admin'), getMyProperties);
 router.get('/:id', getPropertyById);
 

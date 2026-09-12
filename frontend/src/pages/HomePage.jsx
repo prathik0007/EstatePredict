@@ -24,9 +24,24 @@ const HomePage = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState('All');
+  const [availableCities, setAvailableCities] = useState([]);
   const [searchBedrooms, setSearchBedrooms] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchFilterCities = async () => {
+      try {
+        const res = await api.get('/properties/filters');
+        if (res.data.success && res.data.cities) {
+          setAvailableCities(res.data.cities);
+        }
+      } catch (err) {
+        console.error('Error fetching cities:', err);
+      }
+    };
+    fetchFilterCities();
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -210,14 +225,11 @@ const HomePage = () => {
                     style={{ border: 'none', background: 'transparent', outline: 'none', fontWeight: '600', color: '#1e293b', width: '100%', fontSize: '0.9rem' }}
                   >
                     <option value="All">All Cities</option>
-                    <option value="Mumbai">Mumbai</option>
-                    <option value="Bangalore">Bangalore</option>
-                    <option value="Hyderabad">Hyderabad</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Kolkata">Kolkata</option>
-                    <option value="Chennai">Chennai</option>
-                    <option value="Pune">Pune</option>
-                    <option value="Ahmedabad">Ahmedabad</option>
+                    {availableCities && availableCities.length > 0 ? (
+                      availableCities.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))
+                    ) : null}
                   </select>
                 </div>
 

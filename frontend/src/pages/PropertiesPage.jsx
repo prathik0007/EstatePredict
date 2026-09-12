@@ -23,6 +23,36 @@ const PropertiesPage = () => {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [sort, setSort] = useState('newest');
+  const [filterOptions, setFilterOptions] = useState({
+    cities: [],
+    neighborhoods: [],
+    propertyTypes: [],
+    roomTypes: []
+  });
+
+  useEffect(() => {
+    const loadFilters = async () => {
+      try {
+        const res = await api.get('/properties/filters');
+        if (res.data.success) {
+          setFilterOptions(res.data);
+        }
+      } catch (err) {
+        console.error('Error loading property filter options:', err);
+      }
+    };
+    loadFilters();
+  }, []);
+
+  const hasActiveFilters =
+    city !== 'All' ||
+    neighborhood !== 'All' ||
+    bedrooms !== 'All' ||
+    propertyType !== 'All' ||
+    roomType !== 'All' ||
+    Boolean(minPrice) ||
+    Boolean(maxPrice) ||
+    Boolean(search.trim());
 
   const fetchProperties = async () => {
     setLoading(true);
@@ -161,16 +191,25 @@ const PropertiesPage = () => {
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={city} onChange={(e) => setCity(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
               <option value="All">All Cities</option>
-              <option value="Mumbai">Mumbai</option>
-              <option value="Bangalore">Bangalore</option>
-              <option value="Hyderabad">Hyderabad</option>
-              <option value="Delhi">Delhi</option>
-              <option value="Kolkata">Kolkata</option>
-              <option value="Chennai">Chennai</option>
-              <option value="Pune">Pune</option>
-              <option value="Ahmedabad">Ahmedabad</option>
+              {filterOptions.cities && filterOptions.cities.length > 0 ? (
+                filterOptions.cities.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))
+              ) : null}
             </select>
           </div>
+
+          {/* Neighborhood Filter (if available in dataset) */}
+          {filterOptions.neighborhoods && filterOptions.neighborhoods.length > 0 && (
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <select value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
+                <option value="All">All Neighborhoods</option>
+                {filterOptions.neighborhoods.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Bedrooms */}
           <div className="form-group" style={{ marginBottom: 0 }}>
@@ -186,15 +225,20 @@ const PropertiesPage = () => {
           {/* Property Type */}
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={propertyType} onChange={(e) => setPropertyType(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
-              <option value="All">All Types</option>
-              <option value="Apartment">Apartment</option>
-              <option value="Villa">Villa</option>
-              <option value="Condominium">Condominium</option>
-              <option value="Entire rental unit">Entire rental unit</option>
-              <option value="Entire home">Entire home</option>
-              <option value="Entire guest suite">Entire guest suite</option>
-              <option value="Entire townhouse">Entire townhouse</option>
-              <option value="Private room in home">Private room in home</option>
+              <option value="All">All Property Types</option>
+              {filterOptions.propertyTypes && filterOptions.propertyTypes.length > 0 ? (
+                filterOptions.propertyTypes.map((pt) => (
+                  <option key={pt} value={pt}>{pt}</option>
+                ))
+              ) : (
+                <>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Condominium">Condominium</option>
+                  <option value="Entire home">Entire home</option>
+                  <option value="Entire rental unit">Entire rental unit</option>
+                </>
+              )}
             </select>
           </div>
 
@@ -202,10 +246,17 @@ const PropertiesPage = () => {
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={roomType} onChange={(e) => setRoomType(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
               <option value="All">All Room Types</option>
-              <option value="Entire home/apt">Entire home/apt</option>
-              <option value="Private room">Private room</option>
-              <option value="Shared room">Shared room</option>
-              <option value="Hotel room">Hotel room</option>
+              {filterOptions.roomTypes && filterOptions.roomTypes.length > 0 ? (
+                filterOptions.roomTypes.map((rt) => (
+                  <option key={rt} value={rt}>{rt}</option>
+                ))
+              ) : (
+                <>
+                  <option value="Entire home/apt">Entire home/apt</option>
+                  <option value="Private room">Private room</option>
+                  <option value="Shared room">Shared room</option>
+                </>
+              )}
             </select>
           </div>
 
@@ -238,11 +289,20 @@ const PropertiesPage = () => {
         </div>
       ) : properties.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '80px 0', background: '#ffffff', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#334155' }}>No properties matched your criteria</h3>
-          <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '6px' }}>Try adjusting your filters or resetting the search.</p>
-          <button onClick={handleResetFilters} className="btn btn-secondary btn-sm" style={{ marginTop: '16px' }}>
-            Reset Filters
-          </button>
+          {hasActiveFilters ? (
+            <>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#334155' }}>No properties matched your criteria</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '6px' }}>Try adjusting your filters or resetting the search.</p>
+              <button onClick={handleResetFilters} className="btn btn-secondary btn-sm" style={{ marginTop: '16px' }}>
+                Reset Filters
+              </button>
+            </>
+          ) : (
+            <>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '700', color: '#334155' }}>No listings currently available in database</h3>
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '6px' }}>There are currently no property listings in the rental database.</p>
+            </>
+          )}
         </div>
       ) : viewMode === 'split' ? (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
