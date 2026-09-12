@@ -9,17 +9,16 @@ services:
     envVars:
       - key: PORT
         value: 10000
-      - key: FLASK_ML_URL
-        fromService:
-          type: web
-          name: rental-ml-service
-          property: host
       - key: MONGO_URI
         sync: false
       - key: JWT_SECRET
         sync: false
       - key: USD_TO_INR_RATE
         value: "83.5"
+      # FLASK_ML_URL must be set manually in the Render dashboard
+      # to the full URL of the rental-ml-service (e.g. https://rental-ml-service.onrender.com)
+      - key: FLASK_ML_URL
+        sync: false
 
   # Python Flask V5 ML Inference Service
   - type: web
@@ -27,7 +26,7 @@ services:
     env: python
     rootDir: .
     buildCommand: pip install -r ml_service/requirements.txt
-    startCommand: gunicorn --chdir ml_service app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 1
+    startCommand: gunicorn --chdir ml_service app:app --bind 0.0.0.0:$PORT --timeout 180 --workers 1
     envVars:
       - key: PORT
         value: 10000
