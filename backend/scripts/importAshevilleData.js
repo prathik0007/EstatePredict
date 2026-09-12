@@ -67,7 +67,7 @@ async function runImport() {
     }
 
     console.log('Connecting to MongoDB Atlas...');
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoUri, { dbName: 'rental_management_db' });
     console.log('Connected to MongoDB Atlas successfully.');
 
     // 1. Find or establish default owner
