@@ -24,7 +24,6 @@ import MapViewer from '../components/MapViewer';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
-import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams();
@@ -315,19 +314,17 @@ const PropertyDetailsPage = () => {
               }}>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: '#6d28d9', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    PREDICTED RENTAL PRICE
+                    PREDICTED NIGHTLY RENTAL PRICE
                   </span>
                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a' }}>
-                    ₹{usdToInr(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
-                    USD: ${Number(property.predictedRentInfo.predictedRent).toFixed(2)} (1 USD = ₹{USD_TO_INR_RATE})
+                    ${Number(property.predictedRentInfo.predictedRent).toFixed(2)}
+                    <span style={{ fontSize: '0.825rem', color: '#64748b', fontWeight: '500' }}> / night</span>
                   </div>
                 </div>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: '#059669', fontWeight: '700' }}>95% Nominal Conformal Interval</span>
                   <div style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b' }}>
-                    ₹{usdToInr(property.predictedRentInfo.lowerBound).toLocaleString('en-IN')} – ₹{usdToInr(property.predictedRentInfo.upperBound).toLocaleString('en-IN')}
+                    ${Number(property.predictedRentInfo.lowerBound).toFixed(2)} – ${Number(property.predictedRentInfo.upperBound).toFixed(2)}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>

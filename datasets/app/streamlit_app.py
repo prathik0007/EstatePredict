@@ -163,12 +163,12 @@ if predict:
     st.subheader("🏠 Predicted Monthly Rent")
     st.metric(
     label="Predicted Rent",
-    value=f"₹{result['predicted_rent']:.2f}"
+    value=f"${result['predicted_rent']:.2f}"
 )
 
     st.subheader("📊 95% Confidence Interval")
     st.info(
-    f"₹{result['lower_bound']:.2f}  –  ₹{result['upper_bound']:.2f}"
+    f"${result['lower_bound']:.2f}  –  ${result['upper_bound']:.2f}"
 )
     # Display SHAP Plot
 

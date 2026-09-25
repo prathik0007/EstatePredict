@@ -53,15 +53,22 @@ def predict_rent_endpoint():
         city_coords = {
             'Downtown Austin': (30.2747, -97.7404),
             'Downtown': (30.2747, -97.7404),
+            'South Congress (SoCo)': (30.2505, -97.7497),
             'South Congress': (30.2505, -97.7497),
             'East Austin': (30.2625, -97.7215),
             'Zilker / Barton Hills': (30.2670, -97.7730),
+            'Zilker': (30.2670, -97.7730),
+            'The Domain / North Austin': (30.4014, -97.7247),
             'The Domain': (30.4014, -97.7247),
+            'UT Austin / West Campus': (30.2849, -97.7341),
             'UT Austin / Campus': (30.2849, -97.7341),
+            'South Lamar / Bouldin Creek': (30.2510, -97.7610),
             'South Lamar': (30.2510, -97.7610),
+            'Mueller / Central East': (30.3015, -97.7050),
             'Mueller': (30.3015, -97.7050),
             'Hyde Park': (30.3050, -97.7300),
             'Rainey Street / Convention Center': (30.2635, -97.7397),
+            'Austin Airport Corridor': (30.1975, -97.6664),
             'Austin Airport': (30.1975, -97.6664),
             # Legacy aliases default to central Austin
             'Mumbai': (30.2747, -97.7404),
@@ -78,7 +85,7 @@ def predict_rent_endpoint():
             'Mangaluru': (30.2747, -97.7404),
             'Mysuru': (30.2747, -97.7404)
         }
-        city = data.get("city", "Bengaluru")
+        city = data.get("city", "Downtown Austin")
         default_lat, default_lng = city_coords.get(city, (30.2747, -97.7404))
 
         accommodates = float(data.get("accommodates") or data.get("guests") or 4)

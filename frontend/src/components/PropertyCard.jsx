@@ -4,7 +4,6 @@ import { MapPin, BedDouble, Bath, Users, Sparkles, Heart, ShieldCheck } from 'lu
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
-import { usdToInr } from '../utils/currency';
 
 const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle }) => {
   const { isAuthenticated, isTenant } = useAuth();
@@ -115,7 +114,7 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
               <span>AI Predicted Rate</span>
             </div>
             <span style={{ color: '#34d399' }}>
-              ₹{usdToInr(property.predictedRentInfo.predictedRent).toLocaleString('en-IN')}
+              ${Number(property.predictedRentInfo.predictedRent).toLocaleString('en-US')}/night
             </span>
           </div>
         )}

@@ -45,7 +45,7 @@ exports.predictRent = async (req, res) => {
     const ratingVal = parseNum(pickVal(req.body.rating, req.body.review_scores_rating, req.body.reviewScoresRating), 4.85);
     const ratingCleanlinessVal = parseNum(pickVal(req.body.rating_cleanliness, req.body.ratingCleanliness), 4.90);
     const ratingLocationVal = parseNum(pickVal(req.body.rating_location, req.body.ratingLocation), 4.85);
-    const cityVal = parseStr(pickVal(req.body.city), 'Bengaluru');
+    const cityVal = parseStr(pickVal(req.body.city), 'Downtown Austin');
     const descriptionVal = parseStr(pickVal(req.body.description), '');
 
     const formData = new FormData();

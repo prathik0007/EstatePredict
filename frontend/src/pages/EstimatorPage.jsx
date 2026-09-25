@@ -12,35 +12,27 @@ import {
   MapPin
 } from 'lucide-react';
 import mlApi from '../services/mlApi';
-import { usdToInr, getInrPrice, USD_TO_INR_RATE } from '../utils/currency';
 
-// 12 Indian Cities available for valuation
-const INDIAN_CITIES = [
-  'Bengaluru',
-  'Mumbai',
-  'Delhi',
-  'Hyderabad',
-  'Chennai',
-  'Pune',
-  'Kolkata',
-  'Ahmedabad',
-  'Jaipur',
-  'Kochi',
-  'Mangaluru',
-  'Mysuru'
+// Austin Neighborhoods & Districts aligned with Inside Airbnb benchmark
+const AUSTIN_NEIGHBORHOODS = [
+  { name: 'Downtown Austin', lat: 30.2747, lng: -97.7404 },
+  { name: 'South Congress (SoCo)', lat: 30.2505, lng: -97.7497 },
+  { name: 'East Austin', lat: 30.2625, lng: -97.7215 },
+  { name: 'Zilker / Barton Hills', lat: 30.2670, lng: -97.7730 },
+  { name: 'The Domain / North Austin', lat: 30.4014, lng: -97.7247 },
+  { name: 'UT Austin / West Campus', lat: 30.2849, lng: -97.7341 },
+  { name: 'South Lamar / Bouldin Creek', lat: 30.2510, lng: -97.7610 },
+  { name: 'Mueller / Central East', lat: 30.3015, lng: -97.7050 },
+  { name: 'Hyde Park', lat: 30.3050, lng: -97.7300 },
+  { name: 'Rainey Street / Convention Center', lat: 30.2635, lng: -97.7397 },
+  { name: 'Austin Airport Corridor', lat: 30.1975, lng: -97.6664 }
 ];
-
-// Reference coordinates for V5 model inference contract compatibility.
-// The V5 model was trained on the 5,050 listing Austin benchmark.
-// These default reference coordinates maintain standard geometric input integrity
-// without fabricating Indian geographic training data or altering V5 feature definitions.
-const DEFAULT_MODEL_COORDINATES = { lat: 30.2747, lng: -97.7404 };
 
 const EstimatorPage = () => {
   const [formData, setFormData] = useState({
-    city: 'Bengaluru',
-    latitude: DEFAULT_MODEL_COORDINATES.lat,
-    longitude: DEFAULT_MODEL_COORDINATES.lng,
+    city: 'Downtown Austin',
+    latitude: 30.2747,
+    longitude: -97.7404,
     accommodates: 4,
     bedrooms: 2,
     bathrooms: 2,
@@ -59,6 +51,18 @@ const EstimatorPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'city') {
+      const selected = AUSTIN_NEIGHBORHOODS.find(n => n.name === value);
+      if (selected) {
+        setFormData(prev => ({
+          ...prev,
+          city: value,
+          latitude: selected.lat,
+          longitude: selected.lng
+        }));
+        return;
+      }
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -142,7 +146,7 @@ const EstimatorPage = () => {
           AI Rental Price Valuation & Prediction Intervals
         </h1>
         <p style={{ color: '#64748b', fontSize: '1rem', maxWidth: '780px', margin: '8px auto 0' }}>
-          Predict calibrated market rates using LightGBM multimodal concatenation, 20 target-independent geographic distance features, 95% nominal conformal prediction intervals, and SHAP attribution.
+          Predict calibrated market rates using LightGBM multimodal concatenation, 20 target-independent geographic distance features (Austin, TX), 95% nominal conformal prediction intervals, and SHAP attribution.
         </p>
       </div>
 
@@ -152,19 +156,19 @@ const EstimatorPage = () => {
           <form onSubmit={handleEstimate}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', margin: 0 }}>
-                Property Features & Specifications (Indian Cities)
+                Property Features & Specifications (Austin, TX)
               </h3>
               <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', padding: '4px 10px', borderRadius: '20px', fontWeight: '700' }}>
-                V5 Architecture
+                5,050 Cohort Aligned
               </span>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
               <div className="form-group">
-                <label className="form-label">Indian City</label>
+                <label className="form-label">Austin Neighborhood / District</label>
                 <select name="city" value={formData.city} onChange={handleInputChange} className="form-select">
-                  {INDIAN_CITIES.map(c => (
-                    <option key={c} value={c}>{c}</option>
+                  {AUSTIN_NEIGHBORHOODS.map(n => (
+                    <option key={n.name} value={n.name}>{n.name}</option>
                   ))}
                 </select>
               </div>
@@ -242,7 +246,7 @@ const EstimatorPage = () => {
                 onChange={handleInputChange}
                 className="form-textarea"
                 rows="3"
-                placeholder="Spacious modern apartment with open kitchen, high-speed WiFi, dedicated workspace, and convenient transit access..."
+                placeholder="Stylish modern Austin home near Downtown and Lady Bird Lake, featuring high ceilings, open kitchen, private patio, fast fiber internet, and dedicated workspace..."
               />
               <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>
                 Normalized BAAI/bge-small-en-v1.5 embedding. If omitted, the 91-feature Tabular+Geographic fallback is used.
@@ -296,20 +300,15 @@ const EstimatorPage = () => {
 
               {/* Main Predicted Rental Price */}
               <div style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #c4b5fd', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    PREDICTED RENTAL PRICE
-                  </span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: '600' }}>
-                    USD: ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)} / night
-                  </span>
-                </div>
+                <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  PREDICTED NIGHTLY RENTAL PRICE
+                </span>
                 <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
-                  ₹{getInrPrice(prediction, 'predicted_rent').toLocaleString('en-IN')}
+                  ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)}
+                  <span style={{ fontSize: '1rem', fontWeight: '500', color: '#64748b' }}> / night</span>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
-                  <span>Model: {prediction.model_name || 'V5 LightGBM Multimodal Regressor (log1p)'}</span>
-                  <span>Conversion rate: 1 USD = ₹{USD_TO_INR_RATE}</span>
+                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                  Model: {prediction.model_name || 'V5 LightGBM Multimodal Regressor (log1p)'}
                 </div>
               </div>
 
@@ -324,10 +323,10 @@ const EstimatorPage = () => {
                   </span>
                 </div>
                 <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>
-                  ₹{getInrPrice(prediction, 'lower_bound').toLocaleString('en-IN')} – ₹{getInrPrice(prediction, 'upper_bound').toLocaleString('en-IN')}
+                  ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}
                 </div>
                 <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px', lineHeight: '1.4' }}>
-                  Distribution-free split conformal prediction interval with finite-sample nonconformity quantile q = 0.8435 on log1p scale (USD range: ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}). Display converted to INR at 1 USD = ₹{USD_TO_INR_RATE}. Empirical coverage of 96.63% represents aggregate test cohort coverage across 5,050 aligned Austin listings, not an individual accuracy guarantee for any single prediction.
+                  Distribution-free split conformal prediction interval with finite-sample nonconformity quantile q = 0.8435 on log1p scale. Empirical coverage of 96.63% represents aggregate test cohort coverage across 5,050 aligned Austin listings, not an individual accuracy guarantee for any single prediction.
                 </p>
               </div>
 
@@ -338,32 +337,30 @@ const EstimatorPage = () => {
                     <BarChart3 size={16} color="#7c3aed" /> SHAP Feature Attribution — Tabular + Geographic Features
                   </div>
                   <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '10px' }}>
-                    TreeSHAP feature attributions on physical property characteristics from the 91-feature Tabular+Geographic model. These values represent mathematical contributions to the model's log-scale prediction, not real-world causal effects. Austin landmark distance features are excluded from display to maintain geographical integrity with selected Indian cities.
+                    TreeSHAP relative attribution indicating feature contribution to log-scale price prediction across physical & Austin landmark features.
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {prediction.top_factors
-                      .filter(item => !/austin|downtown|congress|zilker|domain|cota|airport|location/i.test(item.feature))
-                      .map((item, idx) => {
-                        const impactNum = typeof item.impact === 'number' ? item.impact : parseFloat(item.impact);
-                        const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
-                        const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
-                        const isPositive = impactNum >= 0;
+                    {prediction.top_factors.map((item, idx) => {
+                      const impactNum = typeof item.impact === 'number' ? item.impact : parseFloat(item.impact);
+                      const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                      const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                      const isPositive = impactNum >= 0;
 
-                        return (
-                          <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
-                            <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
-                            <span style={{
-                              fontWeight: '800',
-                              color: isPositive ? '#15803d' : '#b91c1c',
-                              background: isPositive ? '#dcfce7' : '#fee2e2',
-                              padding: '2px 8px',
-                              borderRadius: '6px'
-                            }}>
-                              {formattedVal}
-                            </span>
-                          </div>
-                        );
-                      })}
+                      return (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
+                          <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
+                          <span style={{
+                            fontWeight: '800',
+                            color: isPositive ? '#15803d' : '#b91c1c',
+                            background: isPositive ? '#dcfce7' : '#fee2e2',
+                            padding: '2px 8px',
+                            borderRadius: '6px'
+                          }}>
+                            {formattedVal}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

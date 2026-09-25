@@ -50,9 +50,9 @@ async function runE2ETests() {
       { headers: { Authorization: `Bearer ${tenantToken}` } }
     );
     console.log('✔ [5/8] Multimodal ML Valuation Engine:');
-    console.log(`        Predicted Monthly Rent: ₹${predictionRes.data.data.predicted_rent}`);
-    console.log(`        95% Confidence Band   : ₹${predictionRes.data.data.lower_bound} – ₹${predictionRes.data.data.upper_bound}`);
-    console.log(`        Top SHAP Factor       : ${predictionRes.data.data.top_factors[0].feature} (+₹${predictionRes.data.data.top_factors[0].impact})`);
+    console.log(`        Predicted Monthly Rent: $${predictionRes.data.data.predicted_rent}`);
+    console.log(`        95% Confidence Band   : $${predictionRes.data.data.lower_bound} – $${predictionRes.data.data.upper_bound}`);
+    console.log(`        Top SHAP Factor       : ${predictionRes.data.data.top_factors[0].feature} (+$${predictionRes.data.data.top_factors[0].impact})`);
 
     // 5. Properties Query & Filtering
     const propertiesRes = await axios.get(`${API_URL}/properties?city=Mumbai`);

@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
 import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshCw, Info } from 'lucide-react';
 import mlApi from '../services/mlApi';
-import { usdToInr, USD_TO_INR_RATE } from '../utils/currency';
 
-// 12 Indian Cities available for valuation
-const INDIAN_CITIES = [
-  'Bengaluru',
-  'Mumbai',
-  'Delhi',
-  'Hyderabad',
-  'Chennai',
-  'Pune',
-  'Kolkata',
-  'Ahmedabad',
-  'Jaipur',
-  'Kochi',
-  'Mangaluru',
-  'Mysuru'
+// Austin Districts aligned with Inside Airbnb benchmark
+const AUSTIN_DISTRICTS = [
+  { name: 'Downtown Austin', lat: 30.2747, lng: -97.7404 },
+  { name: 'South Congress (SoCo)', lat: 30.2505, lng: -97.7497 },
+  { name: 'East Austin', lat: 30.2625, lng: -97.7215 },
+  { name: 'Zilker / Barton Hills', lat: 30.2670, lng: -97.7730 },
+  { name: 'The Domain / North Austin', lat: 30.4014, lng: -97.7247 },
+  { name: 'UT Austin / West Campus', lat: 30.2849, lng: -97.7341 },
+  { name: 'South Lamar / Bouldin Creek', lat: 30.2510, lng: -97.7610 },
+  { name: 'Mueller / Central East', lat: 30.3015, lng: -97.7050 },
+  { name: 'Hyde Park', lat: 30.3050, lng: -97.7300 },
+  { name: 'Rainey Street / Convention Center', lat: 30.2635, lng: -97.7397 },
+  { name: 'Austin Airport Corridor', lat: 30.1975, lng: -97.6664 }
 ];
-
-// Standard reference coordinates to preserve V5 model inference contract
-const DEFAULT_MODEL_COORDINATES = { lat: 30.2747, lng: -97.7404 };
 
 const AiPriceEstimatorModal = ({
   isOpen,
@@ -30,9 +25,9 @@ const AiPriceEstimatorModal = ({
   onApplyPrice = null
 }) => {
   const [formData, setFormData] = useState({
-    city: initialData.city || 'Bengaluru',
-    latitude: initialData.latitude || DEFAULT_MODEL_COORDINATES.lat,
-    longitude: initialData.longitude || DEFAULT_MODEL_COORDINATES.lng,
+    city: initialData.city || 'Downtown Austin',
+    latitude: initialData.latitude || 30.2747,
+    longitude: initialData.longitude || -97.7404,
     accommodates: initialData.accommodates || 4,
     bedrooms: initialData.bedrooms || initialData.bhk || 2,
     bathrooms: initialData.bathrooms || initialData.bathroom || 2,
@@ -49,6 +44,18 @@ const AiPriceEstimatorModal = ({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'city') {
+      const selected = AUSTIN_DISTRICTS.find(d => d.name === value);
+      if (selected) {
+        setFormData(prev => ({
+          ...prev,
+          city: value,
+          latitude: selected.lat,
+          longitude: selected.lng
+        }));
+        return;
+      }
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -129,10 +136,10 @@ const AiPriceEstimatorModal = ({
         {/* Input Controls */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '16px' }}>
           <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label" style={{ fontSize: '0.75rem' }}>Indian City</label>
+            <label className="form-label" style={{ fontSize: '0.75rem' }}>Austin District</label>
             <select name="city" value={formData.city} onChange={handleChange} className="form-select" style={{ padding: '0.5rem' }}>
-              {INDIAN_CITIES.map(c => (
-                <option key={c} value={c}>{c}</option>
+              {AUSTIN_DISTRICTS.map(d => (
+                <option key={d.name} value={d.name}>{d.name}</option>
               ))}
             </select>
           </div>
@@ -187,13 +194,11 @@ const AiPriceEstimatorModal = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  PREDICTED RENTAL PRICE
+                  PREDICTED NIGHTLY RENTAL PRICE
                 </span>
                 <div style={{ fontSize: '2rem', fontWeight: '900', color: '#0f172a', lineHeight: 1.2 }}>
-                  ₹{usdToInr(predictionResult.predicted_rent).toLocaleString('en-IN')}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '2px' }}>
-                  USD: ${Number(predictionResult.predicted_rent).toFixed(2)} (1 USD = ₹{USD_TO_INR_RATE})
+                  ${Number(predictionResult.predicted_rent).toFixed(2)}
+                  <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}> / night</span>
                 </div>
                 <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
                   Model: {predictionResult.model_name?.includes('HistGradient') ? 'V5 LightGBM Multimodal Regressor (log1p)' : (predictionResult.model_name || 'V5 LightGBM Multimodal Regressor (log1p)')}
@@ -204,10 +209,10 @@ const AiPriceEstimatorModal = ({
                   <ShieldCheck size={12} /> Empirical coverage: 96.63%
                 </span>
                 <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#059669', marginTop: '4px' }}>
-                  95% Nominal Conformal Prediction Interval
+                  95% Nominal Conformal Interval
                 </div>
                 <div style={{ fontSize: '1rem', fontWeight: '800', color: '#334155', marginTop: '2px' }}>
-                  ₹{usdToInr(predictionResult.lower_bound).toLocaleString('en-IN')} – ₹{usdToInr(predictionResult.upper_bound).toLocaleString('en-IN')}
+                  ${Number(predictionResult.lower_bound).toFixed(2)} – ${Number(predictionResult.upper_bound).toFixed(2)}
                 </div>
               </div>
             </div>
@@ -216,35 +221,33 @@ const AiPriceEstimatorModal = ({
             {predictionResult.top_factors && predictionResult.top_factors.length > 0 && (
               <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
                 <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution — Tabular + Geographic Features
+                  <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution:
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '8px' }}>
-                  Mathematical feature contributions to log-scale prediction on physical characteristics (not causal effects). Austin landmark features excluded for geographic consistency.
+                  TreeSHAP feature attributions on physical property & Austin landmark distance characteristics.
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {predictionResult.top_factors
-                    .filter(factor => !/austin|downtown|congress|zilker|domain|cota|airport|location/i.test(factor.feature))
-                    .map((factor, idx) => {
-                      const impactNum = typeof factor.impact === 'number' ? factor.impact : parseFloat(factor.impact);
-                      const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
-                      const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
-                      const isPositive = impactNum >= 0;
+                  {predictionResult.top_factors.map((factor, idx) => {
+                    const impactNum = typeof factor.impact === 'number' ? factor.impact : parseFloat(factor.impact);
+                    const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                    const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                    const isPositive = impactNum >= 0;
 
-                      return (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
-                          <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
-                          <span style={{
-                            fontWeight: '700',
-                            color: isPositive ? '#16a34a' : '#dc2626',
-                            background: isPositive ? '#dcfce7' : '#fee2e2',
-                            padding: '2px 8px',
-                            borderRadius: '4px'
-                          }}>
-                            {formattedVal}
-                          </span>
-                        </div>
-                      );
-                    })}
+                    return (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
+                        <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
+                        <span style={{
+                          fontWeight: '700',
+                          color: isPositive ? '#16a34a' : '#dc2626',
+                          background: isPositive ? '#dcfce7' : '#fee2e2',
+                          padding: '2px 8px',
+                          borderRadius: '4px'
+                        }}>
+                          {formattedVal}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
