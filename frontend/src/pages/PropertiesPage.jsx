@@ -305,10 +305,12 @@ const PropertiesPage = () => {
           )}
         </div>
       ) : viewMode === 'split' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '750px', overflowY: 'auto', paddingRight: '8px' }}>
             {properties.map((prop) => (
-              <PropertyCard key={prop._id} property={prop} />
+              <div key={prop._id} style={{ flexShrink: 0 }}>
+                <PropertyCard property={prop} />
+              </div>
             ))}
           </div>
           <div style={{ position: 'sticky', top: '90px', height: '750px' }}>

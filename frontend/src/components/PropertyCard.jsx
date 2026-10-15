@@ -41,9 +41,9 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
     : '/datasets-images/image_0.jpg';
 
   return (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', flexShrink: 0 }}>
       {/* Property Image Box */}
-      <div style={{ position: 'relative', height: '210px', overflow: 'hidden', backgroundColor: '#e2e8f0' }}>
+      <div style={{ position: 'relative', height: '210px', flexShrink: 0, overflow: 'hidden', backgroundColor: '#e2e8f0' }}>
         <img
           src={mainImage}
           alt={property.title}
