@@ -86,7 +86,7 @@ const TenantDashboard = () => {
         </Link>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(300px, 1fr)', gap: '32px' }}>
+      <div className="responsive-2col-grid">
         {/* Bookings Tracker List */}
         <div>
           <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#1e293b', marginBottom: '16px' }}>

@@ -241,7 +241,7 @@ const PropertyDetailsPage = () => {
       </div>
 
       {/* Main Grid: Left Details & Right Booking Card */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(320px, 1fr)', gap: '36px' }}>
+      <div className="responsive-2col-grid">
         {/* Left Column */}
         <div>
           {/* Key Specs Card */}

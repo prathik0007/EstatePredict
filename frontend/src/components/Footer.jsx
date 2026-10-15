@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Building2, Heart, Shield, Cpu, Sparkles } from 'lucide-react';
 
 const Footer = () => {
@@ -20,7 +21,7 @@ const Footer = () => {
           {/* Col 1: Brand info */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ffffff', marginBottom: '12px' }}>
-              <div style={{ background: '#3b82f6', color: '#fff', padding: '6px', borderRadius: '8px', display: 'flex' }}>
+              <div style={{ background: 'var(--color-primary)', color: '#fff', padding: '6px', borderRadius: '8px', display: 'flex' }}>
                 <Building2 size={20} />
               </div>
               <span style={{ fontSize: '1.2rem', fontWeight: '800' }}>EstatePredict</span>
@@ -51,10 +52,10 @@ const Footer = () => {
               Platform Navigation
             </h4>
             <ul style={{ listStyle: 'none', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li><a href="/properties" style={{ color: '#94a3b8' }}>Search & Filter Listings</a></li>
-              <li><a href="/estimator" style={{ color: '#94a3b8' }}>AI Rental Rate Valuation</a></li>
-              <li><a href="/login" style={{ color: '#94a3b8' }}>Host & Guest Portals</a></li>
-              <li><a href="/admin/dashboard" style={{ color: '#94a3b8' }}>Platform Administration</a></li>
+              <li><Link to="/properties" style={{ color: '#94a3b8', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#ffffff'} onMouseLeave={(e) => e.target.style.color = '#94a3b8'}>Search & Filter Listings</Link></li>
+              <li><Link to="/estimator" style={{ color: '#94a3b8', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#ffffff'} onMouseLeave={(e) => e.target.style.color = '#94a3b8'}>AI Rental Rate Valuation</Link></li>
+              <li><Link to="/login" style={{ color: '#94a3b8', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#ffffff'} onMouseLeave={(e) => e.target.style.color = '#94a3b8'}>Host & Guest Portals</Link></li>
+              <li><Link to="/admin/dashboard" style={{ color: '#94a3b8', transition: 'color 0.2s' }} onMouseEnter={(e) => e.target.style.color = '#ffffff'} onMouseLeave={(e) => e.target.style.color = '#94a3b8'}>Platform Administration</Link></li>
             </ul>
           </div>
 

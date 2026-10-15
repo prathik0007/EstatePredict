@@ -124,10 +124,11 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
       <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
         {/* Price Row */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
             <span style={{ fontSize: '1.4rem', fontWeight: '800', color: '#0f172a' }}>
               ${Number(property.price).toLocaleString('en-US')}
             </span>
+            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '500' }}>/night</span>
           </div>
           <span className="badge badge-ai" style={{ fontSize: '0.7rem' }}>
             {property.propertyType}
@@ -167,9 +168,10 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '8px',
-          padding: '10px 0',
-          borderTop: '1px solid var(--border-color)',
-          borderBottom: '1px solid var(--border-color)',
+          padding: '10px 8px',
+          background: '#f8fafc',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid var(--border-color)',
           marginBottom: '16px',
           textAlign: 'center'
         }}>

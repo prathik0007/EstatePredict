@@ -150,7 +150,7 @@ const EstimatorPage = () => {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(360px, 1fr)', gap: '32px' }}>
+      <div className="responsive-2col-grid">
         {/* Form Inputs */}
         <div className="card" style={{ padding: '28px' }}>
           <form onSubmit={handleEstimate}>

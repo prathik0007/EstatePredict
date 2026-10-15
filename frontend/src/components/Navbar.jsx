@@ -331,8 +331,73 @@ const Navbar = () => {
               </div>
             </>
           )}
+
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="mobile-nav-toggle"
+            aria-label="Toggle navigation menu"
+            style={{
+              display: 'none',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#0f172a',
+              padding: '6px',
+              borderRadius: '8px'
+            }}
+          >
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Dropdown Menu */}
+      {mobileMenuOpen && (
+        <div style={{
+          padding: '16px 24px 20px',
+          borderTop: '1px solid var(--border-color)',
+          background: '#ffffff',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px'
+        }}>
+          <Link
+            to="/properties"
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ fontWeight: '600', color: '#1e293b', fontSize: '0.95rem', padding: '6px 0' }}
+          >
+            Explore Properties
+          </Link>
+          {isAuthenticated && (
+            <Link
+              to="/estimator"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                fontWeight: '700',
+                color: '#6d28d9',
+                fontSize: '0.95rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 0'
+              }}
+            >
+              <Sparkles size={16} color="#7c3aed" /> AI Rent Estimator
+            </Link>
+          )}
+          {isOwner && (
+            <Link
+              to="/add-property"
+              onClick={() => setMobileMenuOpen(false)}
+              className="btn btn-primary btn-sm"
+              style={{ alignSelf: 'flex-start' }}
+            >
+              <PlusCircle size={16} /> List Property
+            </Link>
+          )}
+        </div>
+      )}
     </header>
   );
 };

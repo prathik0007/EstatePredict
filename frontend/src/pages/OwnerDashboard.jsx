@@ -120,38 +120,17 @@ const OwnerDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', borderBottom: '1px solid var(--border-color)', marginBottom: '24px' }}>
+      <div className="tab-nav-container">
         <button
           onClick={() => setActiveTab('listings')}
-          style={{
-            padding: '12px 20px',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'listings' ? '3px solid #3b82f6' : '3px solid transparent',
-            color: activeTab === 'listings' ? '#3b82f6' : '#64748b',
-            fontWeight: '700',
-            fontSize: '0.95rem',
-            cursor: 'pointer'
-          }}
+          className={`tab-nav-btn ${activeTab === 'listings' ? 'active-primary' : ''}`}
         >
           My Properties ({properties.length})
         </button>
 
         <button
           onClick={() => setActiveTab('requests')}
-          style={{
-            padding: '12px 20px',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'requests' ? '3px solid #3b82f6' : '3px solid transparent',
-            color: activeTab === 'requests' ? '#3b82f6' : '#64748b',
-            fontWeight: '700',
-            fontSize: '0.95rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
+          className={`tab-nav-btn ${activeTab === 'requests' ? 'active-primary' : ''}`}
         >
           Stay / Visit Inquiries ({requests.length})
           {pendingRequestsCount > 0 && (

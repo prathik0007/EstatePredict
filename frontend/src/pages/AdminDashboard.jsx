@@ -123,51 +123,24 @@ const AdminDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', borderBottom: '1px solid var(--border-color)', marginBottom: '24px' }}>
+      <div className="tab-nav-container">
         <button
           onClick={() => setActiveTab('overview')}
-          style={{
-            padding: '12px 20px',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'overview' ? '3px solid #dc2626' : '3px solid transparent',
-            color: activeTab === 'overview' ? '#dc2626' : '#64748b',
-            fontWeight: '700',
-            fontSize: '0.95rem',
-            cursor: 'pointer'
-          }}
+          className={`tab-nav-btn ${activeTab === 'overview' ? 'active-danger' : ''}`}
         >
           Neighborhood Analytics
         </button>
 
         <button
           onClick={() => setActiveTab('properties')}
-          style={{
-            padding: '12px 20px',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'properties' ? '3px solid #dc2626' : '3px solid transparent',
-            color: activeTab === 'properties' ? '#dc2626' : '#64748b',
-            fontWeight: '700',
-            fontSize: '0.95rem',
-            cursor: 'pointer'
-          }}
+          className={`tab-nav-btn ${activeTab === 'properties' ? 'active-danger' : ''}`}
         >
           Listing Moderation ({properties.length})
         </button>
 
         <button
           onClick={() => setActiveTab('users')}
-          style={{
-            padding: '12px 20px',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'users' ? '3px solid #dc2626' : '3px solid transparent',
-            color: activeTab === 'users' ? '#dc2626' : '#64748b',
-            fontWeight: '700',
-            fontSize: '0.95rem',
-            cursor: 'pointer'
-          }}
+          className={`tab-nav-btn ${activeTab === 'users' ? 'active-danger' : ''}`}
         >
           Manage Users ({usersList.length})
         </button>
@@ -180,8 +153,8 @@ const AdminDashboard = () => {
             <MapPin size={18} color="#3b82f6" /> Market Distribution by Location
           </h3>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+          <div className="data-table-wrapper">
+            <table className="data-table">
               <thead>
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
                   <th style={{ padding: '12px' }}>Neighborhood</th>
@@ -214,8 +187,8 @@ const AdminDashboard = () => {
             Property Listings Management
           </h3>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+          <div className="data-table-wrapper">
+            <table className="data-table">
               <thead>
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
                   <th style={{ padding: '12px' }}>Property</th>
@@ -284,8 +257,8 @@ const AdminDashboard = () => {
             Registered Users Directory
           </h3>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+          <div className="data-table-wrapper">
+            <table className="data-table">
               <thead>
                 <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#64748b' }}>
                   <th style={{ padding: '12px' }}>Name</th>

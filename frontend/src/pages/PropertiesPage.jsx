@@ -305,7 +305,7 @@ const PropertiesPage = () => {
           )}
         </div>
       ) : viewMode === 'split' ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
+        <div className="responsive-split-grid">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxHeight: '750px', overflowY: 'auto', paddingRight: '8px' }}>
             {properties.map((prop) => (
               <div key={prop._id} style={{ flexShrink: 0 }}>
