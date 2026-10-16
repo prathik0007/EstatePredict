@@ -1,6 +1,8 @@
 const Booking = require('../models/Booking');
 const Property = require('../models/Property');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
+const emailService = require('../utils/emailService');
 
 // @desc    Create a site visit booking / inquiry
 // @route   POST /api/bookings
@@ -42,8 +44,31 @@ exports.createBooking = async (req, res) => {
       type: 'booking_request',
       title: 'New Visit Booking Request',
       message: `${req.user.name} requested a site visit for "${property.title}" on ${new Date(visitDate).toLocaleDateString()}.`,
-      link: '/owner/bookings'
+      link: '/owner/dashboard'
     });
+
+    // Dispatch email notification to property owner asynchronously (non-blocking)
+    try {
+      const ownerUser = await User.findById(property.owner).select('name email');
+      if (ownerUser && ownerUser.email) {
+        emailService.sendNewBookingEmail({
+          ownerEmail: ownerUser.email,
+          ownerName: ownerUser.name,
+          tenantName: req.user.name,
+          tenantEmail: req.user.email,
+          tenantPhone: contactNumber || req.user.phone,
+          propertyTitle: property.title,
+          visitDate,
+          timeSlot,
+          message,
+          bookingId: booking._id
+        }).catch(err => {
+          console.error('[BookingController] Owner notification email delivery error:', err.message);
+        });
+      }
+    } catch (emailErr) {
+      console.error('[BookingController] Owner lookup for email failed:', emailErr.message);
+    }
 
     res.status(201).json({
       success: true,
@@ -110,7 +135,10 @@ exports.getOwnerRequests = async (req, res) => {
 exports.updateBookingStatus = async (req, res) => {
   try {
     const { status, ownerNotes } = req.body;
-    const booking = await Booking.findById(req.params.id).populate('property');
+    const booking = await Booking.findById(req.params.id)
+      .populate('property')
+      .populate('tenant', 'name email phone')
+      .populate('owner', 'name email phone');
 
     if (!booking) {
       return res.status(404).json({
@@ -120,27 +148,50 @@ exports.updateBookingStatus = async (req, res) => {
     }
 
     // Verify ownership
-    if (booking.owner.toString() !== req.user.id && req.user.role !== 'admin') {
+    const ownerId = booking.owner._id ? booking.owner._id.toString() : booking.owner.toString();
+    if (ownerId !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
         message: 'You are not authorized to update this booking'
       });
     }
 
+    const previousStatus = booking.status;
+    const isStatusChanged = previousStatus !== status;
+
     booking.status = status;
-    if (ownerNotes) booking.ownerNotes = ownerNotes;
+    if (ownerNotes !== undefined) booking.ownerNotes = ownerNotes;
     await booking.save();
 
-    // Create notification for Tenant
-    const notifType = status === 'accepted' ? 'booking_accepted' : 'booking_rejected';
-    await Notification.create({
-      recipient: booking.tenant,
-      sender: req.user.id,
-      type: notifType,
-      title: `Booking Request ${status.toUpperCase()}`,
-      message: `Your visit request for "${booking.property.title}" has been ${status} by the owner.`,
-      link: '/tenant/bookings'
-    });
+    // Prevent duplicate emails and notifications when updated repeatedly to identical status
+    if (isStatusChanged) {
+      // Create in-app notification for Tenant
+      const notifType = status === 'accepted' ? 'booking_accepted' : 'booking_rejected';
+      await Notification.create({
+        recipient: booking.tenant._id || booking.tenant,
+        sender: req.user.id,
+        type: notifType,
+        title: `Booking Request ${status.toUpperCase()}`,
+        message: `Your visit request for "${booking.property?.title}" has been ${status} by the owner.`,
+        link: '/tenant/dashboard'
+      });
+
+      // Send email notification to tenant (graceful, non-blocking failure)
+      if (booking.tenant && booking.tenant.email) {
+        emailService.sendBookingStatusEmail({
+          tenantEmail: booking.tenant.email,
+          tenantName: booking.tenant.name,
+          propertyTitle: booking.property?.title,
+          visitDate: booking.visitDate,
+          timeSlot: booking.timeSlot,
+          status,
+          ownerNotes: booking.ownerNotes,
+          bookingId: booking._id
+        }).catch(emailErr => {
+          console.error('[BookingController] Tenant status email delivery error:', emailErr.message);
+        });
+      }
+    }
 
     res.status(200).json({
       success: true,

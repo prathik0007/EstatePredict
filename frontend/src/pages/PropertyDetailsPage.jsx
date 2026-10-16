@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   MapPin,
   BedDouble,
@@ -27,6 +27,7 @@ import api from '../services/api';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user, isAuthenticated, isTenant } = useAuth();
   const { showToast } = useNotification();
 
@@ -35,6 +36,7 @@ const PropertyDetailsPage = () => {
   const [avgRating, setAvgRating] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [contactingOwner, setContactingOwner] = useState(false);
 
   // Booking Form State
   const [visitDate, setVisitDate] = useState('');
@@ -137,6 +139,33 @@ const PropertyDetailsPage = () => {
       showToast(err.response?.data?.message || 'Failed to post review', 'error');
     } finally {
       setReviewSubmitting(false);
+    }
+  };
+
+  const handleContactOwner = async () => {
+    if (!isAuthenticated) {
+      showToast('Please sign in to contact the property host.', 'info');
+      navigate('/login');
+      return;
+    }
+    const ownerId = property.owner?._id || property.owner;
+    if (ownerId === user?._id) {
+      showToast('You are the host of this property listing.', 'info');
+      return;
+    }
+
+    setContactingOwner(true);
+    try {
+      const res = await api.post('/conversations', {
+        propertyId: property._id
+      });
+      if (res.data.success && res.data.conversation) {
+        navigate(`/messages?conversationId=${res.data.conversation._id}`);
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to initiate conversation with host', 'error');
+    } finally {
+      setContactingOwner(false);
     }
   };
 
@@ -589,6 +618,26 @@ const PropertyDetailsPage = () => {
                   <Mail size={15} color="#3b82f6" /> {property.owner?.email}
                 </div>
               </div>
+
+              {/* Message Host Action */}
+              <button
+                type="button"
+                onClick={handleContactOwner}
+                disabled={contactingOwner}
+                className="btn btn-secondary"
+                style={{
+                  width: '100%',
+                  marginTop: '16px',
+                  fontWeight: '700',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <MessageSquare size={16} />
+                {contactingOwner ? 'Connecting...' : 'Message Host'}
+              </button>
             </div>
           </div>
         </div>

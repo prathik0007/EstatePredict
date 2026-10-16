@@ -30,6 +30,7 @@ app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/wishlist', require('./routes/wishlistRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/conversations', require('./routes/chatRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 
 // Health endpoint

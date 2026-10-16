@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Building2,
   PlusCircle,
@@ -13,12 +13,14 @@ import {
   CheckCircle2,
   XCircle,
   Sparkles,
-  Home
+  Home,
+  MessageSquare
 } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
 
 const OwnerDashboard = () => {
+  const navigate = useNavigate();
   const { showToast } = useNotification();
 
   const [properties, setProperties] = useState([]);
@@ -74,6 +76,25 @@ const OwnerDashboard = () => {
     }
   };
 
+  const handleMessageGuest = async (reqItem) => {
+    try {
+      const res = await api.get('/conversations');
+      if (res.data.success) {
+        const found = res.data.conversations.find(
+          c => (c.property?._id === reqItem.property?._id || c.property === reqItem.property?._id) &&
+               (c.tenant?._id === reqItem.tenant?._id || c.tenant === reqItem.tenant?._id)
+        );
+        if (found) {
+          navigate(`/messages?conversationId=${found._id}`);
+          return;
+        }
+      }
+      navigate('/messages');
+    } catch (err) {
+      navigate('/messages');
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '80px 0', color: '#64748b', fontWeight: '600' }}>
@@ -96,9 +117,14 @@ const OwnerDashboard = () => {
             Host Dashboard
           </h1>
         </div>
-        <Link to="/add-property" className="btn btn-primary">
-          <PlusCircle size={18} /> Add New Listing
-        </Link>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <Link to="/messages" className="btn btn-secondary">
+            <MessageSquare size={18} /> Guest Messages
+          </Link>
+          <Link to="/add-property" className="btn btn-primary">
+            <PlusCircle size={18} /> Add New Listing
+          </Link>
+        </div>
       </div>
 
       {/* Metrics Row */}
@@ -234,24 +260,35 @@ const OwnerDashboard = () => {
                     </div>
 
                     {/* Actions */}
-                    {req.status === 'pending' && (
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button
-                          onClick={() => handleUpdateStatus(req._id, 'accepted')}
-                          className="btn btn-primary btn-sm"
-                          style={{ background: '#10b981' }}
-                        >
-                          <Check size={16} /> Accept Request
-                        </button>
-                        <button
-                          onClick={() => handleUpdateStatus(req._id, 'rejected')}
-                          className="btn btn-secondary btn-sm"
-                          style={{ color: '#ef4444' }}
-                        >
-                          <X size={16} /> Reject
-                        </button>
-                      </div>
-                    )}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleMessageGuest(req)}
+                        className="btn btn-secondary btn-sm"
+                        style={{ gap: '6px' }}
+                      >
+                        <MessageSquare size={15} /> Message Guest
+                      </button>
+
+                      {req.status === 'pending' && (
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => handleUpdateStatus(req._id, 'accepted')}
+                            className="btn btn-primary btn-sm"
+                            style={{ background: '#10b981' }}
+                          >
+                            <Check size={16} /> Accept Request
+                          </button>
+                          <button
+                            onClick={() => handleUpdateStatus(req._id, 'rejected')}
+                            className="btn btn-secondary btn-sm"
+                            style={{ color: '#ef4444' }}
+                          >
+                            <X size={16} /> Reject
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

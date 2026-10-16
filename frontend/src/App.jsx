@@ -18,6 +18,7 @@ import WishlistPage from './pages/WishlistPage';
 import AdminDashboard from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import MessagesPage from './pages/MessagesPage';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
                   <Route path="/properties" element={<PropertiesPage />} />
                   <Route path="/properties/:id" element={<PropertyDetailsPage />} />
                   <Route path="/estimator" element={<EstimatorPage />} />
+                  <Route path="/messages" element={<MessagesPage />} />
                 </Route>
 
                 {/* Owner & Admin Protected Routes */}

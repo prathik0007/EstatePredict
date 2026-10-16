@@ -7,6 +7,7 @@ import {
   Sparkles,
   PlusCircle,
   Bell,
+  MessageSquare,
   User,
   LogOut,
   LayoutDashboard,
@@ -121,6 +122,25 @@ const Navbar = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {isAuthenticated && (
             <>
+              {/* Messages Direct Link */}
+              <Link
+                to="/messages"
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid var(--border-color)',
+                  padding: '8px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#334155',
+                  textDecoration: 'none'
+                }}
+                title="Messages & Chat"
+              >
+                <MessageSquare size={20} />
+              </Link>
+
               {/* Notification Bell */}
               <div ref={notificationRef} style={{ position: 'relative' }}>
                 <button
@@ -305,6 +325,13 @@ const Navbar = () => {
                         <ShieldCheck size={16} /> Admin Portal
                       </Link>
                     )}
+                    <Link
+                      to="/messages"
+                      onClick={() => setShowUserMenu(false)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', fontSize: '0.875rem', fontWeight: '600', color: '#334155', borderRadius: '8px' }}
+                    >
+                      <MessageSquare size={16} /> Messages
+                    </Link>
                     <hr style={{ margin: '6px 0', border: 'none', borderTop: '1px solid var(--border-color)' }} />
                     <button
                       onClick={handleLogout}
@@ -370,21 +397,38 @@ const Navbar = () => {
             Explore Properties
           </Link>
           {isAuthenticated && (
-            <Link
-              to="/estimator"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                fontWeight: '700',
-                color: '#6d28d9',
-                fontSize: '0.95rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 0'
-              }}
-            >
-              <Sparkles size={16} color="#7c3aed" /> AI Rent Estimator
-            </Link>
+            <>
+              <Link
+                to="/estimator"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  fontWeight: '700',
+                  color: '#6d28d9',
+                  fontSize: '0.95rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 0'
+                }}
+              >
+                <Sparkles size={16} color="#7c3aed" /> AI Rent Estimator
+              </Link>
+              <Link
+                to="/messages"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  fontWeight: '600',
+                  color: '#1e293b',
+                  fontSize: '0.95rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 0'
+                }}
+              >
+                <MessageSquare size={16} /> Messages
+              </Link>
+            </>
           )}
           {isOwner && (
             <Link

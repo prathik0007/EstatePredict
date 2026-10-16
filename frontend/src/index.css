@@ -474,3 +474,25 @@ a {
   border-bottom-color: #dc2626;
 }
 
+/* Responsive Chat & Messaging Styles */
+.chat-container-card {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+}
+
+@media (max-width: 768px) {
+  .chat-container-card {
+    grid-template-columns: 1fr !important;
+  }
+  .chat-sidebar.mobile-hide {
+    display: none !important;
+  }
+  .chat-main.mobile-hide {
+    display: none !important;
+  }
+  .mobile-back-btn {
+    display: inline-flex !important;
+  }
+}
+
+

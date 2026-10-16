@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   CalendarCheck,
   MapPin,
@@ -10,18 +10,32 @@ import {
   Eye,
   User,
   Heart,
-  Home
+  Home,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
 
 const TenantDashboard = () => {
+  const navigate = useNavigate();
   const { user, updateUser } = useAuth();
   const { showToast } = useNotification();
 
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const handleMessageHost = async (propertyId) => {
+    if (!propertyId) return;
+    try {
+      const res = await api.post('/conversations', { propertyId });
+      if (res.data.success && res.data.conversation) {
+        navigate(`/messages?conversationId=${res.data.conversation._id}`);
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not initiate chat with host', 'error');
+    }
+  };
 
   // Profile edit state
   const [name, setName] = useState(user?.name || '');
@@ -81,9 +95,14 @@ const TenantDashboard = () => {
             My Bookings & Inquiries
           </h1>
         </div>
-        <Link to="/tenant/wishlist" className="btn btn-secondary">
-          <Heart size={16} color="#ef4444" /> View Saved Favorites
-        </Link>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <Link to="/messages" className="btn btn-primary">
+            <MessageSquare size={16} /> My Messages
+          </Link>
+          <Link to="/tenant/wishlist" className="btn btn-secondary">
+            <Heart size={16} color="#ef4444" /> View Saved Favorites
+          </Link>
+        </div>
       </div>
 
       <div className="responsive-2col-grid">
@@ -141,7 +160,15 @@ const TenantDashboard = () => {
                         {booking.status.toUpperCase()}
                       </span>
                       {booking.property?._id && (
-                        <div style={{ marginTop: '12px' }}>
+                        <div style={{ marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleMessageHost(booking.property._id)}
+                            className="btn btn-secondary btn-sm"
+                            style={{ gap: '4px' }}
+                          >
+                            <MessageSquare size={14} /> Message Host
+                          </button>
                           <Link to={`/properties/${booking.property._id}`} className="btn btn-secondary btn-sm">
                             <Eye size={14} /> View Property
                           </Link>
