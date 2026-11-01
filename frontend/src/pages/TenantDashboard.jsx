@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+import { getPropertyImageUrl } from '../utils/imageUtils';
 import api from '../services/api';
 
 const TenantDashboard = () => {
@@ -130,7 +131,7 @@ const TenantDashboard = () => {
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', gap: '16px' }}>
                       <img
-                        src={(booking.property?.images && booking.property.images[0]) || '/datasets-images/image_0.jpg'}
+                        src={getPropertyImageUrl(booking.property?.images && booking.property.images[0])}
                         alt=""
                         style={{ width: '100px', height: '75px', borderRadius: '8px', objectFit: 'cover' }}
                         onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=300'; }}

@@ -1,21 +1,44 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('../config/cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-const uploadDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+const isCloudinaryConfigured = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+);
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'property-' + uniqueSuffix + path.extname(file.originalname));
+let storage;
+
+if (isCloudinaryConfigured) {
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'rental_properties',
+      allowed_formats: ['jpeg', 'jpg', 'png', 'webp'],
+      transformation: [{ width: 1600, height: 1000, crop: 'limit', quality: 'auto' }]
+    }
+  });
+  console.log('[Upload Middleware] Cloudinary storage initialized successfully.');
+} else {
+  const uploadDir = path.join(__dirname, '../uploads');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
-});
+
+  storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, 'property-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+  console.log('[Upload Middleware] Cloudinary credentials not configured in .env; falling back to local disk storage.');
+}
 
 const fileFilter = (req, file, cb) => {
   const allowedFileTypes = /jpeg|jpg|png|webp/;

@@ -129,7 +129,15 @@ exports.createProperty = async (req, res) => {
 
     // Handle uploaded images
     if (req.files && req.files.length > 0) {
-      propertyData.images = req.files.map(file => `/uploads/${file.filename}`);
+      propertyData.images = req.files.map(file => {
+        if (file.path && (file.path.startsWith('http://') || file.path.startsWith('https://'))) {
+          return file.path;
+        }
+        if (file.secure_url) {
+          return file.secure_url;
+        }
+        return `/uploads/${file.filename}`;
+      });
     } else if (typeof propertyData.images === 'string') {
       try {
         propertyData.images = JSON.parse(propertyData.images);
@@ -202,7 +210,15 @@ exports.updateProperty = async (req, res) => {
 
     // Append new uploaded images if provided
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => `/uploads/${file.filename}`);
+      const newImages = req.files.map(file => {
+        if (file.path && (file.path.startsWith('http://') || file.path.startsWith('https://'))) {
+          return file.path;
+        }
+        if (file.secure_url) {
+          return file.secure_url;
+        }
+        return `/uploads/${file.filename}`;
+      });
       updateData.images = [...(property.images || []), ...newImages];
     }
 

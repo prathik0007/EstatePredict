@@ -17,6 +17,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { useNotification } from '../context/NotificationContext';
+import { getPropertyImageUrl } from '../utils/imageUtils';
 import api from '../services/api';
 
 const OwnerDashboard = () => {
@@ -187,7 +188,7 @@ const OwnerDashboard = () => {
                 <div key={prop._id} className="card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     <img
-                      src={(prop.images && prop.images[0]) || '/datasets-images/image_0.jpg'}
+                      src={getPropertyImageUrl(prop.images && prop.images[0])}
                       alt=""
                       style={{ width: '90px', height: '65px', borderRadius: '8px', objectFit: 'cover' }}
                       onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=300'; }}

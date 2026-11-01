@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Link } from 'react-router-dom';
+import { getPropertyImageUrl } from '../utils/imageUtils';
 
 // Fix standard leaflet marker icon paths
 delete L.Icon.Default.prototype._getIconUrl;
@@ -73,7 +74,7 @@ const MapViewer = ({ properties = [], singleProperty = null, height = '450px', z
               <Popup>
                 <div style={{ minWidth: '180px' }}>
                   <img
-                    src={(prop.images && prop.images[0]) || '/datasets-images/image_0.jpg'}
+                    src={getPropertyImageUrl(prop.images && prop.images[0])}
                     alt={prop.title}
                     style={{ width: '100%', height: '90px', objectFit: 'cover', borderRadius: '6px', marginBottom: '6px' }}
                     onError={(e) => {

@@ -23,6 +23,7 @@ import {
 import MapViewer from '../components/MapViewer';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+import { getPropertyImageUrl } from '../utils/imageUtils';
 import api from '../services/api';
 
 const PropertyDetailsPage = () => {
@@ -187,9 +188,10 @@ const PropertyDetailsPage = () => {
     );
   }
 
-  const images = (property.images && property.images.length > 0)
+  const rawImages = (property.images && property.images.length > 0)
     ? property.images
     : ['/datasets-images/image_0.jpg'];
+  const images = rawImages.map(img => getPropertyImageUrl(img));
 
   return (
     <div className="container" style={{ padding: '32px 1.5rem 80px' }}>

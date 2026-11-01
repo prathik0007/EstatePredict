@@ -4,6 +4,7 @@ import { MapPin, BedDouble, Bath, Users, Sparkles, Heart, ShieldCheck } from 'lu
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import api from '../services/api';
+import { getPropertyImageUrl } from '../utils/imageUtils';
 
 const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle }) => {
   const { isAuthenticated, isTenant } = useAuth();
@@ -36,9 +37,10 @@ const PropertyCard = ({ property, isWishlistedInitial = false, onWishlistToggle 
     }
   };
 
-  const mainImage = (property.images && property.images.length > 0)
+  const rawImage = (property.images && property.images.length > 0)
     ? property.images[0]
     : '/datasets-images/image_0.jpg';
+  const mainImage = getPropertyImageUrl(rawImage);
 
   return (
     <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%', flexShrink: 0 }}>

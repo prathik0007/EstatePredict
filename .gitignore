@@ -69,4 +69,5 @@ datasets/multimodal_v5/models/multimodal_attention_fusion.pt
 # geo_scaler.joblib (~2KB)
 
 backend/backups/
+.sf/
 
