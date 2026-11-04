@@ -45,6 +45,7 @@ function App() {
                 {/* Owner & Admin Protected Routes */}
                 <Route element={<ProtectedRoute allowedRoles={['owner', 'admin']} />}>
                   <Route path="/add-property" element={<AddPropertyPage />} />
+                  <Route path="/edit-property/:id" element={<AddPropertyPage />} />
                   <Route path="/owner/dashboard" element={<OwnerDashboard />} />
                 </Route>
 

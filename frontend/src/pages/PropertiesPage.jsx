@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, Map, Grid, RefreshCw, X, SlidersHorizontal } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import MapViewer from '../components/MapViewer';
+import { INDIAN_CITY_NAMES, INDIAN_STATES } from '../utils/indianCities';
 import api from '../services/api';
 
 const PropertiesPage = () => {
@@ -15,6 +16,7 @@ const PropertiesPage = () => {
 
   // Filters State initialized from searchParams
   const [city, setCity] = useState(searchParams.get('city') || 'All');
+  const [state, setState] = useState(searchParams.get('state') || 'All');
   const [neighborhood, setNeighborhood] = useState(searchParams.get('neighborhood') || 'All');
   const [bedrooms, setBedrooms] = useState(searchParams.get('bedrooms') || searchParams.get('bhk') || 'All');
   const [propertyType, setPropertyType] = useState(searchParams.get('propertyType') || 'All');
@@ -24,7 +26,8 @@ const PropertiesPage = () => {
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [sort, setSort] = useState('newest');
   const [filterOptions, setFilterOptions] = useState({
-    cities: [],
+    cities: INDIAN_CITY_NAMES,
+    states: INDIAN_STATES,
     neighborhoods: [],
     propertyTypes: [],
     roomTypes: []
@@ -35,7 +38,13 @@ const PropertiesPage = () => {
       try {
         const res = await api.get('/properties/filters');
         if (res.data.success) {
-          setFilterOptions(res.data);
+          const mergedCities = Array.from(new Set([...INDIAN_CITY_NAMES, ...(res.data.cities || [])])).sort();
+          const mergedStates = Array.from(new Set([...INDIAN_STATES, ...(res.data.states || [])])).sort();
+          setFilterOptions({
+            ...res.data,
+            cities: mergedCities,
+            states: mergedStates
+          });
         }
       } catch (err) {
         console.error('Error loading property filter options:', err);
@@ -46,6 +55,7 @@ const PropertiesPage = () => {
 
   const hasActiveFilters =
     city !== 'All' ||
+    state !== 'All' ||
     neighborhood !== 'All' ||
     bedrooms !== 'All' ||
     propertyType !== 'All' ||
@@ -59,6 +69,7 @@ const PropertiesPage = () => {
     try {
       const params = new URLSearchParams();
       if (city !== 'All') params.append('city', city);
+      if (state !== 'All') params.append('state', state);
       if (neighborhood !== 'All') params.append('neighborhood', neighborhood);
       if (bedrooms !== 'All') {
         params.append('bedrooms', bedrooms);
@@ -85,7 +96,7 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, [city, neighborhood, bedrooms, propertyType, roomType, sort]);
+  }, [city, state, neighborhood, bedrooms, propertyType, roomType, sort]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -94,6 +105,7 @@ const PropertiesPage = () => {
 
   const handleResetFilters = () => {
     setCity('All');
+    setState('All');
     setNeighborhood('All');
     setBedrooms('All');
     setPropertyType('All');
@@ -194,6 +206,18 @@ const PropertiesPage = () => {
               {filterOptions.cities && filterOptions.cities.length > 0 ? (
                 filterOptions.cities.map((c) => (
                   <option key={c} value={c}>{c}</option>
+                ))
+              ) : null}
+            </select>
+          </div>
+
+          {/* State Filter */}
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <select value={state} onChange={(e) => setState(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
+              <option value="All">All States</option>
+              {filterOptions.states && filterOptions.states.length > 0 ? (
+                filterOptions.states.map((st) => (
+                  <option key={st} value={st}>{st}</option>
                 ))
               ) : null}
             </select>
@@ -314,7 +338,7 @@ const PropertiesPage = () => {
             ))}
           </div>
           <div style={{ position: 'sticky', top: '90px', height: '750px' }}>
-            <MapViewer properties={properties} height="100%" />
+            <MapViewer properties={properties} selectedCity={city !== 'All' ? city : null} height="100%" />
           </div>
         </div>
       ) : (

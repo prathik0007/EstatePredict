@@ -212,7 +212,7 @@ const PropertyDetailsPage = () => {
             {property.title}
           </h1>
           <p style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#64748b', fontSize: '0.95rem' }}>
-            <MapPin size={16} color="#3b82f6" /> {property.location?.address ? `${property.location.address}, ` : ''}{property.location?.city || 'Unknown'}{property.location?.state ? `, ${property.location.state}` : ''}
+            <MapPin size={16} color="#3b82f6" /> {property.location?.address ? `${property.location.address}, ` : ''}{property.location?.city || 'Unknown'}{property.location?.state ? `, ${property.location.state}` : ''}{property.location?.pincode ? ` - ${property.location.pincode}` : ''}{property.location?.country ? `, ${property.location.country}` : ''}
           </p>
         </div>
 
@@ -413,7 +413,7 @@ const PropertyDetailsPage = () => {
               Location & Neighborhood
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '16px' }}>
-              {property.location?.address ? `${property.location.address}, ` : ''}{property.location?.city || 'Unknown'}{property.location?.state ? `, ${property.location.state}` : ''}
+              {property.location?.address ? `${property.location.address}, ` : ''}{property.location?.city || 'Unknown'}{property.location?.state ? `, ${property.location.state}` : ''}{property.location?.pincode ? ` - ${property.location.pincode}` : ''}{property.location?.country ? `, ${property.location.country}` : ''}
             </p>
             <MapViewer singleProperty={property} height="320px" zoom={14} />
           </div>

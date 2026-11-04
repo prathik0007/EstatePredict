@@ -17,6 +17,7 @@ import {
 import PropertyCard from '../components/PropertyCard';
 import MapViewer from '../components/MapViewer';
 import { useAuth } from '../context/AuthContext';
+import { INDIAN_CITY_NAMES } from '../utils/indianCities';
 import api from '../services/api';
 
 const HomePage = () => {
@@ -24,7 +25,7 @@ const HomePage = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState('All');
-  const [availableCities, setAvailableCities] = useState([]);
+  const [availableCities, setAvailableCities] = useState(INDIAN_CITY_NAMES);
   const [searchBedrooms, setSearchBedrooms] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
@@ -34,7 +35,8 @@ const HomePage = () => {
       try {
         const res = await api.get('/properties/filters');
         if (res.data.success && res.data.cities) {
-          setAvailableCities(res.data.cities);
+          const merged = Array.from(new Set([...INDIAN_CITY_NAMES, ...res.data.cities])).sort();
+          setAvailableCities(merged);
         }
       } catch (err) {
         console.error('Error fetching cities:', err);

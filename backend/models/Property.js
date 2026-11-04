@@ -80,14 +80,16 @@ const propertySchema = new mongoose.Schema({
     address: { type: String, required: true },
     city: {
       type: String,
-      default: 'Asheville'
+      required: true,
+      default: 'Bangalore'
     },
-    neighborhood: { type: String, default: 'Downtown' },
-    state: { type: String, default: 'NC' },
-    pincode: { type: String, default: '28801' },
+    neighborhood: { type: String, default: '' },
+    state: { type: String, default: 'Karnataka' },
+    pincode: { type: String, default: '' },
+    country: { type: String, default: 'India' },
     coordinates: {
-      lat: { type: Number, required: true, default: 35.5951 },
-      lng: { type: Number, required: true, default: -82.5515 }
+      lat: { type: Number, required: true, default: 12.9716 },
+      lng: { type: Number, required: true, default: 77.5946 }
     }
   },
   amenities: [{
@@ -126,7 +128,9 @@ propertySchema.index({
   description: 'text',
   'location.address': 'text',
   'location.city': 'text',
-  'location.neighborhood': 'text'
+  'location.neighborhood': 'text',
+  'location.state': 'text',
+  'location.pincode': 'text'
 });
 
 module.exports = mongoose.model('Property', propertySchema);

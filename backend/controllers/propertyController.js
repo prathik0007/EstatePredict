@@ -9,6 +9,7 @@ exports.getProperties = async (req, res) => {
     const {
       search,
       city,
+      state,
       neighborhood,
       bhk,
       bedrooms,
@@ -31,12 +32,15 @@ exports.getProperties = async (req, res) => {
         { title: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
         { 'location.address': { $regex: search, $options: 'i' } },
-        { 'location.city': { $regex: search, $options: 'i' } }
+        { 'location.city': { $regex: search, $options: 'i' } },
+        { 'location.state': { $regex: search, $options: 'i' } },
+        { 'location.pincode': { $regex: search, $options: 'i' } }
       ];
     }
 
     // Filters
     if (city && city !== 'All') query['location.city'] = new RegExp(`^${city}$`, 'i');
+    if (state && state !== 'All') query['location.state'] = new RegExp(`^${state}$`, 'i');
     if (neighborhood && neighborhood !== 'All') query['location.neighborhood'] = new RegExp(neighborhood, 'i');
     const bedVal = bhk || bedrooms;
     if (bedVal && bedVal !== 'All') {
@@ -152,6 +156,9 @@ exports.createProperty = async (req, res) => {
         propertyData.location = JSON.parse(propertyData.location);
       } catch (e) {}
     }
+    if (propertyData.location && !propertyData.location.country) {
+      propertyData.location.country = 'India';
+    }
 
     // Parse amenities if stringified JSON
     if (typeof propertyData.amenities === 'string') {
@@ -224,6 +231,18 @@ exports.updateProperty = async (req, res) => {
 
     if (typeof updateData.location === 'string') {
       try { updateData.location = JSON.parse(updateData.location); } catch (e) {}
+    }
+    if (updateData.location && typeof updateData.location === 'object') {
+      const existingLoc = property.location?.toObject ? property.location.toObject() : (property.location || {});
+      updateData.location = {
+        ...existingLoc,
+        ...updateData.location,
+        country: updateData.location.country || existingLoc.country || 'India',
+        coordinates: {
+          ...(existingLoc.coordinates || {}),
+          ...(updateData.location.coordinates || {})
+        }
+      };
     }
     if (typeof updateData.amenities === 'string') {
       try { updateData.amenities = JSON.parse(updateData.amenities); } catch (e) {}
@@ -302,19 +321,45 @@ exports.getMyProperties = async (req, res) => {
   }
 };
 
+// Supported 8 Indian cities & states
+const SUPPORTED_INDIAN_CITIES = [
+  'Mangalore',
+  'Bangalore',
+  'Mysore',
+  'Mumbai',
+  'Delhi',
+  'Hyderabad',
+  'Chennai',
+  'Pune'
+];
+
+const SUPPORTED_INDIAN_STATES = [
+  'Karnataka',
+  'Maharashtra',
+  'Delhi',
+  'Telangana',
+  'Tamil Nadu'
+];
+
 // @desc    Get dynamic distinct filter options from available properties
 // @route   GET /api/properties/filters
 // @access  Public
 exports.getPropertyFilters = async (req, res) => {
   try {
-    const cities = await Property.distinct('location.city', { status: 'available' });
+    const dbCities = await Property.distinct('location.city', { status: 'available' });
+    const dbStates = await Property.distinct('location.state', { status: 'available' });
     const neighborhoods = await Property.distinct('location.neighborhood', { status: 'available' });
     const propertyTypes = await Property.distinct('propertyType', { status: 'available' });
     const roomTypes = await Property.distinct('roomType', { status: 'available' });
 
+    // Merge supported 8 Indian cities with existing database cities (preserving USA listings like Asheville/Austin)
+    const cities = Array.from(new Set([...SUPPORTED_INDIAN_CITIES, ...dbCities.filter(Boolean)])).sort();
+    const states = Array.from(new Set([...SUPPORTED_INDIAN_STATES, ...dbStates.filter(Boolean)])).sort();
+
     res.status(200).json({
       success: true,
-      cities: cities.filter(Boolean).sort(),
+      cities,
+      states,
       neighborhoods: neighborhoods.filter(Boolean).sort(),
       propertyTypes: propertyTypes.filter(Boolean).sort(),
       roomTypes: roomTypes.filter(Boolean).sort()

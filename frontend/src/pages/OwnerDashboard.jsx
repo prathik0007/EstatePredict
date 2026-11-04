@@ -204,9 +204,12 @@ const OwnerDashboard = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Link to={`/properties/${prop._id}`} className="btn btn-secondary btn-sm" title="View Listing">
                       <Eye size={15} /> View
+                    </Link>
+                    <Link to={`/edit-property/${prop._id}`} className="btn btn-secondary btn-sm" title="Edit Listing">
+                      <Edit size={15} /> Edit
                     </Link>
                     <button
                       onClick={() => handleDeleteProperty(prop._id)}
