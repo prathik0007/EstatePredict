@@ -69,3 +69,4 @@ export const getCityData = (cityName) => {
   if (!cityName) return null;
   return INDIAN_CITIES.find(c => c.city.toLowerCase() === cityName.trim().toLowerCase()) || null;
 };
+
