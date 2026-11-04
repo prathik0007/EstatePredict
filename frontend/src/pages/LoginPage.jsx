@@ -136,19 +136,16 @@ const LoginPage = () => {
           </button>
         </form>
 
-        {/* Quick Demo Credentials Switcher */}
+        {/* Quick Credentials Switcher */}
         <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border-color)' }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>
-            Quick Demo Accounts (1-Click Fill)
-          </span>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginTop: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
             <button
               type="button"
               onClick={() => handleQuickDemoLogin('owner@rental.com', 'ownerpassword123')}
               className="btn btn-secondary btn-sm"
               style={{ fontSize: '0.75rem' }}
             >
-              Owner Demo
+              Owner
             </button>
             <button
               type="button"
@@ -156,7 +153,7 @@ const LoginPage = () => {
               className="btn btn-secondary btn-sm"
               style={{ fontSize: '0.75rem' }}
             >
-              Tenant Demo
+              Tenant
             </button>
             <button
               type="button"
@@ -164,7 +161,7 @@ const LoginPage = () => {
               className="btn btn-secondary btn-sm"
               style={{ fontSize: '0.75rem' }}
             >
-              Admin Demo
+              Admin
             </button>
           </div>
         </div>
