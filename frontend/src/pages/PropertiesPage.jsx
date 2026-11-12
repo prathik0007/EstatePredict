@@ -223,18 +223,6 @@ const PropertiesPage = () => {
             </select>
           </div>
 
-          {/* Neighborhood Filter (if available in dataset) */}
-          {filterOptions.neighborhoods && filterOptions.neighborhoods.length > 0 && (
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <select value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
-                <option value="All">All Neighborhoods</option>
-                {filterOptions.neighborhoods.map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
           {/* Bedrooms */}
           <div className="form-group" style={{ marginBottom: 0 }}>
             <select value={bedrooms} onChange={(e) => setBedrooms(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
