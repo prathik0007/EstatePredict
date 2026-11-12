@@ -301,7 +301,7 @@ const EstimatorPage = () => {
               {/* Main Predicted Rental Price */}
               <div style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #c4b5fd', marginBottom: '20px' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  PREDICTED NIGHTLY RENTAL PRICE
+                  PREDICTED RENTAL PRICE
                 </span>
                 <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
                   ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)}

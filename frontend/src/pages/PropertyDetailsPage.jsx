@@ -345,7 +345,7 @@ const PropertyDetailsPage = () => {
               }}>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: '#6d28d9', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    PREDICTED NIGHTLY RENTAL PRICE
+                    PREDICTED RENTAL PRICE
                   </span>
                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#0f172a' }}>
                     ${Number(property.predictedRentInfo.predictedRent).toFixed(2)}

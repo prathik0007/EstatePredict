@@ -194,7 +194,7 @@ const AiPriceEstimatorModal = ({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  PREDICTED NIGHTLY RENTAL PRICE
+                  PREDICTED RENTAL PRICE
                 </span>
                 <div style={{ fontSize: '2rem', fontWeight: '900', color: '#0f172a', lineHeight: 1.2 }}>
                   ${Number(predictionResult.predicted_rent).toFixed(2)}
