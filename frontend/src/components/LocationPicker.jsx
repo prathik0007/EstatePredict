@@ -37,7 +37,18 @@ export const CITY_COORDINATES = {
   'Los Angeles': [34.0522, -118.2437],
   'Chicago': [41.8781, -87.6298],
   'Seattle': [47.6062, -122.3321],
-  'Boston': [42.3601, -71.0589]
+  'Boston': [42.3601, -71.0589],
+  // International cities
+  'London': [51.5074, -0.1278],
+  'Toronto': [43.6532, -79.3832],
+  'Vancouver': [49.2827, -123.1207],
+  'Sydney': [-33.8688, 151.2093],
+  'Melbourne': [-37.8136, 144.9631],
+  'Berlin': [52.5200, 13.4050],
+  'Paris': [48.8566, 2.3522],
+  'Dubai': [25.2048, 55.2708],
+  'Singapore': [1.3521, 103.8198],
+  'Tokyo': [35.6762, 139.6503]
 };
 
 function MapRecenter({ center }) {

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, Map, Grid, RefreshCw, X, SlidersHorizontal } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import MapViewer from '../components/MapViewer';
-import { ALL_CITY_NAMES, ALL_STATES } from '../utils/indianCities';
+import { ALL_CITY_NAMES, ALL_STATES, COUNTRY_NAMES } from '../utils/indianCities';
 import api from '../services/api';
 
 const PropertiesPage = () => {
@@ -15,6 +15,7 @@ const PropertiesPage = () => {
   const [totalCount, setTotalCount] = useState(0);
 
   // Filters State initialized from searchParams
+  const [country, setCountry] = useState(searchParams.get('country') || 'All');
   const [city, setCity] = useState(searchParams.get('city') || 'All');
   const [state, setState] = useState(searchParams.get('state') || 'All');
   const [neighborhood, setNeighborhood] = useState(searchParams.get('neighborhood') || 'All');
@@ -26,6 +27,7 @@ const PropertiesPage = () => {
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [sort, setSort] = useState('newest');
   const [filterOptions, setFilterOptions] = useState({
+    countries: COUNTRY_NAMES,
     cities: ALL_CITY_NAMES,
     states: ALL_STATES,
     neighborhoods: [],
@@ -38,10 +40,12 @@ const PropertiesPage = () => {
       try {
         const res = await api.get('/properties/filters');
         if (res.data.success) {
+          const mergedCountries = Array.from(new Set([...COUNTRY_NAMES, ...(res.data.countries || [])])).sort();
           const mergedCities = Array.from(new Set([...ALL_CITY_NAMES, ...(res.data.cities || [])])).sort();
           const mergedStates = Array.from(new Set([...ALL_STATES, ...(res.data.states || [])])).sort();
           setFilterOptions({
             ...res.data,
+            countries: mergedCountries,
             cities: mergedCities,
             states: mergedStates
           });
@@ -54,6 +58,7 @@ const PropertiesPage = () => {
   }, []);
 
   const hasActiveFilters =
+    country !== 'All' ||
     city !== 'All' ||
     state !== 'All' ||
     neighborhood !== 'All' ||
@@ -68,6 +73,7 @@ const PropertiesPage = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
+      if (country !== 'All') params.append('country', country);
       if (city !== 'All') params.append('city', city);
       if (state !== 'All') params.append('state', state);
       if (neighborhood !== 'All') params.append('neighborhood', neighborhood);
@@ -96,7 +102,7 @@ const PropertiesPage = () => {
 
   useEffect(() => {
     fetchProperties();
-  }, [city, state, neighborhood, bedrooms, propertyType, roomType, sort]);
+  }, [country, city, state, neighborhood, bedrooms, propertyType, roomType, sort]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -104,6 +110,7 @@ const PropertiesPage = () => {
   };
 
   const handleResetFilters = () => {
+    setCountry('All');
     setCity('All');
     setState('All');
     setNeighborhood('All');
@@ -197,6 +204,18 @@ const PropertiesPage = () => {
               className="form-input"
               style={{ padding: '0.55rem 0.85rem' }}
             />
+          </div>
+
+          {/* Country Filter */}
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <select value={country} onChange={(e) => setCountry(e.target.value)} className="form-select" style={{ padding: '0.55rem 0.85rem' }}>
+              <option value="All">All Countries</option>
+              {filterOptions.countries && filterOptions.countries.length > 0 ? (
+                filterOptions.countries.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))
+              ) : null}
+            </select>
           </div>
 
           {/* City Filter */}

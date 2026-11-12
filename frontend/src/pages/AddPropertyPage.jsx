@@ -19,6 +19,8 @@ import {
   INDIAN_CITY_NAMES,
   USA_CITIES,
   USA_CITY_NAMES,
+  INTERNATIONAL_CITIES,
+  SUPPORTED_COUNTRIES,
   ALL_CITIES,
   ALL_CITY_NAMES,
   getCityData
@@ -140,6 +142,116 @@ const AddPropertyPage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCountryChange = (e) => {
+    const chosenCountry = e.target.value;
+    if (chosenCountry === 'India') {
+      const bgl = getCityData('Bangalore');
+      setFormData(prev => ({
+        ...prev,
+        country: 'India',
+        city: bgl.city,
+        state: bgl.state,
+        pincode: bgl.pincode,
+        coordinates: { lat: bgl.lat, lng: bgl.lng }
+      }));
+    } else if (chosenCountry === 'USA' || chosenCountry === 'United States') {
+      const aus = getCityData('Austin');
+      setFormData(prev => ({
+        ...prev,
+        country: 'USA',
+        city: aus.city,
+        state: aus.state,
+        pincode: aus.pincode,
+        coordinates: { lat: aus.lat, lng: aus.lng }
+      }));
+    } else if (chosenCountry === 'United Kingdom') {
+      const ldn = getCityData('London');
+      setFormData(prev => ({
+        ...prev,
+        country: 'United Kingdom',
+        city: ldn.city,
+        state: ldn.state,
+        pincode: ldn.pincode,
+        coordinates: { lat: ldn.lat, lng: ldn.lng }
+      }));
+    } else if (chosenCountry === 'Canada') {
+      const tor = getCityData('Toronto');
+      setFormData(prev => ({
+        ...prev,
+        country: 'Canada',
+        city: tor.city,
+        state: tor.state,
+        pincode: tor.pincode,
+        coordinates: { lat: tor.lat, lng: tor.lng }
+      }));
+    } else if (chosenCountry === 'Australia') {
+      const syd = getCityData('Sydney');
+      setFormData(prev => ({
+        ...prev,
+        country: 'Australia',
+        city: syd.city,
+        state: syd.state,
+        pincode: syd.pincode,
+        coordinates: { lat: syd.lat, lng: syd.lng }
+      }));
+    } else if (chosenCountry === 'Germany') {
+      const ber = getCityData('Berlin');
+      setFormData(prev => ({
+        ...prev,
+        country: 'Germany',
+        city: ber.city,
+        state: ber.state,
+        pincode: ber.pincode,
+        coordinates: { lat: ber.lat, lng: ber.lng }
+      }));
+    } else if (chosenCountry === 'France') {
+      const par = getCityData('Paris');
+      setFormData(prev => ({
+        ...prev,
+        country: 'France',
+        city: par.city,
+        state: par.state,
+        pincode: par.pincode,
+        coordinates: { lat: par.lat, lng: par.lng }
+      }));
+    } else if (chosenCountry === 'United Arab Emirates') {
+      const dxb = getCityData('Dubai');
+      setFormData(prev => ({
+        ...prev,
+        country: 'United Arab Emirates',
+        city: dxb.city,
+        state: dxb.state,
+        pincode: dxb.pincode,
+        coordinates: { lat: dxb.lat, lng: dxb.lng }
+      }));
+    } else if (chosenCountry === 'Singapore') {
+      const sg = getCityData('Singapore');
+      setFormData(prev => ({
+        ...prev,
+        country: 'Singapore',
+        city: sg.city,
+        state: sg.state,
+        pincode: sg.pincode,
+        coordinates: { lat: sg.lat, lng: sg.lng }
+      }));
+    } else if (chosenCountry === 'Japan') {
+      const tyo = getCityData('Tokyo');
+      setFormData(prev => ({
+        ...prev,
+        country: 'Japan',
+        city: tyo.city,
+        state: tyo.state,
+        pincode: tyo.pincode,
+        coordinates: { lat: tyo.lat, lng: tyo.lng }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        country: chosenCountry
+      }));
+    }
   };
 
   const handleCityChange = (e) => {
@@ -439,6 +551,21 @@ const AddPropertyPage = () => {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '16px' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Country *</label>
+              <select
+                name="country"
+                value={formData.country || 'India'}
+                onChange={handleCountryChange}
+                className="form-select"
+                required
+              >
+                {SUPPORTED_COUNTRIES.map(ctry => (
+                  <option key={ctry.value} value={ctry.value}>{ctry.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: 0 }}>
               <label className="form-label">City *</label>
               <select
                 name="city"
@@ -457,6 +584,11 @@ const AddPropertyPage = () => {
                     <option key={c.city} value={c.city}>{c.city} ({c.state})</option>
                   ))}
                 </optgroup>
+                <optgroup label="International Cities">
+                  {INTERNATIONAL_CITIES.map(c => (
+                    <option key={c.city} value={c.city}>{c.city} ({c.country})</option>
+                  ))}
+                </optgroup>
                 {/* Maintain existing USA / custom cities if editing legacy listing */}
                 {formData.city && !ALL_CITY_NAMES.includes(formData.city) && (
                   <option value={formData.city}>{formData.city}</option>
@@ -465,11 +597,11 @@ const AddPropertyPage = () => {
             </div>
 
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">State *</label>
+              <label className="form-label">State / Region *</label>
               <input
                 type="text"
                 name="state"
-                placeholder="State"
+                placeholder="State or Region"
                 value={formData.state}
                 onChange={handleInputChange}
                 className="form-input"
@@ -487,18 +619,6 @@ const AddPropertyPage = () => {
                 onChange={handleInputChange}
                 className="form-input"
                 required
-              />
-            </div>
-
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Country</label>
-              <input
-                type="text"
-                name="country"
-                value={formData.country || 'India'}
-                onChange={handleInputChange}
-                className="form-input"
-                disabled
               />
             </div>
           </div>

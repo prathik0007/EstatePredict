@@ -186,7 +186,44 @@ export const USA_CITIES = [
 export const USA_CITY_NAMES = USA_CITIES.map(c => c.city);
 export const USA_STATES = Array.from(new Set(USA_CITIES.map(c => c.state)));
 
-export const ALL_CITIES = [...INDIAN_CITIES, ...USA_CITIES];
+/**
+ * Supported International Cities
+ */
+export const INTERNATIONAL_CITIES = [
+  { city: 'London', state: 'England', country: 'United Kingdom', pincode: 'EC1A 1BB', lat: 51.5074, lng: -0.1278 },
+  { city: 'Toronto', state: 'Ontario', country: 'Canada', pincode: 'M5H 2N2', lat: 43.6532, lng: -79.3832 },
+  { city: 'Vancouver', state: 'British Columbia', country: 'Canada', pincode: 'V6B 1A1', lat: 49.2827, lng: -123.1207 },
+  { city: 'Sydney', state: 'New South Wales', country: 'Australia', pincode: '2000', lat: -33.8688, lng: 151.2093 },
+  { city: 'Melbourne', state: 'Victoria', country: 'Australia', pincode: '3000', lat: -37.8136, lng: 144.9631 },
+  { city: 'Berlin', state: 'Berlin', country: 'Germany', pincode: '10115', lat: 52.5200, lng: 13.4050 },
+  { city: 'Paris', state: 'Île-de-France', country: 'France', pincode: '75001', lat: 48.8566, lng: 2.3522 },
+  { city: 'Dubai', state: 'Dubai', country: 'United Arab Emirates', pincode: '00000', lat: 25.2048, lng: 55.2708 },
+  { city: 'Singapore', state: 'Singapore', country: 'Singapore', pincode: '018989', lat: 1.3521, lng: 103.8198 },
+  { city: 'Tokyo', state: 'Tokyo', country: 'Japan', pincode: '100-0001', lat: 35.6762, lng: 139.6503 }
+];
+
+export const INTERNATIONAL_CITY_NAMES = INTERNATIONAL_CITIES.map(c => c.city);
+
+/**
+ * Supported Countries List
+ */
+export const SUPPORTED_COUNTRIES = [
+  { value: 'India', label: 'India' },
+  { value: 'USA', label: 'United States (USA)' },
+  { value: 'United Kingdom', label: 'United Kingdom (UK)' },
+  { value: 'Canada', label: 'Canada' },
+  { value: 'Australia', label: 'Australia' },
+  { value: 'Germany', label: 'Germany' },
+  { value: 'France', label: 'France' },
+  { value: 'United Arab Emirates', label: 'United Arab Emirates (UAE)' },
+  { value: 'Singapore', label: 'Singapore' },
+  { value: 'Japan', label: 'Japan' },
+  { value: 'Other', label: 'Other Country' }
+];
+
+export const COUNTRY_NAMES = SUPPORTED_COUNTRIES.map(c => c.value);
+
+export const ALL_CITIES = [...INDIAN_CITIES, ...USA_CITIES, ...INTERNATIONAL_CITIES];
 export const ALL_CITY_NAMES = ALL_CITIES.map(c => c.city);
 export const ALL_STATES = Array.from(new Set(ALL_CITIES.map(c => c.state)));
 

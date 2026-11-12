@@ -56,6 +56,7 @@ exports.getProperties = async (req, res) => {
   try {
     const {
       search,
+      country,
       city,
       state,
       neighborhood,
@@ -82,11 +83,13 @@ exports.getProperties = async (req, res) => {
         { 'location.address': { $regex: search, $options: 'i' } },
         { 'location.city': { $regex: search, $options: 'i' } },
         { 'location.state': { $regex: search, $options: 'i' } },
+        { 'location.country': { $regex: search, $options: 'i' } },
         { 'location.pincode': { $regex: search, $options: 'i' } }
       ];
     }
 
     // Filters
+    if (country && country !== 'All') query['location.country'] = new RegExp(`^${country}$`, 'i');
     if (city && city !== 'All') query['location.city'] = new RegExp(`^${city}$`, 'i');
     if (state && state !== 'All') query['location.state'] = new RegExp(`^${state}$`, 'i');
     if (neighborhood && neighborhood !== 'All') query['location.neighborhood'] = new RegExp(neighborhood, 'i');
@@ -377,6 +380,7 @@ exports.getMyProperties = async (req, res) => {
 // @access  Public
 exports.getPropertyFilters = async (req, res) => {
   try {
+    const dbCountries = await Property.distinct('location.country', { status: 'available' });
     const dbCities = await Property.distinct('location.city', { status: 'available' });
     const dbStates = await Property.distinct('location.state', { status: 'available' });
     const neighborhoods = await Property.distinct('location.neighborhood', { status: 'available' });
@@ -384,11 +388,13 @@ exports.getPropertyFilters = async (req, res) => {
     const roomTypes = await Property.distinct('roomType', { status: 'available' });
 
     // Merge supported Indian & USA benchmark cities with existing database cities
+    const countries = Array.from(new Set(['India', 'USA', 'United Kingdom', 'Canada', 'Australia', 'Germany', 'France', 'United Arab Emirates', 'Singapore', 'Japan', ...dbCountries.filter(Boolean)])).sort();
     const cities = Array.from(new Set([...SUPPORTED_INDIAN_CITIES, ...SUPPORTED_USA_CITIES, ...dbCities.filter(Boolean)])).sort();
     const states = Array.from(new Set([...SUPPORTED_INDIAN_STATES, ...SUPPORTED_USA_STATES, ...dbStates.filter(Boolean)])).sort();
 
     res.status(200).json({
       success: true,
+      countries,
       cities,
       states,
       neighborhoods: neighborhoods.filter(Boolean).sort(),
