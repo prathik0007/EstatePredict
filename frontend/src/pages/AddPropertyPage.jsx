@@ -422,7 +422,7 @@ const AddPropertyPage = () => {
         {/* Section 3: Indian City Location & Leaflet OpenStreetMap Pin Picker */}
         <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
           <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#1e293b', marginBottom: '6px' }}>
-            3. Property Location (8 Supported Indian Cities)
+            3. Property Location
           </h3>
           <p style={{ fontSize: '0.825rem', color: '#64748b', marginBottom: '16px' }}>
             Select your Indian city, verify the state and PIN code, and pinpoint the exact coordinates on OpenStreetMap.
