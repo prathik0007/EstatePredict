@@ -14,7 +14,15 @@ import {
 import LocationPicker from '../components/LocationPicker';
 import AiPriceEstimatorModal from '../components/AiPriceEstimatorModal';
 import { useNotification } from '../context/NotificationContext';
-import { INDIAN_CITIES, INDIAN_CITY_NAMES, getCityData } from '../utils/indianCities';
+import {
+  INDIAN_CITIES,
+  INDIAN_CITY_NAMES,
+  USA_CITIES,
+  USA_CITY_NAMES,
+  ALL_CITIES,
+  ALL_CITY_NAMES,
+  getCityData
+} from '../utils/indianCities';
 import { getPropertyImageUrl } from '../utils/imageUtils';
 import api from '../services/api';
 
@@ -102,7 +110,7 @@ const AddPropertyPage = () => {
             city: loc.city || 'Bangalore',
             state: loc.state || (cityMatch ? cityMatch.state : 'Karnataka'),
             pincode: loc.pincode || (cityMatch ? cityMatch.pincode : ''),
-            country: loc.country || 'India',
+            country: loc.country || (cityMatch ? cityMatch.country : 'India'),
             coordinates: loc.coordinates?.lat && loc.coordinates?.lng
               ? { lat: loc.coordinates.lat, lng: loc.coordinates.lng }
               : (cityMatch ? { lat: cityMatch.lat, lng: cityMatch.lng } : { lat: 12.9716, lng: 77.5946 })
@@ -142,7 +150,8 @@ const AddPropertyPage = () => {
         ...prev,
         city: cityData.city,
         state: cityData.state,
-        pincode: prev.pincode && prev.pincode !== '560001' ? prev.pincode : cityData.pincode,
+        country: cityData.country || 'India',
+        pincode: cityData.pincode || prev.pincode,
         coordinates: { lat: cityData.lat, lng: cityData.lng }
       }));
     } else {
@@ -276,7 +285,7 @@ const AddPropertyPage = () => {
         <p style={{ color: '#64748b', fontSize: '0.95rem', maxWidth: '560px', margin: '0 auto' }}>
           {isEdit
             ? 'Update property details, location coordinates, amenities, or nightly pricing.'
-            : 'Add your property in one of our 8 supported Indian metropolitan cities with OpenStreetMap pin placement.'}
+            : 'Add your property with location coordinates and OpenStreetMap pin placement (India & USA supported).'}
         </p>
       </div>
 
@@ -425,7 +434,7 @@ const AddPropertyPage = () => {
             3. Property Location
           </h3>
           <p style={{ fontSize: '0.825rem', color: '#64748b', marginBottom: '16px' }}>
-            Select your Indian city, verify the state and PIN code, and pinpoint the exact coordinates on OpenStreetMap.
+            Select your city (India & USA supported), verify the state and postal code, and pinpoint the exact coordinates on OpenStreetMap.
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '16px' }}>
@@ -438,11 +447,18 @@ const AddPropertyPage = () => {
                 className="form-select"
                 required
               >
-                {INDIAN_CITIES.map(c => (
-                  <option key={c.city} value={c.city}>{c.city} ({c.state})</option>
-                ))}
-                {/* Maintain existing USA cities if editing legacy listing */}
-                {formData.city && !INDIAN_CITY_NAMES.includes(formData.city) && (
+                <optgroup label="India (8 Cities)">
+                  {INDIAN_CITIES.map(c => (
+                    <option key={c.city} value={c.city}>{c.city} ({c.state})</option>
+                  ))}
+                </optgroup>
+                <optgroup label="United States (USA Benchmark)">
+                  {USA_CITIES.map(c => (
+                    <option key={c.city} value={c.city}>{c.city} ({c.state})</option>
+                  ))}
+                </optgroup>
+                {/* Maintain existing USA / custom cities if editing legacy listing */}
+                {formData.city && !ALL_CITY_NAMES.includes(formData.city) && (
                   <option value={formData.city}>{formData.city}</option>
                 )}
               </select>
@@ -462,11 +478,11 @@ const AddPropertyPage = () => {
             </div>
 
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">PIN Code *</label>
+              <label className="form-label">PIN / Postal Code *</label>
               <input
                 type="text"
                 name="pincode"
-                placeholder="e.g. 560001"
+                placeholder="e.g. 560001 or 78701"
                 value={formData.pincode}
                 onChange={handleInputChange}
                 className="form-input"

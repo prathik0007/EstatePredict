@@ -1,6 +1,54 @@
 const Property = require('../models/Property');
 const User = require('../models/User');
 
+// Supported Indian cities & states
+const SUPPORTED_INDIAN_CITIES = [
+  'Mangalore',
+  'Bangalore',
+  'Mysore',
+  'Mumbai',
+  'Delhi',
+  'Hyderabad',
+  'Chennai',
+  'Pune'
+];
+
+const SUPPORTED_INDIAN_STATES = [
+  'Karnataka',
+  'Maharashtra',
+  'Delhi',
+  'Telangana',
+  'Tamil Nadu'
+];
+
+// Supported USA cities & states (Austin & Asheville benchmark datasets)
+const SUPPORTED_USA_CITIES = [
+  'Austin',
+  'Downtown Austin',
+  'South Congress',
+  'East Austin',
+  'The Domain',
+  'Zilker',
+  'UT Austin / Campus',
+  'Asheville',
+  'New York',
+  'San Francisco',
+  'Los Angeles',
+  'Chicago',
+  'Seattle',
+  'Boston'
+];
+
+const SUPPORTED_USA_STATES = [
+  'Texas',
+  'North Carolina',
+  'New York',
+  'California',
+  'Illinois',
+  'Washington',
+  'Massachusetts'
+];
+
 // @desc    Get all properties with filtering, search and pagination
 // @route   GET /api/properties
 // @access  Public
@@ -157,7 +205,8 @@ exports.createProperty = async (req, res) => {
       } catch (e) {}
     }
     if (propertyData.location && !propertyData.location.country) {
-      propertyData.location.country = 'India';
+      const c = propertyData.location.city;
+      propertyData.location.country = SUPPORTED_USA_CITIES.includes(c) ? 'USA' : 'India';
     }
 
     // Parse amenities if stringified JSON
@@ -234,10 +283,12 @@ exports.updateProperty = async (req, res) => {
     }
     if (updateData.location && typeof updateData.location === 'object') {
       const existingLoc = property.location?.toObject ? property.location.toObject() : (property.location || {});
+      const city = updateData.location.city || existingLoc.city;
+      const defaultCountry = SUPPORTED_USA_CITIES.includes(city) ? 'USA' : 'India';
       updateData.location = {
         ...existingLoc,
         ...updateData.location,
-        country: updateData.location.country || existingLoc.country || 'India',
+        country: updateData.location.country || existingLoc.country || defaultCountry,
         coordinates: {
           ...(existingLoc.coordinates || {}),
           ...(updateData.location.coordinates || {})
@@ -321,26 +372,6 @@ exports.getMyProperties = async (req, res) => {
   }
 };
 
-// Supported 8 Indian cities & states
-const SUPPORTED_INDIAN_CITIES = [
-  'Mangalore',
-  'Bangalore',
-  'Mysore',
-  'Mumbai',
-  'Delhi',
-  'Hyderabad',
-  'Chennai',
-  'Pune'
-];
-
-const SUPPORTED_INDIAN_STATES = [
-  'Karnataka',
-  'Maharashtra',
-  'Delhi',
-  'Telangana',
-  'Tamil Nadu'
-];
-
 // @desc    Get dynamic distinct filter options from available properties
 // @route   GET /api/properties/filters
 // @access  Public
@@ -352,9 +383,9 @@ exports.getPropertyFilters = async (req, res) => {
     const propertyTypes = await Property.distinct('propertyType', { status: 'available' });
     const roomTypes = await Property.distinct('roomType', { status: 'available' });
 
-    // Merge supported 8 Indian cities with existing database cities (preserving USA listings like Asheville/Austin)
-    const cities = Array.from(new Set([...SUPPORTED_INDIAN_CITIES, ...dbCities.filter(Boolean)])).sort();
-    const states = Array.from(new Set([...SUPPORTED_INDIAN_STATES, ...dbStates.filter(Boolean)])).sort();
+    // Merge supported Indian & USA benchmark cities with existing database cities
+    const cities = Array.from(new Set([...SUPPORTED_INDIAN_CITIES, ...SUPPORTED_USA_CITIES, ...dbCities.filter(Boolean)])).sort();
+    const states = Array.from(new Set([...SUPPORTED_INDIAN_STATES, ...SUPPORTED_USA_STATES, ...dbStates.filter(Boolean)])).sort();
 
     res.status(200).json({
       success: true,

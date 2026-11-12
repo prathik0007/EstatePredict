@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, Filter, Map, Grid, RefreshCw, X, SlidersHorizontal } from 'lucide-react';
 import PropertyCard from '../components/PropertyCard';
 import MapViewer from '../components/MapViewer';
-import { INDIAN_CITY_NAMES, INDIAN_STATES } from '../utils/indianCities';
+import { ALL_CITY_NAMES, ALL_STATES } from '../utils/indianCities';
 import api from '../services/api';
 
 const PropertiesPage = () => {
@@ -26,8 +26,8 @@ const PropertiesPage = () => {
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [sort, setSort] = useState('newest');
   const [filterOptions, setFilterOptions] = useState({
-    cities: INDIAN_CITY_NAMES,
-    states: INDIAN_STATES,
+    cities: ALL_CITY_NAMES,
+    states: ALL_STATES,
     neighborhoods: [],
     propertyTypes: [],
     roomTypes: []
@@ -38,8 +38,8 @@ const PropertiesPage = () => {
       try {
         const res = await api.get('/properties/filters');
         if (res.data.success) {
-          const mergedCities = Array.from(new Set([...INDIAN_CITY_NAMES, ...(res.data.cities || [])])).sort();
-          const mergedStates = Array.from(new Set([...INDIAN_STATES, ...(res.data.states || [])])).sort();
+          const mergedCities = Array.from(new Set([...ALL_CITY_NAMES, ...(res.data.cities || [])])).sort();
+          const mergedStates = Array.from(new Set([...ALL_STATES, ...(res.data.states || [])])).sort();
           setFilterOptions({
             ...res.data,
             cities: mergedCities,

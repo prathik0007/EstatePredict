@@ -29,8 +29,15 @@ export const CITY_COORDINATES = {
   'South Congress': [30.2505, -97.7497],
   'East Austin': [30.2625, -97.7215],
   'Zilker / Barton Hills': [30.2670, -97.7730],
+  'Zilker': [30.2670, -97.7730],
   'The Domain': [30.4014, -97.7247],
-  'UT Austin / Campus': [30.2849, -97.7341]
+  'UT Austin / Campus': [30.2849, -97.7341],
+  'New York': [40.7128, -74.0060],
+  'San Francisco': [37.7749, -122.4194],
+  'Los Angeles': [34.0522, -118.2437],
+  'Chicago': [41.8781, -87.6298],
+  'Seattle': [47.6062, -122.3321],
+  'Boston': [42.3601, -71.0589]
 };
 
 function MapRecenter({ center }) {
