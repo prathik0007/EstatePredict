@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshCw, Info, AlertTriangle } from 'lucide-react';
 import mlApi from '../services/mlApi';
+import { verifyUploadedImage } from '../utils/imageVerifier';
 
 // Austin Districts aligned with Inside Airbnb benchmark
 const AUSTIN_DISTRICTS = [
@@ -74,6 +75,26 @@ const AiPriceEstimatorModal = ({
         data.append('review_scores_rating', formData.review_scores_rating);
       }
       if (imageFile) {
+        // Run client-side zero-shot image verification guard (MobileNet + pattern check)
+        const check = await verifyUploadedImage(imageFile, imageFile.name);
+        if (!check.isProperty) {
+          setPredictionResult({
+            is_property_image: false,
+            image_status: 'unknown',
+            predicted_rent: 'Unknown',
+            predicted_price_usd: 'Unknown',
+            predicted_price_inr: 'Unknown',
+            detected_type: check.detectedType || 'Non-Property Object',
+            message: check.reason || `Non-property image detected (${check.detectedType || 'object/item'}). EstatePredict only values authentic real estate properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`,
+            unit: 'USD/night',
+            model_name: 'EstatePredict Visual Validation Guard (MobileNet + AI)',
+            pipeline_used: `Refused: ${check.detectedType || 'Non-Property Object'}`,
+            modalities_used: { tabular: false, geographic: false, text: false, image: true },
+            top_factors: []
+          });
+          setLoading(false);
+          return;
+        }
         data.append('image', imageFile);
       }
 
