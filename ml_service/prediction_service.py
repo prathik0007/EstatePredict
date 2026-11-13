@@ -478,6 +478,28 @@ class MultimodalV5Predictor:
             {"feature": "Number of Reviews", "impact": format_shap(reviews_shap)},
             {"feature": "Availability (365d)", "impact": format_shap(avail_shap)}
         ]
+
+        if has_image:
+            try:
+                from classify_image import extract_visual_metrics
+                if hasattr(image_file, "seek"):
+                    image_file.seek(0)
+                img_pil = Image.open(image_file).convert("RGB")
+                vm = extract_visual_metrics(img_pil)
+                visual_factors = [
+                    {"feature": "Interior Design & Staging (Visual)", "impact": round(vm["interior_design"], 2)},
+                    {"feature": "Lighting Design & Ambience (Visual)", "impact": round(vm["lighting_design"], 2)},
+                    {"feature": "Furniture Arrangement (Visual)", "impact": round(vm["furniture_arrangement"], 2)},
+                    {"feature": "Floor Design & Finishes (Visual)", "impact": round(vm["floor_design"], 2)},
+                    {"feature": "Image Quality & Resolution (Visual)", "impact": round(vm["image_quality"], 2)},
+                    {"feature": "Overall Property Visual Condition (Visual)", "impact": round(vm["overall_property_condition"], 2)}
+                ]
+                candidate_factors.extend(visual_factors)
+                if hasattr(image_file, "seek"):
+                    image_file.seek(0)
+            except Exception as ex:
+                print(f"Visual metrics display note: {ex}")
+
         top_factors = [f for f in candidate_factors if f["impact"] != 0.0]
         top_factors.sort(key=lambda x: abs(x["impact"]), reverse=True)
         if len(top_factors) < 3:

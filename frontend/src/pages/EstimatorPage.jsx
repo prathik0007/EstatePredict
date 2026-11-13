@@ -375,10 +375,10 @@ const EstimatorPage = () => {
                   {prediction.top_factors && prediction.top_factors.length > 0 && (
                     <div style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
                       <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#1e293b', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <BarChart3 size={16} color="#7c3aed" /> SHAP Feature Attribution — Tabular + Geographic Features
+                        <BarChart3 size={16} color="#7c3aed" /> Feature Attribution — Tabular, Geographic & Visual Factors
                       </div>
                       <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '10px' }}>
-                        TreeSHAP relative attribution indicating feature contribution to log-scale price prediction across physical & Austin landmark features.
+                        Relative feature attribution indicating feature contribution to price prediction across physical, landmark & visual design characteristics.
                       </p>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                         {prediction.top_factors.map((item, idx) => {

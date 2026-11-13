@@ -260,10 +260,10 @@ const AiPriceEstimatorModal = ({
                 {predictionResult.top_factors && predictionResult.top_factors.length > 0 && (
                   <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
                     <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution:
+                      <BarChart3 size={14} color="#7c3aed" /> Feature Attribution (Tabular, Geographic & Visual):
                     </div>
                     <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '8px' }}>
-                      TreeSHAP feature attributions on physical property & Austin landmark distance characteristics.
+                      Relative feature attributions indicating contribution across physical, landmark and visual property factors.
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       {predictionResult.top_factors.map((factor, idx) => {
