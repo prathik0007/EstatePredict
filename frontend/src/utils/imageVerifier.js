@@ -61,14 +61,24 @@ export const PROPERTY_PATTERNS = [
   /church/i, /home\b/i, /house\b/i, /building/i, /room\b/i, /hall\b/i, /architecture/i
 ];
 
+export const PROPERTY_FILENAME_REGEX = /(room|house|home|apt|apartment|villa|flat|suite|living|bed|bedroom|kitchen|bath|bathroom|exterior|property|hall|balcony|patio|facade|building|condo)/i;
+
 /**
  * Verifies whether an image (file, img element, or filename) represents authentic real estate.
- * Uses both filename inspection and browser-side MobileNet computer vision.
+ * Uses filename heuristics and browser-side MobileNet computer vision.
  */
 export async function verifyUploadedImage(imgElementOrFile, originalFilename = '') {
   const filename = originalFilename || (imgElementOrFile && imgElementOrFile.name) || '';
   
-  // 1. Filename pattern check
+  // 1. Positive filename check (houses, rooms, apartments, villas)
+  if (filename && PROPERTY_FILENAME_REGEX.test(filename)) {
+    return {
+      isProperty: true,
+      detectedType: 'Residential Property'
+    };
+  }
+
+  // 2. Negative filename check (bowls, plants, animals, cars, objects)
   if (filename) {
     const fn = filename.toLowerCase();
     for (const pat of NON_PROPERTY_PATTERNS) {
@@ -104,6 +114,17 @@ export async function verifyUploadedImage(imgElementOrFile, originalFilename = '
         if (predictions && predictions.length > 0) {
           const top = predictions[0];
           const topClass = top.className.toLowerCase();
+
+          // Check if top class is a residential property/room
+          for (const pat of PROPERTY_PATTERNS) {
+            if (pat.test(topClass)) {
+              return {
+                isProperty: true,
+                detectedType: 'Residential Property',
+                probability: top.probability
+              };
+            }
+          }
 
           // Check if top class is a non-property object
           for (const pat of NON_PROPERTY_PATTERNS) {
@@ -160,3 +181,4 @@ function createImageElementFromFile(file) {
     img.src = url;
   });
 }
+

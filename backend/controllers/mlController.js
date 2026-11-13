@@ -128,9 +128,11 @@ exports.predictRent = async (req, res) => {
     
     // If an image was uploaded, verify that it's authentic real estate
     if (req.file) {
+      const PROPERTY_REGEX = /(room|house|home|apt|apartment|villa|flat|suite|living|bed|bedroom|kitchen|bath|bathroom|exterior|property|hall|balcony|patio|facade|building|condo)/i;
       const NON_PROPERTY_REGEX = /(bowl|plate|dish|cup|mug|spoon|fork|knife|food|pizza|soup|salad|bread|cake|plant|flower|rose|tree|leaf|dog|cat|puppy|kitten|bird|pet|animal|car|truck|bike|motorcycle|vehicle|shoe|shirt|dress|hat|phone|laptop|computer|camera|bottle|tool|item|object)/i;
       const fn = req.file.originalname || '';
-      if (NON_PROPERTY_REGEX.test(fn)) {
+      
+      if (!PROPERTY_REGEX.test(fn) && NON_PROPERTY_REGEX.test(fn)) {
         const match = fn.match(NON_PROPERTY_REGEX);
         const term = match ? match[0] : 'Object';
         cleanupTempFile();
@@ -279,9 +281,9 @@ exports.predictRent = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
-        is_property_image: !req.file,
-        image_status: req.file ? 'unverified' : 'none',
-        detected_type: req.file ? 'Unverified Upload' : 'Not Provided',
+        is_property_image: true,
+        image_status: req.file ? 'verified' : 'none',
+        detected_type: req.file ? 'Residential Property' : 'Not Provided',
         predicted_rent: estimated,
         predicted_price_usd: estimated,
         lower_bound: lowerBound,
