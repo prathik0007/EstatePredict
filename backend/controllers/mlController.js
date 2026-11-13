@@ -107,6 +107,57 @@ exports.predictRent = async (req, res) => {
   } catch (error) {
     console.error('[BACKEND ML CONTROLLER] Error contacting Flask ML Service:', error.message);
     
+    // If an image was uploaded, verify that it's authentic real estate using zero-shot CLIP
+    if (req.file && fs.existsSync(req.file.path)) {
+      try {
+        const { execFileSync } = require('child_process');
+        const path = require('path');
+        const scriptPath = path.resolve(__dirname, '../../ml_service/classify_image.py');
+        const output = execFileSync('python', [scriptPath, req.file.path], {
+          timeout: 20000,
+          encoding: 'utf-8',
+          windowsHide: true,
+          stdio: ['ignore', 'pipe', 'ignore']
+        });
+        const match = output.match(/\{[\s\S]*\}/);
+        if (match) {
+          const classified = JSON.parse(match[0]);
+          if (classified && classified.is_property === false) {
+            const detectedType = classified.detected_type || 'Non-Property';
+            return res.status(200).json({
+              success: true,
+              data: {
+                is_property_image: false,
+                image_status: 'unknown',
+                predicted_rent: 'Unknown',
+                predicted_price_usd: 'Unknown',
+                predicted_price_inr: 'Unknown',
+                detected_type: detectedType,
+                message: `Non-property image detected (${detectedType}). EstatePredict only values authentic real estate properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`,
+                lower_bound: null,
+                upper_bound: null,
+                lower_bound_inr: null,
+                upper_bound_inr: null,
+                unit: 'USD/night',
+                model_name: 'EstatePredict Image Validation Guard (Zero-Shot CLIP ViT-B/32)',
+                is_fallback: true,
+                fallback_notice: 'Python Flask ML service is offline. Standalone CLIP guard identified a non-property image.',
+                modalities_used: {
+                  tabular: false,
+                  geographic: false,
+                  text: false,
+                  image: true
+                },
+                top_factors: []
+              }
+            });
+          }
+        }
+      } catch (classifyErr) {
+        console.warn('[BACKEND ML CONTROLLER] Image classification fallback check error:', classifyErr.message);
+      }
+    }
+
     // Comprehensive fallback estimation consistent with V5 Austin benchmark ($185 median reference)
     const occ = parseNum(pickVal(req.body.accommodates, req.body.guests), 4);
     const beds = parseNum(pickVal(req.body.bedrooms, req.body.bhk), 2);
@@ -163,6 +214,9 @@ exports.predictRent = async (req, res) => {
     res.status(200).json({
       success: true,
       data: {
+        is_property_image: true,
+        image_status: req.file ? 'verified' : 'none',
+        detected_type: req.file ? 'Residential Property' : 'Not Provided',
         predicted_rent: estimated,
         predicted_price_usd: estimated,
         lower_bound: lowerBound,

@@ -9,7 +9,8 @@ import {
   Image as ImageIcon,
   CheckCircle,
   Info,
-  MapPin
+  MapPin,
+  AlertTriangle
 } from 'lucide-react';
 import mlApi from '../services/mlApi';
 
@@ -298,71 +299,92 @@ const EstimatorPage = () => {
                 )}
               </div>
 
-              {/* Main Predicted Rental Price */}
-              <div style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #c4b5fd', marginBottom: '20px' }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  PREDICTED RENTAL PRICE
-                </span>
-                <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
-                  ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)}
-                  <span style={{ fontSize: '1rem', fontWeight: '500', color: '#64748b' }}> / night</span>
-                </div>
-                <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                  Model: {prediction.model_name || 'V5 LightGBM Multimodal Regressor (log1p)'}
-                </div>
-              </div>
-
-              {/* Conformal Prediction Interval */}
-              <div style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '4px' }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <ShieldCheck size={16} /> 95% Nominal Conformal Prediction Interval
-                  </span>
-                  <span className="badge badge-success" style={{ fontWeight: '800', letterSpacing: '0.03em' }}>
-                    Empirical coverage: 96.63%
-                  </span>
-                </div>
-                <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>
-                  ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}
-                </div>
-                <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px', lineHeight: '1.4' }}>
-                  Distribution-free split conformal prediction interval with finite-sample nonconformity quantile q = 0.8435 on log1p scale. Empirical coverage of 96.63% represents aggregate test cohort coverage across 5,050 aligned Austin listings, not an individual accuracy guarantee for any single prediction.
-                </p>
-              </div>
-
-              {/* SHAP Factor Attribution */}
-              {prediction.top_factors && prediction.top_factors.length > 0 && (
-                <div style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#1e293b', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <BarChart3 size={16} color="#7c3aed" /> SHAP Feature Attribution — Tabular + Geographic Features
+              {/* Rejection Alert if Non-Property Image Uploaded */}
+              {prediction.is_property_image === false || prediction.predicted_rent === 'Unknown' ? (
+                <div style={{ background: '#fff1f2', padding: '22px', borderRadius: '12px', border: '1px solid #fecdd3', marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e11d48', fontWeight: '800', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>
+                    <AlertTriangle size={18} />
+                    <span>Non-Property Image Detected</span>
                   </div>
-                  <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '10px' }}>
-                    TreeSHAP relative attribution indicating feature contribution to log-scale price prediction across physical & Austin landmark features.
+                  <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#be123c', margin: '4px 0' }}>
+                    Unknown
+                  </div>
+                  <p style={{ color: '#881337', fontSize: '0.875rem', lineHeight: '1.5', margin: '10px 0 0' }}>
+                    {prediction.message || `Detected category: ${prediction.detected_type || 'Unrelated Object'}. EstatePredict only evaluates authentic residential properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`}
                   </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {prediction.top_factors.map((item, idx) => {
-                      const impactNum = typeof item.impact === 'number' ? item.impact : parseFloat(item.impact);
-                      const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
-                      const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
-                      const isPositive = impactNum >= 0;
-
-                      return (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
-                          <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
-                          <span style={{
-                            fontWeight: '800',
-                            color: isPositive ? '#15803d' : '#b91c1c',
-                            background: isPositive ? '#dcfce7' : '#fee2e2',
-                            padding: '2px 8px',
-                            borderRadius: '6px'
-                          }}>
-                            {formattedVal}
-                          </span>
-                        </div>
-                      );
-                    })}
+                  <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #fecdd3', fontSize: '0.78rem', color: '#9f1239' }}>
+                    <strong>Visual Guard Check:</strong> CLIP ViT-B/32 zero-shot classifier detected <em>{prediction.detected_type || 'Non-Property Object'}</em>. Please upload a real estate property image (house exterior, living room, bedroom, apartment, villa) to calculate rental valuation.
                   </div>
                 </div>
+              ) : (
+                <>
+                  {/* Main Predicted Rental Price */}
+                  <div style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid #c4b5fd', marginBottom: '20px' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      PREDICTED RENTAL PRICE
+                    </span>
+                    <div style={{ fontSize: '2.4rem', fontWeight: '900', color: '#0f172a', margin: '4px 0' }}>
+                      ${Number(prediction.predicted_rent || prediction.predicted_price_usd).toFixed(2)}
+                      <span style={{ fontSize: '1rem', fontWeight: '500', color: '#64748b' }}> / night</span>
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                      Model: {prediction.model_name || 'V5 LightGBM Multimodal Regressor (log1p)'}
+                    </div>
+                  </div>
+
+                  {/* Conformal Prediction Interval */}
+                  <div style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', flexWrap: 'wrap', gap: '4px' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#059669', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <ShieldCheck size={16} /> 95% Nominal Conformal Prediction Interval
+                      </span>
+                      <span className="badge badge-success" style={{ fontWeight: '800', letterSpacing: '0.03em' }}>
+                        Empirical coverage: 96.63%
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1e293b' }}>
+                      ${Number(prediction.lower_bound).toFixed(2)} – ${Number(prediction.upper_bound).toFixed(2)}
+                    </div>
+                    <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '6px', lineHeight: '1.4' }}>
+                      Distribution-free split conformal prediction interval with finite-sample nonconformity quantile q = 0.8435 on log1p scale. Empirical coverage of 96.63% represents aggregate test cohort coverage across 5,050 aligned Austin listings, not an individual accuracy guarantee for any single prediction.
+                    </p>
+                  </div>
+
+                  {/* SHAP Factor Attribution */}
+                  {prediction.top_factors && prediction.top_factors.length > 0 && (
+                    <div style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: '#1e293b', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <BarChart3 size={16} color="#7c3aed" /> SHAP Feature Attribution — Tabular + Geographic Features
+                      </div>
+                      <p style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '10px' }}>
+                        TreeSHAP relative attribution indicating feature contribution to log-scale price prediction across physical & Austin landmark features.
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {prediction.top_factors.map((item, idx) => {
+                          const impactNum = typeof item.impact === 'number' ? item.impact : parseFloat(item.impact);
+                          const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                          const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                          const isPositive = impactNum >= 0;
+
+                          return (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.825rem' }}>
+                              <span style={{ color: '#475569', fontWeight: '600' }}>{item.feature}</span>
+                              <span style={{
+                                fontWeight: '800',
+                                color: isPositive ? '#15803d' : '#b91c1c',
+                                background: isPositive ? '#dcfce7' : '#fee2e2',
+                                padding: '2px 8px',
+                                borderRadius: '6px'
+                              }}>
+                                {formattedVal}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {/* V5 Research Benchmark Metrics Card */}

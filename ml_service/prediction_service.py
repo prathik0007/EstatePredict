@@ -9,6 +9,11 @@ from PIL import Image
 from sentence_transformers import SentenceTransformer
 import shap
 
+try:
+    from classify_image import PROPERTY_PROMPTS, NON_PROPERTY_CATEGORIES, classify_image
+except ImportError:
+    from ml_service.classify_image import PROPERTY_PROMPTS, NON_PROPERTY_CATEGORIES, classify_image
+
 # Resolve paths safely
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATASETS_DIR = BASE_DIR / "datasets"
@@ -147,6 +152,8 @@ class MultimodalV5Predictor:
             print(f"Warning: Error loading text encoder: {e}")
 
         # 6. Image Encoder (sentence-transformers/clip-ViT-B-32)
+        self.prop_embs = None
+        self.non_prop_embs_list = None
         try:
             print("Loading sentence-transformers/clip-ViT-B-32 image encoder...")
             try:
@@ -154,10 +161,65 @@ class MultimodalV5Predictor:
             except Exception:
                 self.image_model = SentenceTransformer("sentence-transformers/clip-ViT-B-32")
             blank_img = Image.new('RGB', (224, 224), (0, 0, 0))
-            self.default_img_emb = np.asarray(self.image_model.encode([blank_img], normalize_embeddings=True), dtype=np.float32)
+            self.default_img_emb = np.asarray(self.image_model.encode([blank_img], normalize_embeddings=True, show_progress_bar=False), dtype=np.float32)
             print("Loaded sentence-transformers/clip-ViT-B-32 image encoder (512d).")
+
+            # Precompute zero-shot image prompt embeddings for fast property verification
+            try:
+                self.prop_embs = self.image_model.encode(PROPERTY_PROMPTS, normalize_embeddings=True, show_progress_bar=False)
+                self.non_prop_embs_list = [
+                    (cat, self.image_model.encode(prompts, normalize_embeddings=True, show_progress_bar=False))
+                    for cat, prompts in NON_PROPERTY_CATEGORIES
+                ]
+                print("Initialized zero-shot property image verification guard (CLIP ViT-B/32).")
+            except Exception as ex:
+                print(f"Note on image guard prompt precomputation: {ex}")
         except Exception as e:
             print(f"Warning: Error loading image encoder: {e}")
+
+    def verify_property_image(self, image_file):
+        """
+        Verifies whether an uploaded image represents an authentic residential property
+        (house, apartment, room, villa, interior/exterior) or an unrelated object
+        (plant, flower, animal, person, food, vehicle, everyday item).
+        """
+        if self.image_model is None or self.prop_embs is None or self.non_prop_embs_list is None:
+            try:
+                return classify_image(image_file)
+            except Exception:
+                return {"is_property": True, "detected_type": "Residential Property"}
+
+        try:
+            if hasattr(image_file, "seek"):
+                image_file.seek(0)
+            img = Image.open(image_file).convert("RGB")
+            img_emb = self.image_model.encode([img], normalize_embeddings=True, show_progress_bar=False)[0]
+
+            p_sim = float(np.max(np.dot(self.prop_embs, img_emb)))
+            best_np_sim = -1.0
+            best_cat = "Non-Property"
+            for cat_name, embs in self.non_prop_embs_list:
+                sim = float(np.max(np.dot(embs, img_emb)))
+                if sim > best_np_sim:
+                    best_np_sim = sim
+                    best_cat = cat_name
+
+            # Property score must exceed non-property score and meet threshold
+            is_prop = bool(p_sim > best_np_sim and p_sim >= 0.20)
+            if hasattr(image_file, "seek"):
+                image_file.seek(0)
+
+            return {
+                "is_property": is_prop,
+                "property_score": round(p_sim, 4),
+                "non_property_score": round(best_np_sim, 4),
+                "detected_type": "Residential Property" if is_prop else best_cat
+            }
+        except Exception as e:
+            print(f"Error during property image verification: {e}")
+            if hasattr(image_file, "seek"):
+                image_file.seek(0)
+            return {"is_property": True, "detected_type": "Residential Property"}
 
     def extract_geo_features(self, lat, lon):
         """
@@ -257,6 +319,46 @@ class MultimodalV5Predictor:
               f"rating={rating}, cleanliness={rating_cleanliness}, location={rating_location}, "
               f"superhost={is_superhost}, room_type='{room_type}', property_type='{property_type}', "
               f"has_description={bool(description and description.strip())}, has_image={image_file is not None}", flush=True)
+
+        # Zero-shot image verification guard: reject non-property images (plants, animals, objects, etc.)
+        if image_file is not None:
+            verification = self.verify_property_image(image_file)
+            if not verification.get("is_property", True):
+                detected_type = verification.get("detected_type", "Non-Property")
+                print(f"[V5 GUARD] Non-property image detected: {detected_type} "
+                      f"(prop_score={verification.get('property_score')}, "
+                      f"non_prop_score={verification.get('non_property_score')}). "
+                      f"Refusing rental price valuation.", flush=True)
+                return {
+                    "is_property_image": False,
+                    "image_status": "unknown",
+                    "predicted_rent": "Unknown",
+                    "predicted_price_usd": "Unknown",
+                    "predicted_price_inr": "Unknown",
+                    "detected_type": detected_type,
+                    "message": f"Non-property image detected ({detected_type}). EstatePredict only values authentic real estate properties (houses, apartments, rooms, villas). Rental price prediction is unavailable for this image.",
+                    "lower_bound": None,
+                    "upper_bound": None,
+                    "lower_bound_inr": None,
+                    "upper_bound_inr": None,
+                    "unit": "USD/night",
+                    "model_name": "EstatePredict Image Validation Guard (Zero-Shot CLIP ViT-B/32)",
+                    "pipeline_used": f"Refused: Non-Property Image ({detected_type})",
+                    "modalities_used": {
+                        "tabular": False,
+                        "geographic": False,
+                        "text": False,
+                        "image": True
+                    },
+                    "image_used": True,
+                    "description_used": False,
+                    "top_factors": [],
+                    "research_benchmark": {
+                        "benchmark_name": "V5 Multimodal Research Benchmark",
+                        "cohort_size": "5,050 aligned Austin, TX listings (Authentic Properties Only)",
+                        "note": "Inference refused: Uploaded image failed property authenticity verification."
+                    }
+                }
 
         # 1. Tabular features (71-dimensional output via ColumnTransformer)
         tab_row = {
@@ -387,6 +489,9 @@ class MultimodalV5Predictor:
         upper_bound_inr = int(round(upper_bound_usd * usd_to_inr_rate))
 
         return {
+            "is_property_image": True,
+            "image_status": "verified" if has_image else "none",
+            "detected_type": "Residential Property" if has_image else "Not Provided",
             "predicted_rent": round(predicted_price_usd, 2),
             "predicted_price_usd": round(predicted_price_usd, 2),
             "lower_bound": round(lower_bound_usd, 2),

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshCw, Info } from 'lucide-react';
+import { Sparkles, TrendingUp, ShieldCheck, BarChart3, CheckCircle2, X, RefreshCw, Info, AlertTriangle } from 'lucide-react';
 import mlApi from '../services/mlApi';
 
 // Austin Districts aligned with Inside Airbnb benchmark
@@ -191,79 +191,99 @@ const AiPriceEstimatorModal = ({
         {/* Prediction Results */}
         {predictionResult && (
           <div className="ai-prediction-card">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
-              <div>
-                <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  PREDICTED RENTAL PRICE
-                </span>
-                <div style={{ fontSize: '2rem', fontWeight: '900', color: '#0f172a', lineHeight: 1.2 }}>
-                  ${Number(predictionResult.predicted_rent).toFixed(2)}
-                  <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}> / night</span>
+            {predictionResult.is_property_image === false || predictionResult.predicted_rent === 'Unknown' ? (
+              <div style={{ background: '#fff1f2', padding: '16px', borderRadius: '12px', border: '1px solid #fecdd3' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#e11d48', fontWeight: '800', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
+                  <AlertTriangle size={16} />
+                  <span>Non-Property Image Detected</span>
                 </div>
-                <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
-                  Model: {predictionResult.model_name?.includes('HistGradient') ? 'V5 LightGBM Multimodal Regressor (log1p)' : (predictionResult.model_name || 'V5 LightGBM Multimodal Regressor (log1p)')}
+                <div style={{ fontSize: '1.8rem', fontWeight: '900', color: '#be123c', margin: '4px 0' }}>
+                  Unknown
                 </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: '800' }}>
-                  <ShieldCheck size={12} /> Empirical coverage: 96.63%
-                </span>
-                <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#059669', marginTop: '4px' }}>
-                  95% Nominal Conformal Interval
-                </div>
-                <div style={{ fontSize: '1rem', fontWeight: '800', color: '#334155', marginTop: '2px' }}>
-                  ${Number(predictionResult.lower_bound).toFixed(2)} – ${Number(predictionResult.upper_bound).toFixed(2)}
+                <p style={{ color: '#881337', fontSize: '0.8rem', lineHeight: '1.4', margin: '6px 0 0' }}>
+                  {predictionResult.message || `Detected category: ${predictionResult.detected_type || 'Unrelated Object'}. EstatePredict only evaluates authentic residential properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`}
+                </p>
+                <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #fecdd3', fontSize: '0.72rem', color: '#9f1239' }}>
+                  Please upload a photo of a house, apartment, living room, bedroom, or exterior to estimate rental market rate.
                 </div>
               </div>
-            </div>
-
-            {/* Top Influencing Factors (SHAP) */}
-            {predictionResult.top_factors && predictionResult.top_factors.length > 0 && (
-              <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution:
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#6d28d9', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      PREDICTED RENTAL PRICE
+                    </span>
+                    <div style={{ fontSize: '2rem', fontWeight: '900', color: '#0f172a', lineHeight: 1.2 }}>
+                      ${Number(predictionResult.predicted_rent).toFixed(2)}
+                      <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: '500' }}> / night</span>
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '2px' }}>
+                      Model: {predictionResult.model_name?.includes('HistGradient') ? 'V5 LightGBM Multimodal Regressor (log1p)' : (predictionResult.model_name || 'V5 LightGBM Multimodal Regressor (log1p)')}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: '800' }}>
+                      <ShieldCheck size={12} /> Empirical coverage: 96.63%
+                    </span>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '600', color: '#059669', marginTop: '4px' }}>
+                      95% Nominal Conformal Interval
+                    </div>
+                    <div style={{ fontSize: '1rem', fontWeight: '800', color: '#334155', marginTop: '2px' }}>
+                      ${Number(predictionResult.lower_bound).toFixed(2)} – ${Number(predictionResult.upper_bound).toFixed(2)}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '8px' }}>
-                  TreeSHAP feature attributions on physical property & Austin landmark distance characteristics.
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  {predictionResult.top_factors.map((factor, idx) => {
-                    const impactNum = typeof factor.impact === 'number' ? factor.impact : parseFloat(factor.impact);
-                    const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
-                    const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
-                    const isPositive = impactNum >= 0;
 
-                    return (
-                      <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
-                        <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
-                        <span style={{
-                          fontWeight: '700',
-                          color: isPositive ? '#16a34a' : '#dc2626',
-                          background: isPositive ? '#dcfce7' : '#fee2e2',
-                          padding: '2px 8px',
-                          borderRadius: '4px'
-                        }}>
-                          {formattedVal}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+                {/* Top Influencing Factors (SHAP) */}
+                {predictionResult.top_factors && predictionResult.top_factors.length > 0 && (
+                  <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: '700', color: '#334155', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <BarChart3 size={14} color="#7c3aed" /> SHAP Feature Attribution:
+                    </div>
+                    <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '8px' }}>
+                      TreeSHAP feature attributions on physical property & Austin landmark distance characteristics.
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {predictionResult.top_factors.map((factor, idx) => {
+                        const impactNum = typeof factor.impact === 'number' ? factor.impact : parseFloat(factor.impact);
+                        const isNearZero = isNaN(impactNum) || Math.abs(impactNum) < 0.005;
+                        const formattedVal = isNearZero ? '0' : (impactNum > 0 ? `+${impactNum}` : `${impactNum}`);
+                        const isPositive = impactNum >= 0;
 
-            {/* Action to apply price if inside listing wizard */}
-            {onApplyPrice && (
-              <button
-                onClick={() => {
-                  onApplyPrice(predictionResult.predicted_rent, predictionResult);
-                  onClose();
-                }}
-                className="btn btn-primary btn-sm"
-                style={{ width: '100%', marginTop: '16px', fontWeight: '700' }}
-              >
-                <CheckCircle2 size={16} /> Apply AI Price to Listing Form
-              </button>
+                        return (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem' }}>
+                            <span style={{ color: '#64748b', fontWeight: '500' }}>{factor.feature}</span>
+                            <span style={{
+                              fontWeight: '700',
+                              color: isPositive ? '#16a34a' : '#dc2626',
+                              background: isPositive ? '#dcfce7' : '#fee2e2',
+                              padding: '2px 8px',
+                              borderRadius: '4px'
+                            }}>
+                              {formattedVal}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action to apply price if inside listing wizard */}
+                {onApplyPrice && (
+                  <button
+                    onClick={() => {
+                      onApplyPrice(predictionResult.predicted_rent, predictionResult);
+                      onClose();
+                    }}
+                    className="btn btn-primary btn-sm"
+                    style={{ width: '100%', marginTop: '16px', fontWeight: '700' }}
+                  >
+                    <CheckCircle2 size={16} /> Apply AI Price to Listing Form
+                  </button>
+                )}
+              </>
             )}
           </div>
         )}
