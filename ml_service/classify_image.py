@@ -21,41 +21,55 @@ logging.getLogger("transformers").setLevel(logging.ERROR)
 logging.getLogger("sentence_transformers").setLevel(logging.ERROR)
 
 PROPERTY_PROMPTS = [
-    "a photo of a house exterior",
-    "a photo of an apartment building",
-    "a photo of a residential living room",
-    "a photo of a bedroom in a home",
-    "a photo of a kitchen in a house",
-    "a photo of a bathroom in an apartment",
-    "a photo of a villa, cottage, or townhouse",
-    "a photo of a real estate property interior, patio, or balcony"
+    "a wide-angle real estate photo of a house exterior, residential building, or home facade",
+    "a wide-angle real estate photo of an apartment building, condominium, or residential property",
+    "a real estate interior photo of an entire living room with sofa, seating, and living space",
+    "a real estate interior photo of an entire furnished bedroom with bed and furniture",
+    "a real estate interior photo of a complete residential kitchen showing cabinets, countertops, and appliances",
+    "a real estate interior photo of a complete bathroom with shower, bathtub, or vanity",
+    "a wide-angle real estate photo of a luxury villa, estate, cottage, or townhouse property",
+    "a wide-angle real estate photo of a residential balcony, terrace, patio, or property backyard"
 ]
 
 NON_PROPERTY_CATEGORIES = [
+    ("Dish / Bowl / Utensil", [
+        "a photo of a bowl, ceramic bowl, soup bowl, plate, dish, or saucer",
+        "a photo of a bowl with a spoon, cereal, soup, broth, or food inside",
+        "a photo of kitchen tableware, dishware, cutlery, spoon, fork, knife, cup, or mug",
+        "a close-up photo of a bowl or plate on a table",
+        "a photo of cookware, pot, pan, or kitchen utensil"
+    ]),
+    ("Food / Meal", [
+        "a photo of food, cooked meal, fruit, vegetable, dessert, snack, or beverage",
+        "a close-up photo of food, breakfast, lunch, dinner, or drinks on a table",
+        "a photo of a recipe, dish, or ingredients"
+    ]),
     ("Plant / Flower", [
-        "a photo of a plant, flower, tree, leaf, or garden blossom",
-        "a photo of a houseplant or floral arrangement",
-        "a close-up photo of flowers or green leaves"
+        "a photo of a plant, flower, tree, leaf, houseplant, or garden blossom",
+        "a photo of a potted plant, floral bouquet, or green foliage",
+        "a close-up photo of flowers, petals, or garden plants"
     ]),
     ("Animal / Pet", [
         "a photo of an animal, dog, cat, puppy, kitten, bird, wildlife, or pet",
+        "a photo of a dog or cat indoors or outdoors",
         "a photo of an animal or insect in nature"
     ]),
     ("Person / Face", [
         "a photo of a human face, person, portrait, selfie, or people",
-        "a photo of a person standing or sitting"
-    ]),
-    ("Food / Dish", [
-        "a photo of food, cooked meal, fruit, vegetable, dessert, or beverage"
+        "a photo of a man, woman, or child standing or sitting"
     ]),
     ("Vehicle", [
-        "a photo of a car, automobile, truck, motorcycle, bicycle, or bus"
+        "a photo of a car, automobile, truck, motorcycle, bicycle, scooter, or bus",
+        "a photo of a vehicle on a road, street, or parking lot"
     ]),
-    ("Object / Appliance", [
-        "a photo of an isolated object, shoe, clothes, electronics, phone, laptop, or tool"
+    ("Object / Everyday Item", [
+        "a close-up photo of an isolated object, shoe, clothes, bag, bottle, or item",
+        "a photo of electronics, smartphone, laptop, gadget, watch, or hardware tool",
+        "an isolated product photograph of a single object or merchandise"
     ]),
     ("Graphic / Text", [
-        "a screenshot, digital graphic, meme, cartoon, illustration, or text document"
+        "a screenshot, digital graphic, meme, cartoon, illustration, logo, or document",
+        "a chart, diagram, poster, banner, or drawing"
     ])
 ]
 
@@ -72,22 +86,45 @@ def get_classifier():
         except Exception:
             _model = SentenceTransformer("sentence-transformers/clip-ViT-B-32")
         
-        _prop_embs = _model.encode(PROPERTY_PROMPTS, normalize_embeddings=True, show_progress_bar=False)
-        _non_prop_embs_list = [
-            (cat, _model.encode(prompts, normalize_embeddings=True, show_progress_bar=False))
-            for cat, prompts in NON_PROPERTY_CATEGORIES
-        ]
+        npz_path = Path(__file__).resolve().parent / "prompt_embeddings.npz"
+        if npz_path.exists():
+            try:
+                data = np.load(str(npz_path), allow_pickle=True)
+                _prop_embs = data["prop_embs"]
+                num_cats = int(data["num_cats"])
+                _non_prop_embs_list = [
+                    (str(data[f"cat_name_{i}"]), data[f"cat_{i}"])
+                    for i in range(num_cats)
+                ]
+            except Exception:
+                _prop_embs = None
+                _non_prop_embs_list = None
+
+        if _prop_embs is None or _non_prop_embs_list is None:
+            _prop_embs = _model.encode(PROPERTY_PROMPTS, normalize_embeddings=True, show_progress_bar=False)
+            _non_prop_embs_list = [
+                (cat, _model.encode(prompts, normalize_embeddings=True, show_progress_bar=False))
+                for cat, prompts in NON_PROPERTY_CATEGORIES
+            ]
     return _model, _prop_embs, _non_prop_embs_list
 
 def classify_image(image_input):
     """
     Classifies an image as residential property or non-property.
-    image_input can be a file path, file-like object, or PIL Image.
+    image_input can be a local file path, URL, file-like object, or PIL Image.
     """
     model, prop_embs, non_prop_embs_list = get_classifier()
 
     if isinstance(image_input, (str, Path)):
-        img = Image.open(str(image_input)).convert("RGB")
+        path_str = str(image_input).strip()
+        if path_str.startswith("http://") or path_str.startswith("https://"):
+            import io
+            import urllib.request
+            req = urllib.request.Request(path_str, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req) as resp:
+                img = Image.open(io.BytesIO(resp.read())).convert("RGB")
+        else:
+            img = Image.open(path_str).convert("RGB")
     elif hasattr(image_input, "seek"):
         image_input.seek(0)
         img = Image.open(image_input).convert("RGB")
@@ -107,8 +144,8 @@ def classify_image(image_input):
             best_np_sim = sim
             best_cat = cat_name
 
-    # Must have higher similarity to property prompts AND meet baseline threshold
-    is_property = bool(p_sim > best_np_sim and p_sim >= 0.20)
+    # Property must clearly exceed non-property score with margin and meet confidence threshold
+    is_property = bool(p_sim > (best_np_sim + 0.015) and p_sim >= 0.22)
 
     return {
         "is_property": is_property,

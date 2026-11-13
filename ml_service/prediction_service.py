@@ -204,8 +204,8 @@ class MultimodalV5Predictor:
                     best_np_sim = sim
                     best_cat = cat_name
 
-            # Property score must exceed non-property score and meet threshold
-            is_prop = bool(p_sim > best_np_sim and p_sim >= 0.20)
+            # Property must clearly exceed non-property score with margin and meet confidence threshold
+            is_prop = bool(p_sim > (best_np_sim + 0.015) and p_sim >= 0.22)
             if hasattr(image_file, "seek"):
                 image_file.seek(0)
 

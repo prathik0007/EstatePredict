@@ -73,8 +73,18 @@ exports.predictRent = async (req, res) => {
 
     // Attach image if uploaded
     if (req.file) {
-      formData.append('image', fs.createReadStream(req.file.path), req.file.originalname);
+      if (req.file.path && fs.existsSync(req.file.path)) {
+        formData.append('image', fs.createReadStream(req.file.path), req.file.originalname);
+      }
     }
+
+    const cleanupTempFile = () => {
+      if (req.file && req.file.path && fs.existsSync(req.file.path) && req.file.path.includes('uploads')) {
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (_) {}
+      }
+    };
 
     // Log request payload immediately before sending to Flask (no secrets or binary image bytes)
     console.log('[BACKEND ML CONTROLLER] Forwarding payload to Flask ML service:', {
@@ -103,60 +113,78 @@ exports.predictRent = async (req, res) => {
       timeout: 30000
     });
 
+    cleanupTempFile();
     res.status(200).json(response.data);
   } catch (error) {
     console.error('[BACKEND ML CONTROLLER] Error contacting Flask ML Service:', error.message);
+
+    const cleanupTempFile = () => {
+      if (req.file && req.file.path && fs.existsSync(req.file.path) && req.file.path.includes('uploads')) {
+        try {
+          fs.unlinkSync(req.file.path);
+        } catch (_) {}
+      }
+    };
     
     // If an image was uploaded, verify that it's authentic real estate using zero-shot CLIP
-    if (req.file && fs.existsSync(req.file.path)) {
-      try {
-        const { execFileSync } = require('child_process');
-        const path = require('path');
-        const scriptPath = path.resolve(__dirname, '../../ml_service/classify_image.py');
-        const output = execFileSync('python', [scriptPath, req.file.path], {
-          timeout: 20000,
-          encoding: 'utf-8',
-          windowsHide: true,
-          stdio: ['ignore', 'pipe', 'ignore']
-        });
-        const match = output.match(/\{[\s\S]*\}/);
-        if (match) {
-          const classified = JSON.parse(match[0]);
-          if (classified && classified.is_property === false) {
-            const detectedType = classified.detected_type || 'Non-Property';
-            return res.status(200).json({
-              success: true,
-              data: {
-                is_property_image: false,
-                image_status: 'unknown',
-                predicted_rent: 'Unknown',
-                predicted_price_usd: 'Unknown',
-                predicted_price_inr: 'Unknown',
-                detected_type: detectedType,
-                message: `Non-property image detected (${detectedType}). EstatePredict only values authentic real estate properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`,
-                lower_bound: null,
-                upper_bound: null,
-                lower_bound_inr: null,
-                upper_bound_inr: null,
-                unit: 'USD/night',
-                model_name: 'EstatePredict Image Validation Guard (Zero-Shot CLIP ViT-B/32)',
-                is_fallback: true,
-                fallback_notice: 'Python Flask ML service is offline. Standalone CLIP guard identified a non-property image.',
-                modalities_used: {
-                  tabular: false,
-                  geographic: false,
-                  text: false,
-                  image: true
-                },
-                top_factors: []
-              }
-            });
+    if (req.file) {
+      const imgTarget = req.file.path;
+      const isLocal = imgTarget && fs.existsSync(imgTarget);
+      const isRemote = imgTarget && (imgTarget.startsWith('http://') || imgTarget.startsWith('https://'));
+
+      if (isLocal || isRemote) {
+        try {
+          const { execFileSync } = require('child_process');
+          const path = require('path');
+          const scriptPath = path.resolve(__dirname, '../../ml_service/classify_image.py');
+          const output = execFileSync('python', [scriptPath, imgTarget], {
+            timeout: 60000,
+            encoding: 'utf-8',
+            windowsHide: true,
+            stdio: ['ignore', 'pipe', 'ignore']
+          });
+          const match = output.match(/\{[\s\S]*\}/);
+          if (match) {
+            const classified = JSON.parse(match[0]);
+            if (classified && classified.is_property === false) {
+              const detectedType = classified.detected_type || 'Non-Property';
+              cleanupTempFile();
+              return res.status(200).json({
+                success: true,
+                data: {
+                  is_property_image: false,
+                  image_status: 'unknown',
+                  predicted_rent: 'Unknown',
+                  predicted_price_usd: 'Unknown',
+                  predicted_price_inr: 'Unknown',
+                  detected_type: detectedType,
+                  message: `Non-property image detected (${detectedType}). EstatePredict only values authentic real estate properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`,
+                  lower_bound: null,
+                  upper_bound: null,
+                  lower_bound_inr: null,
+                  upper_bound_inr: null,
+                  unit: 'USD/night',
+                  model_name: 'EstatePredict Image Validation Guard (Zero-Shot CLIP ViT-B/32)',
+                  is_fallback: true,
+                  fallback_notice: 'Python Flask ML service is offline. Standalone CLIP guard identified a non-property image.',
+                  modalities_used: {
+                    tabular: false,
+                    geographic: false,
+                    text: false,
+                    image: true
+                  },
+                  top_factors: []
+                }
+              });
+            }
           }
+        } catch (classifyErr) {
+          console.warn('[BACKEND ML CONTROLLER] Image classification fallback check error:', classifyErr.message);
         }
-      } catch (classifyErr) {
-        console.warn('[BACKEND ML CONTROLLER] Image classification fallback check error:', classifyErr.message);
       }
     }
+
+    cleanupTempFile();
 
     // Comprehensive fallback estimation consistent with V5 Austin benchmark ($185 median reference)
     const occ = parseNum(pickVal(req.body.accommodates, req.body.guests), 4);
