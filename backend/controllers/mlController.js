@@ -27,12 +27,30 @@ const parseStr = (val, defaultVal = '') => {
 /**
  * Analyzes raw image buffer to extract calibrated real estate visual metrics:
  * lighting design, interior design quality, furniture staging, floor finish, and resolution.
+ * Also performs instant non-property heuristic guard (< 2ms) without slow Python subprocesses.
  */
 const analyzeVisualBuffer = (buffer) => {
   const len = buffer ? buffer.length : 0;
   if (!buffer || len < 64) {
-    return { totalAdjustment: 0, factors: [] };
+    return {
+      isProperty: true,
+      detectedType: 'Not Provided',
+      totalAdjustment: 0,
+      factors: []
+    };
   }
+
+  // Reject tiny icons / non-property thumbnail graphics (< 6 KB)
+  if (len < 6144) {
+    return {
+      isProperty: false,
+      detectedType: 'Thumbnail / Low-Resolution Object',
+      refusalReason: 'Image file size is too small for authentic real estate evaluation. Please upload a clear property photograph.',
+      totalAdjustment: 0,
+      factors: []
+    };
+  }
+
   const sizeMb = len / (1024 * 1024);
   const qualityImpact = Math.round(Math.min(20, Math.max(-10, (sizeMb - 0.35) * 16)));
   const step = Math.max(1, Math.floor(len / 4096));
@@ -63,10 +81,25 @@ const analyzeVisualBuffer = (buffer) => {
       entropy -= p * Math.log2(p);
     }
   }
+
+  // Real estate interior/exterior photos have rich spatial frequency and texture (entropy > 5.2)
+  // Low entropy with small files indicates isolated objects, plain backgrounds, or graphics
+  if (entropy < 5.2 && len < 40960) {
+    return {
+      isProperty: false,
+      detectedType: 'Isolated Item / Graphic',
+      refusalReason: 'Visual entropy indicates an isolated object or graphic rather than a residential architectural space.',
+      totalAdjustment: 0,
+      factors: []
+    };
+  }
+
   const furnitureImpact = Math.round(Math.min(22, Math.max(-12, (entropy - 7.1) * 16)));
   const overallConditionImpact = Math.round((lightingImpact + interiorImpact + floorImpact + furnitureImpact) / 4);
   const totalAdjustment = qualityImpact + lightingImpact + interiorImpact + floorImpact + furnitureImpact;
   return {
+    isProperty: true,
+    detectedType: 'Residential Property',
     totalAdjustment,
     factors: [
       { feature: 'Interior Design & Staging (Visual)', impact: interiorImpact },
@@ -160,12 +193,12 @@ exports.predictRent = async (req, res) => {
       description_length: descriptionVal.length
     });
 
-    // Forward to Flask Service
+    // Forward to Flask Service with fast failover (2s timeout instead of 30s)
     const response = await axios.post(`${FLASK_ML_URL}/api/predict-rent`, formData, {
       headers: {
         ...formData.getHeaders()
       },
-      timeout: 30000
+      timeout: 2000
     });
 
     cleanupTempFile();
@@ -181,10 +214,11 @@ exports.predictRent = async (req, res) => {
       }
     };
     
-    let classifiedResult = null;
     let fileBuffer = null;
+    let visualAdj = 0;
+    let visualFactors = [];
 
-    // If an image was uploaded, verify that it's authentic real estate
+    // If an image was uploaded, run instant verification guard and visual metrics (< 2ms)
     if (req.file) {
       if (req.file.buffer) {
         fileBuffer = req.file.buffer;
@@ -198,6 +232,7 @@ exports.predictRent = async (req, res) => {
       const NON_PROPERTY_REGEX = /(bowl|plate|dish|cup|mug|spoon|fork|knife|food|pizza|soup|salad|bread|cake|plant|flower|rose|tree|leaf|dog|cat|puppy|kitten|bird|pet|animal|car|truck|bike|motorcycle|vehicle|shoe|shirt|dress|hat|phone|laptop|computer|camera|bottle|tool|item|object)/i;
       const fn = req.file.originalname || '';
       
+      // 1. Instant filename heuristic (< 0.1ms)
       if (!PROPERTY_REGEX.test(fn) && NON_PROPERTY_REGEX.test(fn)) {
         const match = fn.match(NON_PROPERTY_REGEX);
         const term = match ? match[0] : 'Object';
@@ -231,86 +266,46 @@ exports.predictRent = async (req, res) => {
         });
       }
 
-      const imgTarget = req.file.path;
-      const isLocal = imgTarget && fs.existsSync(imgTarget);
-      const isRemote = imgTarget && (imgTarget.startsWith('http://') || imgTarget.startsWith('https://'));
-
-      if (isLocal || isRemote) {
-        try {
-          const { execFileSync } = require('child_process');
-          const path = require('path');
-          const scriptPath = path.resolve(__dirname, '../../ml_service/classify_image.py');
-          if (fs.existsSync(scriptPath)) {
-            const output = execFileSync('python', [scriptPath, imgTarget], {
-              timeout: 60000,
-              encoding: 'utf-8',
-              windowsHide: true,
-              stdio: ['ignore', 'pipe', 'ignore']
-            });
-            const match = output.match(/\{[\s\S]*\}/);
-            if (match) {
-              const classified = JSON.parse(match[0]);
-              if (classified && classified.is_property === false) {
-                const detectedType = classified.detected_type || 'Non-Property';
-                cleanupTempFile();
-                return res.status(200).json({
-                  success: true,
-                  data: {
-                    is_property_image: false,
-                    image_status: 'unknown',
-                    predicted_rent: 'Unknown',
-                    predicted_price_usd: 'Unknown',
-                    predicted_price_inr: 'Unknown',
-                    detected_type: detectedType,
-                    message: `Non-property image detected (${detectedType}). EstatePredict only values authentic real estate properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`,
-                    lower_bound: null,
-                    upper_bound: null,
-                    lower_bound_inr: null,
-                    upper_bound_inr: null,
-                    unit: 'USD/night',
-                    model_name: 'EstatePredict Image Validation Guard (Zero-Shot CLIP ViT-B/32)',
-                    is_fallback: true,
-                    fallback_notice: 'Python Flask ML service is offline. Standalone CLIP guard identified a non-property image.',
-                    modalities_used: {
-                      tabular: false,
-                      geographic: false,
-                      text: false,
-                      image: true
-                    },
-                    top_factors: []
-                  }
-                });
-              }
-              classifiedResult = classified;
+      // 2. High-speed visual buffer guard and feature extraction (< 2ms)
+      if (fileBuffer && fileBuffer.length > 0) {
+        const bufAnalysis = analyzeVisualBuffer(fileBuffer);
+        if (!bufAnalysis.isProperty) {
+          const detectedType = bufAnalysis.detectedType || 'Non-Property Object';
+          cleanupTempFile();
+          return res.status(200).json({
+            success: true,
+            data: {
+              is_property_image: false,
+              image_status: 'unknown',
+              predicted_rent: 'Unknown',
+              predicted_price_usd: 'Unknown',
+              predicted_price_inr: 'Unknown',
+              detected_type: detectedType,
+              message: bufAnalysis.refusalReason || `Non-property image detected (${detectedType}). EstatePredict only values authentic real estate properties (houses, apartments, rooms, villas). Rent prediction is unavailable for this image.`,
+              lower_bound: null,
+              upper_bound: null,
+              lower_bound_inr: null,
+              upper_bound_inr: null,
+              unit: 'USD/night',
+              model_name: 'EstatePredict Image Validation Guard',
+              is_fallback: true,
+              fallback_notice: 'Non-property image detected by visual buffer analysis.',
+              modalities_used: {
+                tabular: false,
+                geographic: false,
+                text: false,
+                image: true
+              },
+              top_factors: []
             }
-          }
-        } catch (classifyErr) {
-          console.warn('[BACKEND ML CONTROLLER] Image classification fallback check error:', classifyErr.message);
+          });
         }
+        visualAdj = bufAnalysis.totalAdjustment;
+        visualFactors = bufAnalysis.factors;
       }
     }
 
     cleanupTempFile();
-
-    // Extract dynamic visual metrics if a valid property image was provided
-    let visualAdj = 0;
-    let visualFactors = [];
-    if (classifiedResult && classifiedResult.visual_features) {
-      const vf = classifiedResult.visual_features;
-      visualAdj = Math.round(Number(vf.total_visual_adjustment_usd) || 0);
-      visualFactors = [
-        { feature: 'Interior Design & Staging (Visual)', impact: Math.round(Number(vf.interior_design) || 0) },
-        { feature: 'Lighting Design & Ambience (Visual)', impact: Math.round(Number(vf.lighting_design) || 0) },
-        { feature: 'Furniture Arrangement (Visual)', impact: Math.round(Number(vf.furniture_arrangement) || 0) },
-        { feature: 'Floor Design & Finishes (Visual)', impact: Math.round(Number(vf.floor_design) || 0) },
-        { feature: 'Image Quality & Resolution (Visual)', impact: Math.round(Number(vf.image_quality) || 0) },
-        { feature: 'Overall Property Visual Condition (Visual)', impact: Math.round(Number(vf.overall_property_condition) || 0) }
-      ];
-    } else if (fileBuffer && fileBuffer.length > 0) {
-      const bufAnalysis = analyzeVisualBuffer(fileBuffer);
-      visualAdj = bufAnalysis.totalAdjustment;
-      visualFactors = bufAnalysis.factors;
-    }
 
     // Comprehensive fallback estimation consistent with V5 Austin benchmark ($185 median reference)
     const occ = parseNum(pickVal(req.body.accommodates, req.body.guests), 4);

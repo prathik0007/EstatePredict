@@ -73,6 +73,7 @@ const EstimatorPage = () => {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
+      verifyUploadedImage(file, file.name).catch(() => {});
     }
   };
 

@@ -8,8 +8,8 @@ export async function getMobileNet() {
   if (net) return net;
   if (!loadingPromise) {
     loadingPromise = mobilenet.load({
-      version: 2,
-      alpha: 1.0
+      version: 1,
+      alpha: 0.25
     }).then(model => {
       net = model;
       return net;
@@ -94,7 +94,18 @@ export async function verifyUploadedImage(imgElementOrFile, originalFilename = '
     }
   }
 
-  // 2. MobileNet computer vision check
+  // 3. Fast size check for thumbnails / tiny icons (< 6 KB)
+  if (imgElementOrFile instanceof File || imgElementOrFile instanceof Blob) {
+    if (imgElementOrFile.size < 6144) {
+      return {
+        isProperty: false,
+        detectedType: 'Thumbnail / Low-Resolution Object',
+        reason: 'Image file size is too small for authentic real estate evaluation. Please upload a clear property photograph.'
+      };
+    }
+  }
+
+  // 4. Ultra-fast MobileNet computer vision check with 400ms timeout race
   let imgElement = null;
   if (imgElementOrFile instanceof HTMLImageElement) {
     imgElement = imgElementOrFile;
@@ -108,9 +119,11 @@ export async function verifyUploadedImage(imgElementOrFile, originalFilename = '
 
   if (imgElement) {
     try {
-      const model = await getMobileNet();
+      const modelPromise = getMobileNet();
+      const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 400));
+      const model = await Promise.race([modelPromise, timeoutPromise]);
       if (model) {
-        const predictions = await model.classify(imgElement, 5);
+        const predictions = await model.classify(imgElement, 3);
         if (predictions && predictions.length > 0) {
           const top = predictions[0];
           const topClass = top.className.toLowerCase();
